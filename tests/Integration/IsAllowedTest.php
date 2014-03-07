@@ -1,6 +1,6 @@
 <?php
 
-namespace Tests\MyCLabs\ACL;
+namespace Tests\MyCLabs\ACL\Integration;
 
 use MyCLabs\ACL\Model\Action;
 use Tests\MyCLabs\ACL\Integration\Model\Article;
@@ -10,9 +10,9 @@ use Tests\MyCLabs\ACL\Integration\Model\User;
 /**
  * @coversNothing
  */
-class SimpleIntegrationTest extends AbstractIntegrationTest
+class IsAllowedTest extends AbstractIntegrationTest
 {
-    public function testIsAllowedWithFlush()
+    public function testWithFlush()
     {
         $article1 = new Article();
         $this->em->persist($article1);
@@ -32,7 +32,7 @@ class SimpleIntegrationTest extends AbstractIntegrationTest
         $this->assertTrue($this->aclService->isAllowed($user, Action::EDIT(), $article2));
     }
 
-    public function testIsAllowedWithoutFlush()
+    public function testWithoutFlush()
     {
         $article1 = new Article();
         $article2 = new Article();

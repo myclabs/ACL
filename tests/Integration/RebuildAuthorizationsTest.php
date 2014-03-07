@@ -1,6 +1,6 @@
 <?php
 
-namespace Tests\MyCLabs\ACL;
+namespace Tests\MyCLabs\ACL\Integration;
 
 use MyCLabs\ACL\Model\Action;
 use Tests\MyCLabs\ACL\Integration\Model\Article;

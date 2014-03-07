@@ -1,6 +1,6 @@
 <?php
 
-namespace Tests\MyCLabs\ACL;
+namespace Tests\MyCLabs\ACL\Integration;
 
 use Doctrine\Common\EventManager;
 use Doctrine\ORM\EntityManager;
