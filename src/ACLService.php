@@ -3,7 +3,6 @@
 namespace MyCLabs\ACL;
 
 use Doctrine\ORM\EntityManager;
-use MyCLabs\ACL\Model\Action;
 use MyCLabs\ACL\Model\ResourceInterface;
 use MyCLabs\ACL\Model\Role;
 use MyCLabs\ACL\Model\SecurityIdentityInterface;
@@ -29,12 +28,12 @@ class ACLService
      * Checks if the identity is allowed to do the action on the resource.
      *
      * @param SecurityIdentityInterface $identity
-     * @param Action                    $action
+     * @param string                    $action
      * @param ResourceInterface         $resource
      *
      * @return boolean Is allowed, or not.
      */
-    public function isAllowed(SecurityIdentityInterface $identity, Action $action, ResourceInterface $resource)
+    public function isAllowed(SecurityIdentityInterface $identity, $action, ResourceInterface $resource)
     {
         return $resource->isAllowed($identity, $action);
     }

@@ -3,7 +3,6 @@
 namespace MyCLabs\ACL;
 
 use Doctrine\ORM\QueryBuilder;
-use MyCLabs\ACL\Model\Action;
 use MyCLabs\ACL\Model\SecurityIdentityInterface;
 
 /**
@@ -19,19 +18,18 @@ class QueryBuilderHelper
      * @param QueryBuilder              $qb
      * @param string                    $resourceAlias Alias of the class that is the resource in the query.
      * @param SecurityIdentityInterface $identity
-     * @param Action                    $action
+     * @param string                    $action
      */
     public static function joinACL(
         QueryBuilder $qb,
         $resourceAlias,
         SecurityIdentityInterface $identity,
-        Action $action
+        $action
     ) {
         $qb->innerJoin($resourceAlias . '.authorizations', 'authorization');
         $qb->andWhere('authorization.securityIdentity = :acl_identity');
-        $qb->andWhere('authorization.actionId = :acl_actionId');
+        $qb->andWhere('authorization.actions.' . $action . ' = true');
 
         $qb->setParameter('acl_identity', $identity);
-        $qb->setParameter('acl_actionId', $action->exportToString());
     }
 }

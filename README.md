@@ -11,7 +11,7 @@ $aclService->addRole($user, new CellAdminRole($user, $cell));
 Test permissions:
 
 ```php
-$aclService->isAllowed($user, Action::EDIT(), $resource);
+$aclService->isAllowed($user, Actions::EDIT, $resource);
 ```
 
 ## Usage
@@ -97,8 +97,7 @@ class ArticleEditorRole extends Role
     public function createAuthorizations()
     {
         return [
-            ArticleAuthorization::create($this, Action::VIEW(), $this->article);
-            ArticleAuthorization::create($this, Action::EDIT(), $this->article);
+            ArticleAuthorization::create($this, new Actions([Actions::VIEW, Actions::EDIT], $this->article);
         ];
     }
 }

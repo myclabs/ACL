@@ -26,11 +26,11 @@ trait ResourceTrait
         return $this->authorizations->matching($criteria);
     }
 
-    public function isAllowed(SecurityIdentityInterface $identity, Action $action)
+    public function isAllowed(SecurityIdentityInterface $identity, $action)
     {
         $criteria = new Criteria();
         $criteria->where($criteria->expr()->eq('securityIdentity', $identity));
-        $criteria->andWhere($criteria->expr()->eq('actionId', $action->exportToString()));
+        $criteria->andWhere($criteria->expr()->eq('actions.' . $action, true));
 
         $authorizations = $this->authorizations->matching($criteria);
 

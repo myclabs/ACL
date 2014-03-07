@@ -2,7 +2,7 @@
 
 namespace Tests\MyCLabs\ACL\Integration;
 
-use MyCLabs\ACL\Model\Action;
+use MyCLabs\ACL\Model\Actions;
 use Tests\MyCLabs\ACL\Integration\Model\Article;
 use Tests\MyCLabs\ACL\Integration\Model\ArticleEditorRole;
 use Tests\MyCLabs\ACL\Integration\Model\User;
@@ -29,9 +29,9 @@ class RebuildAuthorizationTest extends AbstractIntegrationTest
 
         $this->aclService->rebuildAuthorizations();
 
-        $this->assertFalse($this->aclService->isAllowed($user, Action::VIEW(), $article1));
-        $this->assertFalse($this->aclService->isAllowed($user, Action::EDIT(), $article1));
-        $this->assertTrue($this->aclService->isAllowed($user, Action::VIEW(), $article2));
-        $this->assertTrue($this->aclService->isAllowed($user, Action::EDIT(), $article2));
+        $this->assertFalse($this->aclService->isAllowed($user, Actions::VIEW, $article1));
+        $this->assertFalse($this->aclService->isAllowed($user, Actions::EDIT, $article1));
+        $this->assertTrue($this->aclService->isAllowed($user, Actions::VIEW, $article2));
+        $this->assertTrue($this->aclService->isAllowed($user, Actions::EDIT, $article2));
     }
 }

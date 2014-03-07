@@ -3,6 +3,7 @@
 namespace Tests\MyCLabs\ACL\Integration;
 
 use MyCLabs\ACL\Model\Action;
+use MyCLabs\ACL\Model\Actions;
 use MyCLabs\ACL\QueryBuilderHelper;
 use Tests\MyCLabs\ACL\Integration\Model\Article;
 use Tests\MyCLabs\ACL\Integration\Model\ArticleEditorRole;
@@ -32,10 +33,9 @@ class QueryFilterTest extends AbstractIntegrationTest
             FROM Tests\MyCLabs\ACL\Integration\Model\Article a
             JOIN a.authorizations auth
             WHERE auth.securityIdentity = :identity
-            AND auth.actionId = :actionId'
+            AND auth.actions.view = true'
         );
         $query->setParameter('identity', $user);
-        $query->setParameter('actionId', Action::VIEW()->exportToString());
         $articles = $query->getResult();
 
         $this->assertCount(1, $articles);
@@ -59,7 +59,7 @@ class QueryFilterTest extends AbstractIntegrationTest
         $qb = $this->em->createQueryBuilder();
         $qb->select('a')
             ->from('Tests\MyCLabs\ACL\Integration\Model\Article', 'a');
-        QueryBuilderHelper::joinACL($qb, 'a', $user, Action::VIEW());
+        QueryBuilderHelper::joinACL($qb, 'a', $user, Actions::VIEW);
         $articles = $qb->getQuery()->getResult();
 
         $this->assertCount(1, $articles);

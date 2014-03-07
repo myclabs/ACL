@@ -40,10 +40,10 @@ abstract class Authorization
     protected $securityIdentity;
 
     /**
-     * @var string
-     * @Column(type="string")
+     * @var Actions
+     * @Embedded(class="Actions")
      */
-    protected $actionId;
+    protected $actions;
 
     /**
      * @var ResourceInterface
@@ -67,13 +67,13 @@ abstract class Authorization
 
     /**
      * @param Role              $role
-     * @param Action            $action
+     * @param Actions           $actions
      * @param ResourceInterface $resource
      * @return static
      */
-    public static function create(Role $role, Action $action, ResourceInterface $resource)
+    public static function create(Role $role, Actions $actions, ResourceInterface $resource)
     {
-        $authorization = new static($role, $role->getSecurityIdentity(), $action, $resource);
+        $authorization = new static($role, $role->getSecurityIdentity(), $actions, $resource);
 
         $resource->addAuthorization($authorization);
 
@@ -85,17 +85,17 @@ abstract class Authorization
      *
      * @param Authorization     $parentAuthorization
      * @param ResourceInterface $resource Nouvelle ressource
-     * @param Action|null       $action
+     * @param Actions|null      $actions
      * @return static
      */
     public static function createChildAuthorization(
         Authorization $parentAuthorization,
         ResourceInterface $resource,
-        Action $action = null
+        Actions $actions = null
     ) {
-        $action = $action ?: $parentAuthorization->getAction();
+        $actions = $actions ?: $parentAuthorization->getActions();
 
-        $authorization = self::create($parentAuthorization->role, $action, $resource);
+        $authorization = self::create($parentAuthorization->role, $actions, $resource);
 
         $authorization->parentAuthorization = $parentAuthorization;
 
@@ -105,18 +105,18 @@ abstract class Authorization
     /**
      * @param Role                      $role
      * @param SecurityIdentityInterface $identity
-     * @param Action                    $action
+     * @param Actions                   $actions
      * @param ResourceInterface         $resource
      */
     private function __construct(
         Role $role,
         SecurityIdentityInterface $identity,
-        Action $action,
+        Actions $actions,
         ResourceInterface $resource
     ) {
         $this->role = $role;
         $this->securityIdentity = $identity;
-        $this->actionId = $action->exportToString();
+        $this->actions = $actions;
         $this->resource = $resource;
 
         $this->childAuthorizations = new ArrayCollection();
@@ -131,19 +131,11 @@ abstract class Authorization
     }
 
     /**
-     * @return Action
+     * @return Actions
      */
-    public function getAction()
+    public function getActions()
     {
-        return Action::importFromString($this->actionId);
-    }
-
-    /**
-     * @return Action
-     */
-    public function getActionId()
-    {
-        return $this->actionId;
+        return $this->actions;
     }
 
     /**

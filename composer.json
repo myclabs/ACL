@@ -1,4 +1,6 @@
 {
+    "name": "myclabs/acl",
+    "type": "library",
     "autoload": {
         "psr-4": {
             "MyCLabs\\ACL\\": "src/",
@@ -6,7 +8,10 @@
         }
     },
     "require": {
-        "doctrine/orm": "~2.4",
+        "php": ">=5.4.0",
+        "doctrine/orm": "2.5.*@dev",
         "myclabs/php-enum": "1.*"
-    }
+    },
+    "minimum-stability": "dev",
+    "prefer-stable": true
 }

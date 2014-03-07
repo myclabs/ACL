@@ -13,11 +13,11 @@ interface ResourceInterface
      * Checks if the identity is allowed to do the action on the resource.
      *
      * @param SecurityIdentityInterface $identity
-     * @param Action                    $action
+     * @param string                    $action
      *
      * @return boolean Is allowed, or not.
      */
-    public function isAllowed(SecurityIdentityInterface $identity, Action $action);
+    public function isAllowed(SecurityIdentityInterface $identity, $action);
 
     /**
      * @param Authorization $authorization

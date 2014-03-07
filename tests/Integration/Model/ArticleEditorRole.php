@@ -2,10 +2,9 @@
 
 namespace Tests\MyCLabs\ACL\Integration\Model;
 
-use MyCLabs\ACL\Model\Action;
+use MyCLabs\ACL\Model\Actions;
 use MyCLabs\ACL\Model\Authorization;
 use MyCLabs\ACL\Model\Role;
-use Tests\MyCLabs\ACL\Integration\Model\Article;
 
 /**
  * @Entity
@@ -31,8 +30,7 @@ class ArticleEditorRole extends Role
     public function createAuthorizations()
     {
         return [
-            ArticleAuthorization::create($this, Action::VIEW(), $this->article),
-            ArticleAuthorization::create($this, Action::EDIT(), $this->article),
+            ArticleAuthorization::create($this, new Actions([Actions::VIEW, Actions::EDIT]), $this->article),
         ];
     }
 }

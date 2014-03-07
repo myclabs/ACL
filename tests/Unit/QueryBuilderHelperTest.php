@@ -3,7 +3,7 @@
 namespace Tests\MyCLabs\ACL;
 
 use Doctrine\ORM\QueryBuilder;
-use MyCLabs\ACL\Model\Action;
+use MyCLabs\ACL\Model\Actions;
 use MyCLabs\ACL\QueryBuilderHelper;
 
 /**
@@ -15,20 +15,18 @@ class QueryBuilderHelperTest extends \PHPUnit_Framework_TestCase
     {
         $em = $this->getMock('Doctrine\ORM\EntityManager', [], [], '', false);
         $identity = $this->getMockForAbstractClass('MyCLabs\ACL\Model\SecurityIdentityInterface');
-        $action = Action::VIEW();
 
         $qb = new QueryBuilder($em);
 
         $qb->select('test')
             ->from('test', 'test');
 
-        QueryBuilderHelper::joinACL($qb, 'test', $identity, $action);
+        QueryBuilderHelper::joinACL($qb, 'test', $identity, Actions::VIEW);
 
         $dql = 'SELECT test FROM test test INNER JOIN test.authorizations authorization '
-            . 'WHERE authorization.securityIdentity = :acl_identity AND authorization.actionId = :acl_actionId';
+            . 'WHERE authorization.securityIdentity = :acl_identity AND authorization.actions.view = true';
         $this->assertEquals($dql, $qb->getDQL());
 
         $this->assertSame($identity, $qb->getParameter('acl_identity')->getValue());
-        $this->assertEquals($action->exportToString(), $qb->getParameter('acl_actionId')->getValue());
     }
 }
