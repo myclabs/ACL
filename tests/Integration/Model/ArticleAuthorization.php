@@ -1,8 +1,9 @@
 <?php
 
-namespace Tests\MyCLabs\ACL\Integration;
+namespace Tests\MyCLabs\ACL\Integration\Model;
 
 use MyCLabs\ACL\Model\Authorization;
+use Tests\MyCLabs\ACL\Integration\Model\Article;
 
 /**
  * @Entity

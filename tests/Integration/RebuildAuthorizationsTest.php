@@ -10,9 +10,9 @@ use Tests\MyCLabs\ACL\Integration\Model\User;
 /**
  * @coversNothing
  */
-class SimpleIntegrationTest extends AbstractIntegrationTest
+class RebuildAuthorizationTest extends AbstractIntegrationTest
 {
-    public function testIsAllowedWithFlush()
+    public function testRebuildAuthorizations()
     {
         $article1 = new Article();
         $this->em->persist($article1);
@@ -25,21 +25,9 @@ class SimpleIntegrationTest extends AbstractIntegrationTest
         $this->aclService->addRole($user, new ArticleEditorRole($user, $article2));
 
         $this->em->flush();
+        $this->em->clear();
 
-        $this->assertFalse($this->aclService->isAllowed($user, Action::VIEW(), $article1));
-        $this->assertFalse($this->aclService->isAllowed($user, Action::EDIT(), $article1));
-        $this->assertTrue($this->aclService->isAllowed($user, Action::VIEW(), $article2));
-        $this->assertTrue($this->aclService->isAllowed($user, Action::EDIT(), $article2));
-    }
-
-    public function testIsAllowedWithoutFlush()
-    {
-        $article1 = new Article();
-        $article2 = new Article();
-
-        $user = new User();
-
-        $this->aclService->addRole($user, new ArticleEditorRole($user, $article2));
+        $this->aclService->rebuildAuthorizations();
 
         $this->assertFalse($this->aclService->isAllowed($user, Action::VIEW(), $article1));
         $this->assertFalse($this->aclService->isAllowed($user, Action::EDIT(), $article1));

@@ -1,6 +1,6 @@
 <?php
 
-namespace Tests\MyCLabs\ACL\Integration;
+namespace Tests\MyCLabs\ACL\Integration\Model;
 
 use Doctrine\Common\Collections\ArrayCollection;
 use Doctrine\Common\Collections\Collection;

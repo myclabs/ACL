@@ -1,0 +1,62 @@
+<?php
+
+namespace Tests\MyCLabs\ACL;
+
+use Doctrine\Common\EventManager;
+use Doctrine\ORM\EntityManager;
+use Doctrine\ORM\Events;
+use Doctrine\ORM\Tools\ResolveTargetEntityListener;
+use Doctrine\ORM\Tools\SchemaTool;
+use Doctrine\ORM\Tools\Setup;
+use MyCLabs\ACL\ACLService;
+use MyCLabs\ACL\MetadataLoader;
+
+abstract class AbstractIntegrationTest extends \PHPUnit_Framework_TestCase
+{
+    /**
+     * @var EntityManager
+     */
+    protected $em;
+
+    /**
+     * @var ACLService
+     */
+    protected $aclService;
+
+    public function setUp()
+    {
+        $paths = [
+            __DIR__ . '/../../src/Model',
+            __DIR__ . '/Model',
+        ];
+        $dbParams = [
+            'driver' => 'pdo_sqlite',
+            'memory' => true,
+        ];
+
+        $evm  = new EventManager();
+        $rtel = new ResolveTargetEntityListener();
+        $rtel->addResolveTargetEntity(
+            'MyCLabs\ACL\Model\SecurityIdentityInterface',
+            'Tests\MyCLabs\ACL\Integration\Model\User',
+            []
+        );
+
+        $metadataLoader = new MetadataLoader();
+        $metadataLoader->registerRoleClass('Tests\MyCLabs\ACL\Integration\Model\ArticleEditorRole', 'articleEditor');
+        $metadataLoader->registerAuthorizationClass('Tests\MyCLabs\ACL\Integration\Model\ArticleAuthorization', 'article');
+
+        $evm->addEventListener(Events::loadClassMetadata, $rtel);
+        $evm->addEventListener(Events::loadClassMetadata, $metadataLoader);
+
+        // Create the entity manager
+        $config = Setup::createAnnotationMetadataConfiguration($paths, true);
+        $this->em = EntityManager::create($dbParams, $config, $evm);
+
+        // Create the DB
+        $tool = new SchemaTool($this->em);
+        $tool->createSchema($this->em->getMetadataFactory()->getAllMetadata());
+
+        $this->aclService = new ACLService($this->em);
+    }
+}
