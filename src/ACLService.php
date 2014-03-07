@@ -4,7 +4,6 @@ namespace MyCLabs\ACL;
 
 use Doctrine\ORM\EntityManager;
 use MyCLabs\ACL\Model\Action;
-use MyCLabs\ACL\Model\Authorization;
 use MyCLabs\ACL\Model\ResourceInterface;
 use MyCLabs\ACL\Model\Role;
 use MyCLabs\ACL\Model\SecurityIdentityInterface;
@@ -69,25 +68,25 @@ class ACLService
     }
 
     /**
-     * Regénère la liste des autorisations.
+     * Clears and rebuilds all the authorizations from the roles.
      */
     public function rebuildAuthorizations()
     {
-        // Vide les autorisations
-        foreach (Authorization::loadList() as $authorization) {
+        $authorizationRepository = $this->entityManager->getRepository('MyCLabs\ACL\Model\Authorization');
+        $roleRepository = $this->entityManager->getRepository('MyCLabs\ACL\Model\Role');
+
+        // Clear
+        foreach ($authorizationRepository->findAll() as $authorization) {
             $this->entityManager->remove($authorization);
         }
         $this->entityManager->flush();
         $this->entityManager->clear();
 
-        // Regénère les roles "non optimisés" qui utilisent les objets
-        foreach (SecurityIdentityInterface::loadList() as $identity) {
-            /** @var SecurityIdentityInterface $identity */
-            foreach ($identity->getRoles() as $role) {
-                $authorizations = $role->createAuthorizations();
-                foreach ($role->createAuthorizations() as $authorization) {
-                    $this->entityManager->persist($authorization);
-                }
+        // Regenerate
+        foreach ($roleRepository->findAll() as $role) {
+            /** @var Role $role */
+            foreach ($role->createAuthorizations() as $authorization) {
+                $this->entityManager->persist($authorization);
             }
         }
         $this->entityManager->flush();
