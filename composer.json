@@ -1,0 +1,12 @@
+{
+    "autoload": {
+        "psr-4": {
+            "MyCLabs\\ACL\\": "src/",
+            "Tests\\MyCLabs\\ACL\\": "tests/"
+        }
+    },
+    "require": {
+        "doctrine/orm": "~2.4",
+        "myclabs/php-enum": "1.*"
+    }
+}

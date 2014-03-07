@@ -1,0 +1,45 @@
+<?php
+
+namespace Tests\MyCLabs\ACL\Integration;
+
+use Doctrine\Common\Collections\ArrayCollection;
+use Doctrine\Common\Collections\Collection;
+use MyCLabs\ACL\Model\ResourceInterface;
+use MyCLabs\ACL\Model\ResourceTrait;
+
+/**
+ * @Entity
+ */
+class Article implements ResourceInterface
+{
+    use ResourceTrait;
+
+    /**
+     * @Id @GeneratedValue
+     * @Column(type="integer")
+     */
+    protected $id;
+
+    /**
+     * @var ArticleAuthorization[]|Collection
+     * @OneToMany(targetEntity="ArticleAuthorization", mappedBy="resource")
+     */
+    protected $authorizations;
+
+    /**
+     * @var ArticleEditorRole[]|Collection
+     * @OneToMany(targetEntity="ArticleEditorRole", mappedBy="resource")
+     */
+    protected $roles;
+
+    public function __construct()
+    {
+        $this->authorizations = new ArrayCollection();
+        $this->roles = new ArrayCollection();
+    }
+
+    public function getId()
+    {
+        return $this->id;
+    }
+}
