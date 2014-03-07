@@ -33,33 +33,11 @@ class ACLService
      * @param Action                    $action
      * @param ResourceInterface         $resource
      *
-     * @throws \RuntimeException The resource must be persisted (have an ID).
-     *
      * @return boolean Is allowed, or not.
      */
     public function isAllowed(SecurityIdentityInterface $identity, Action $action, ResourceInterface $resource)
     {
         return $resource->isAllowed($identity, $action);
-
-        if ($resource->getId() === null) {
-            throw new \RuntimeException(sprintf(
-                'The resource %s must be persisted (id not null) to be able to test the permissions',
-                get_class($resource)
-            ));
-        }
-
-        $repository = $this->entityManager->getRepository(get_class($resource));
-        $qb = $repository->createQueryBuilder('resource');
-        $qb->select('count(resource)')
-            ->innerJoin('resource.authorizations', 'auth')
-            ->where('resource = :resource')
-            ->andWhere('auth.actionId = :actionId')
-            ->andWhere('auth.securityIdentity = :securityIdentity');
-        $qb->setParameter('resource', $resource);
-        $qb->setParameter('actionId', $action->exportToString());
-        $qb->setParameter('securityIdentity', $identity);
-
-        return ($qb->getQuery()->getSingleScalarResult() > 0);
     }
 
     /**

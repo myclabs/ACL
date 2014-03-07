@@ -10,9 +10,19 @@ namespace MyCLabs\ACL\Model;
 interface ResourceInterface
 {
     /**
-     * @return mixed
+     * Checks if the identity is allowed to do the action on the resource.
+     *
+     * @param SecurityIdentityInterface $identity
+     * @param Action                    $action
+     *
+     * @return boolean Is allowed, or not.
      */
-    public function getId();
+    public function isAllowed(SecurityIdentityInterface $identity, Action $action);
+
+    /**
+     * @param Authorization $authorization
+     */
+    public function addAuthorization(Authorization $authorization);
 
     /**
      * Returns the list of authorizations that apply to this resource, excluding inherited authorizations.
