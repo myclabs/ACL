@@ -3,7 +3,7 @@
         "This file locks the dependencies of your project to a known state",
         "Read more about it at http://getcomposer.org/doc/01-basic-usage.md#composer-lock-the-lock-file"
     ],
-    "hash": "c80a11080636ff173926c51dbc05f57e",
+    "hash": "7cad3e15db4f4c12c7b0b8ad33ca6aa2",
     "packages": [
         {
             "name": "doctrine/annotations",
@@ -557,37 +557,6 @@
                 "orm"
             ],
             "time": "2014-03-07 03:38:26"
-        },
-        {
-            "name": "myclabs/php-enum",
-            "version": "1.2.1",
-            "source": {
-                "type": "git",
-                "url": "https://github.com/myclabs/php-enum.git",
-                "reference": "b52c2f215f5b251693369309ea7f537f9d92ec5e"
-            },
-            "dist": {
-                "type": "zip",
-                "url": "https://api.github.com/repos/myclabs/php-enum/zipball/b52c2f215f5b251693369309ea7f537f9d92ec5e",
-                "reference": "b52c2f215f5b251693369309ea7f537f9d92ec5e",
-                "shasum": ""
-            },
-            "type": "library",
-            "autoload": {
-                "psr-0": {
-                    "MyCLabs": "src/"
-                }
-            },
-            "notification-url": "https://packagist.org/downloads/",
-            "license": [
-                "MIT"
-            ],
-            "description": "PHP Enum implementation",
-            "homepage": "http://github.com/myclabs/php-enum",
-            "keywords": [
-                "enum"
-            ],
-            "time": "2013-11-11 18:29:08"
         },
         {
             "name": "symfony/console",
