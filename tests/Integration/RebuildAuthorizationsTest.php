@@ -14,8 +14,7 @@ class RebuildAuthorizationTest extends AbstractIntegrationTest
 {
     public function testRebuildAuthorizations()
     {
-        $this->markTestSkipped('Fails for now because of a bug in Doctrine 2.5');
-
+        $this->markTestSkipped('Feature to be implemented');
         $article1 = new Article();
         $this->em->persist($article1);
         $article2 = new Article();
@@ -24,7 +23,7 @@ class RebuildAuthorizationTest extends AbstractIntegrationTest
         $user = new User();
         $this->em->persist($user);
 
-        $this->aclManager->addRole($user, new ArticleEditorRole($user, $article2));
+        $user->addRole(new ArticleEditorRole($user, $article2));
 
         $this->em->flush();
         $this->em->clear();

@@ -2,7 +2,6 @@
 
 namespace Tests\MyCLabs\ACL\Integration;
 
-use MyCLabs\ACL\Model\Action;
 use MyCLabs\ACL\Model\Actions;
 use MyCLabs\ACL\QueryBuilderHelper;
 use Tests\MyCLabs\ACL\Integration\Model\Article;
@@ -24,7 +23,7 @@ class QueryFilterTest extends AbstractIntegrationTest
         $user = new User();
         $this->em->persist($user);
 
-        $this->aclManager->addRole($user, new ArticleEditorRole($user, $article2));
+        $user->addRole(new ArticleEditorRole($user, $article2));
 
         $this->em->flush();
 
@@ -52,7 +51,7 @@ class QueryFilterTest extends AbstractIntegrationTest
         $user = new User();
         $this->em->persist($user);
 
-        $this->aclManager->addRole($user, new ArticleEditorRole($user, $article2));
+        $user->addRole(new ArticleEditorRole($user, $article2));
 
         $this->em->flush();
 

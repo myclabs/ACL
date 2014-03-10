@@ -12,7 +12,7 @@ use Tests\MyCLabs\ACL\Integration\Model\User;
  */
 class IsAllowedTest extends AbstractIntegrationTest
 {
-    public function testFromDatabase()
+    public function testAfterFlush()
     {
         $article1 = new Article();
         $this->em->persist($article1);
@@ -22,7 +22,7 @@ class IsAllowedTest extends AbstractIntegrationTest
         $user = new User();
         $this->em->persist($user);
 
-        $this->aclManager->addRole($user, new ArticleEditorRole($user, $article2));
+        $user->addRole(new ArticleEditorRole($user, $article2));
 
         $this->em->flush();
 
@@ -31,23 +31,6 @@ class IsAllowedTest extends AbstractIntegrationTest
         $article1 = $this->em->find(get_class($article1), $article1->getId());
         $article2 = $this->em->find(get_class($article2), $article2->getId());
         $user = $this->em->find(get_class($user), $user->getId());
-
-        $this->assertFalse($this->aclManager->isAllowed($user, Actions::VIEW, $article1));
-        $this->assertFalse($this->aclManager->isAllowed($user, Actions::EDIT, $article1));
-        $this->assertTrue($this->aclManager->isAllowed($user, Actions::VIEW, $article2));
-        $this->assertTrue($this->aclManager->isAllowed($user, Actions::EDIT, $article2));
-    }
-
-    public function testFromMemory()
-    {
-        $this->markTestSkipped('Fails for now because of a bug in Doctrine 2.5');
-
-        $article1 = new Article();
-        $article2 = new Article();
-
-        $user = new User();
-
-        $this->aclManager->addRole($user, new ArticleEditorRole($user, $article2));
 
         $this->assertFalse($this->aclManager->isAllowed($user, Actions::VIEW, $article1));
         $this->assertFalse($this->aclManager->isAllowed($user, Actions::EDIT, $article1));

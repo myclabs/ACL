@@ -16,9 +16,9 @@ use Tests\MyCLabs\ACL\Integration\Model\User;
 class ClassScopeTest extends AbstractIntegrationTest
 {
     /**
-     * Check ACLs in the database, when the role is added before a flush
+     * Check ACLs when the role is added before a flush
      */
-    public function testFromDatabaseBeforeFlush()
+    public function testBeforeFlush()
     {
         $article1 = new Article();
         $this->em->persist($article1);
@@ -28,7 +28,7 @@ class ClassScopeTest extends AbstractIntegrationTest
         $user = new User();
         $this->em->persist($user);
 
-        $this->aclManager->addRole($user, new AllArticlesEditorRole($user, [$article1, $article2]));
+        $user->addRole(new AllArticlesEditorRole($user));
 
         $this->em->flush();
 
@@ -47,7 +47,7 @@ class ClassScopeTest extends AbstractIntegrationTest
     }
 
     /**
-     * Check ACLs in the database, when the role is added after a flush
+     * Check ACLs when the role is added after a flush
      */
     public function testFromDatabaseAfterFlush()
     {
@@ -61,7 +61,7 @@ class ClassScopeTest extends AbstractIntegrationTest
 
         $this->em->flush();
 
-        $this->aclManager->addRole($user, new AllArticlesEditorRole($user, [$article1, $article2]));
+        $user->addRole(new AllArticlesEditorRole($user));
 
         $this->em->flush();
 
@@ -79,27 +79,8 @@ class ClassScopeTest extends AbstractIntegrationTest
         $this->assertFalse($this->aclManager->isAllowed($user, Actions::DELETE, $article2));
     }
 
-    public function testFromMemory()
-    {
-        $this->markTestSkipped('Fails for now because of a bug in Doctrine 2.5');
-
-        $article1 = new Article();
-        $article2 = new Article();
-
-        $user = new User();
-
-        $this->aclManager->addRole($user, new ArticleEditorRole($user, $article2));
-
-        $this->assertTrue($this->aclManager->isAllowed($user, Actions::VIEW, $article1));
-        $this->assertTrue($this->aclManager->isAllowed($user, Actions::EDIT, $article1));
-        $this->assertFalse($this->aclManager->isAllowed($user, Actions::DELETE, $article1));
-        $this->assertTrue($this->aclManager->isAllowed($user, Actions::VIEW, $article2));
-        $this->assertTrue($this->aclManager->isAllowed($user, Actions::EDIT, $article2));
-        $this->assertFalse($this->aclManager->isAllowed($user, Actions::DELETE, $article2));
-    }
-
     /**
-     * Check ACLs in the database after a new resource has been created
+     * Check ACLs after a new resource has been created
      */
     public function testNewResource()
     {
@@ -111,13 +92,12 @@ class ClassScopeTest extends AbstractIntegrationTest
 
         $this->em->flush();
 
-        $this->aclManager->addRole($user, new AllArticlesEditorRole($user, [$article1]));
+        $user->addRole(new AllArticlesEditorRole($user));
 
         $this->em->flush();
 
         $article2 = new Article();
         $this->em->persist($article2);
-        $this->aclManager->processNewResource($article2);
         $this->em->flush();
 
         // Clear the entity manager and reload the entities so that we make sure we hit the database

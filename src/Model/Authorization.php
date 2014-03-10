@@ -75,9 +75,6 @@ abstract class Authorization
     {
         $authorization = new static($role, $role->getSecurityIdentity(), $actions, $resource);
 
-        if ($resource) {
-            $resource->addAuthorization($authorization);
-        }
         $role->addAuthorization($authorization);
 
         return $authorization;
@@ -155,14 +152,6 @@ abstract class Authorization
     public function getParentAuthorization()
     {
         return $this->parentAuthorization;
-    }
-
-    /**
-     * @param Authorization $parentAuthorization
-     */
-    public function setParentAuthorization(Authorization $parentAuthorization)
-    {
-        $this->parentAuthorization = $parentAuthorization;
     }
 
     /**

@@ -14,6 +14,21 @@ Test permissions:
 $aclManager->isAllowed($user, Actions::EDIT, $resource);
 ```
 
+### Pros
+
+- extremely optimized:
+  - filters queries at database level (you don't load entities the user can't access)
+  - joins with only 1 extra table
+- authorization cascading/inheritance
+- you can use custom actions on top of the standards VIEW, EDIT, CREATE, DELETE, etc.
+- authorizations are rebuildable: you can change what an "ArticleEditor" can do afterwards and just rebuild the ACL
+
+### Cons
+
+- some extra code: you need to write classes for authorizations and roles because of Doctrine limitations
+- you can't authorize a user directly on a resource: you have to use roles (e.g. an Article Editor, or a Administrator)
+- because of Doctrine limitations you need to flush you roles and resources before testing authorizations
+
 ## Usage
 
 ### 1. Creating a new resource

@@ -44,22 +44,6 @@ abstract class Role
     }
 
     /**
-     * Creates the role's authorizations.
-     *
-     * @param EntityManager $entityManager TODO remove
-     * @return Authorization[]
-     */
-    abstract public function createAuthorizations(EntityManager $entityManager);
-
-    /**
-     * Creates the authorizations for a new resource.
-     *
-     * @param ResourceInterface $resource
-     * @return Authorization[]
-     */
-    abstract public function processNewResource(ResourceInterface $resource);
-
-    /**
      * @return int
      */
     public function getId()
