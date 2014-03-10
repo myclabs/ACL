@@ -34,7 +34,7 @@ abstract class Authorization
 
     /**
      * @var SecurityIdentityInterface
-     * @ManyToOne(targetEntity="SecurityIdentityInterface", inversedBy="authorizations")
+     * @ManyToOne(targetEntity="SecurityIdentityInterface")
      * @JoinColumn(nullable=false, onDelete="CASCADE")
      */
     protected $securityIdentity;
@@ -46,7 +46,7 @@ abstract class Authorization
     protected $actions;
 
     /**
-     * @var ResourceInterface
+     * @var ResourceInterface|null
      */
     protected $resource;
 
@@ -66,16 +66,19 @@ abstract class Authorization
     protected $childAuthorizations;
 
     /**
-     * @param Role              $role
-     * @param Actions           $actions
-     * @param ResourceInterface $resource
+     * @param Role                   $role
+     * @param Actions                $actions
+     * @param ResourceInterface|null $resource
      * @return static
      */
-    public static function create(Role $role, Actions $actions, ResourceInterface $resource)
+    public static function create(Role $role, Actions $actions, ResourceInterface $resource = null)
     {
         $authorization = new static($role, $role->getSecurityIdentity(), $actions, $resource);
 
-        $resource->addAuthorization($authorization);
+        if ($resource) {
+            $resource->addAuthorization($authorization);
+        }
+        $role->addAuthorization($authorization);
 
         return $authorization;
     }
@@ -83,14 +86,14 @@ abstract class Authorization
     /**
      * Crée une autorisation qui hérite d'une autre.
      *
-     * @param Authorization     $parentAuthorization
-     * @param ResourceInterface $resource Nouvelle ressource
-     * @param Actions|null      $actions
+     * @param Authorization          $parentAuthorization
+     * @param ResourceInterface|null $resource Nouvelle ressource
+     * @param Actions|null           $actions
      * @return static
      */
     public static function createChildAuthorization(
         Authorization $parentAuthorization,
-        ResourceInterface $resource,
+        ResourceInterface $resource = null,
         Actions $actions = null
     ) {
         $actions = $actions ?: $parentAuthorization->getActions();
@@ -106,13 +109,13 @@ abstract class Authorization
      * @param Role                      $role
      * @param SecurityIdentityInterface $identity
      * @param Actions                   $actions
-     * @param ResourceInterface         $resource
+     * @param ResourceInterface|null    $resource
      */
     private function __construct(
         Role $role,
         SecurityIdentityInterface $identity,
         Actions $actions,
-        ResourceInterface $resource
+        ResourceInterface $resource = null
     ) {
         $this->role = $role;
         $this->securityIdentity = $identity;
@@ -139,7 +142,7 @@ abstract class Authorization
     }
 
     /**
-     * @return ResourceInterface
+     * @return ResourceInterface|null
      */
     public function getResource()
     {

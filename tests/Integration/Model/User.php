@@ -23,7 +23,7 @@ class User implements SecurityIdentityInterface
 
     /**
      * @var Role[]|Collection
-     * @OneToMany(targetEntity="MyCLabs\ACL\Model\Role", mappedBy="user", cascade={"persist", "remove"})
+     * @OneToMany(targetEntity="MyCLabs\ACL\Model\Role", mappedBy="securityIdentity", cascade={"persist", "remove"})
      */
     protected $roles;
 

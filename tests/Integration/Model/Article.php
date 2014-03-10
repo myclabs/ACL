@@ -22,13 +22,13 @@ class Article implements ResourceInterface
 
     /**
      * @var ArticleAuthorization[]|Collection
-     * @OneToMany(targetEntity="ArticleAuthorization", mappedBy="resource")
+     * @OneToMany(targetEntity="ArticleAuthorization", mappedBy="resource", fetch="EXTRA_LAZY")
      */
     protected $authorizations;
 
     /**
      * @var ArticleEditorRole[]|Collection
-     * @OneToMany(targetEntity="ArticleEditorRole", mappedBy="resource")
+     * @OneToMany(targetEntity="ArticleEditorRole", mappedBy="article")
      */
     protected $roles;
 

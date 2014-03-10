@@ -4,6 +4,8 @@ namespace MyCLabs\ACL\Model;
 
 use Doctrine\Common\Collections\ArrayCollection;
 use Doctrine\Common\Collections\Collection;
+use Doctrine\Common\Collections\Criteria;
+use Doctrine\ORM\EntityManager;
 
 /**
  * Role.
@@ -31,7 +33,7 @@ abstract class Role
 
     /**
      * @var Authorization[]|Collection
-     * @OneToMany(targetEntity="Authorization", mappedBy="product")
+     * @OneToMany(targetEntity="Authorization", mappedBy="role")
      */
     protected $authorizations;
 
@@ -44,9 +46,18 @@ abstract class Role
     /**
      * Creates the role's authorizations.
      *
+     * @param EntityManager $entityManager TODO remove
      * @return Authorization[]
      */
-    abstract public function createAuthorizations();
+    abstract public function createAuthorizations(EntityManager $entityManager);
+
+    /**
+     * Creates the authorizations for a new resource.
+     *
+     * @param ResourceInterface $resource
+     * @return Authorization[]
+     */
+    abstract public function processNewResource(ResourceInterface $resource);
 
     /**
      * @return int
@@ -55,6 +66,16 @@ abstract class Role
     {
         return $this->id;
     }
+    /**
+     * @return Authorization[]
+     */
+    public function getRootAuthorizations()
+    {
+        $criteria = new Criteria();
+        $criteria->where($criteria->expr()->isNull('parentAuthorization'));
+
+        return $this->authorizations->matching($criteria);
+    }
 
     /**
      * @return SecurityIdentityInterface
@@ -62,5 +83,10 @@ abstract class Role
     public function getSecurityIdentity()
     {
         return $this->securityIdentity;
+    }
+
+    public function addAuthorization(Authorization $authorization)
+    {
+        $this->authorizations[] = $authorization;
     }
 }

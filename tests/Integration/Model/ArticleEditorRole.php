@@ -2,8 +2,9 @@
 
 namespace Tests\MyCLabs\ACL\Integration\Model;
 
+use Doctrine\ORM\EntityManager;
 use MyCLabs\ACL\Model\Actions;
-use MyCLabs\ACL\Model\Authorization;
+use MyCLabs\ACL\Model\ResourceInterface;
 use MyCLabs\ACL\Model\Role;
 
 /**
@@ -24,13 +25,15 @@ class ArticleEditorRole extends Role
         parent::__construct($identity);
     }
 
-    /**
-     * @return Authorization[]
-     */
-    public function createAuthorizations()
+    public function createAuthorizations(EntityManager $entityManager)
     {
         return [
             ArticleAuthorization::create($this, new Actions([Actions::VIEW, Actions::EDIT]), $this->article),
         ];
+    }
+
+    public function processNewResource(ResourceInterface $resource)
+    {
+        return [];
     }
 }

@@ -49,7 +49,7 @@ class ACLService
         $identity->addRole($role);
         $this->entityManager->persist($role);
 
-        foreach ($role->createAuthorizations() as $authorization) {
+        foreach ($role->createAuthorizations($this->entityManager) as $authorization) {
             $this->entityManager->persist($authorization);
         }
     }
@@ -66,6 +66,19 @@ class ACLService
         $this->entityManager->remove($role);
     }
 
+    public function processNewResource(ResourceInterface $resource)
+    {
+        // TODO improve this
+        $roleRepository = $this->entityManager->getRepository('MyCLabs\ACL\Model\Role');
+
+        foreach ($roleRepository->findAll() as $role) {
+            /** @var Role $role */
+            foreach ($role->processNewResource($resource) as $authorization) {
+                $this->entityManager->persist($authorization);
+            }
+        }
+    }
+
     /**
      * Clears and rebuilds all the authorizations from the roles.
      */
@@ -75,6 +88,7 @@ class ACLService
         $roleRepository = $this->entityManager->getRepository('MyCLabs\ACL\Model\Role');
 
         // Clear
+        // TODO use DQL DELETE query
         foreach ($authorizationRepository->findAll() as $authorization) {
             $this->entityManager->remove($authorization);
         }
@@ -84,7 +98,7 @@ class ACLService
         // Regenerate
         foreach ($roleRepository->findAll() as $role) {
             /** @var Role $role */
-            foreach ($role->createAuthorizations() as $authorization) {
+            foreach ($role->createAuthorizations($this->entityManager) as $authorization) {
                 $this->entityManager->persist($authorization);
             }
         }

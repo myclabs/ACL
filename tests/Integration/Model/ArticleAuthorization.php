@@ -11,9 +11,9 @@ use Tests\MyCLabs\ACL\Integration\Model\Article;
 class ArticleAuthorization extends Authorization
 {
     /**
-     * @var Article
+     * @var Article|null
      * @ManyToOne(targetEntity="Article", inversedBy="authorizations")
-     * @JoinColumn(nullable=false, onDelete="CASCADE")
+     * @JoinColumn(onDelete="CASCADE")
      */
     protected $resource;
 }
