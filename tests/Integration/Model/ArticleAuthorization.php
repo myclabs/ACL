@@ -3,10 +3,9 @@
 namespace Tests\MyCLabs\ACL\Integration\Model;
 
 use MyCLabs\ACL\Model\Authorization;
-use Tests\MyCLabs\ACL\Integration\Model\Article;
 
 /**
- * @Entity
+ * @Entity(readOnly=true)
  */
 class ArticleAuthorization extends Authorization
 {

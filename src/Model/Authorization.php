@@ -8,7 +8,7 @@ use Doctrine\Common\Collections\Collection;
 /**
  * Authorization of a security identity to do something on a resource.
  *
- * @Entity
+ * @Entity(readOnly=true)
  * @InheritanceType("JOINED")
  * @DiscriminatorColumn(name="type", type="string")
  *

@@ -5,13 +5,13 @@
 You give permissions to a user by adding it a role:
 
 ```php
-$aclManager->addRole($user, new CellAdminRole($user, $cell));
+$user->addRole(new ArticleEditorRole($user, $article);
 ```
 
 Test permissions:
 
 ```php
-$aclManager->isAllowed($user, Actions::EDIT, $resource);
+$aclManager->isAllowed($user, Actions::EDIT, $article);
 ```
 
 ### Pros
@@ -44,7 +44,7 @@ class Article implements ResourceInterface
     use ResourceTrait;
 
     /**
-     * @var ArticleAuthorization[]|Collection
+     * @OneToMany(targetEntity="ArticleAuthorization", mappedBy="resource", fetch="EXTRA_LAZY")
      */
     protected $authorizations;
 
@@ -55,39 +55,20 @@ class Article implements ResourceInterface
 }
 ```
 
-Here is how you would map it with Doctrine:
-
-```yaml
-MyApp\Domain\Article:
-  type: entity
-
-  oneToMany:
-    authorizations:
-      targetEntity: MyApp\Domain\ACL\ArticleAuthorization
-      mappedBy: resource
-```
-
 To create authorizations on the new resource, you need to create a new kind of authorization:
 
 ```php
+/**
+ * @Entity(readOnly=true)
+ */
 class ArticleAuthorization extends Authorization
 {
+    /**
+     * @ManyToOne(targetEntity="Article", inversedBy="authorizations")
+     * @JoinColumn(onDelete="CASCADE")
+     */
+    protected $resource;
 }
-```
-
-and map its `resource` field:
-
-```yaml
-MyApp\Domain\ACL\ArticleAuthorization:
-  type: entity
-
-  manyToOne:
-    resource:
-      targetEntity: MyApp\Domain\Article
-      inversedBy: authorizations
-      joinColumn:
-        nullable: false
-        onDelete: CASCADE
 ```
 
 
@@ -96,15 +77,19 @@ MyApp\Domain\ACL\ArticleAuthorization:
 To create a new role, extend the `Role` abstract class:
 
 ```php
+/**
+ * @Entity(readOnly=true)
+ */
 class ArticleEditorRole extends Role
 {
+    /**
+     * @ManyToOne(targetEntity="Article", inversedBy="roles")
+     */
     protected $article;
 
     public function __construct(User $user, Article $article)
     {
         $this->article = $article;
-        // Bidirectional associations is needed
-        $article->addRole($this);
 
         parent::__construct($user);
     }

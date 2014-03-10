@@ -6,7 +6,6 @@ use Doctrine\ORM\EntityManager;
 use Doctrine\ORM\Event\OnFlushEventArgs;
 use Doctrine\ORM\UnitOfWork;
 use MyCLabs\ACL\Model\Actions;
-use MyCLabs\ACL\Model\ResourceTrait;
 use MyCLabs\ACL\Model\Role;
 
 class ACLArticleListener
