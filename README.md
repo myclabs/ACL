@@ -5,13 +5,13 @@
 You give permissions to a user by adding it a role:
 
 ```php
-$aclService->addRole($user, new CellAdminRole($user, $cell));
+$aclManager->addRole($user, new CellAdminRole($user, $cell));
 ```
 
 Test permissions:
 
 ```php
-$aclService->isAllowed($user, Actions::EDIT, $resource);
+$aclManager->isAllowed($user, Actions::EDIT, $resource);
 ```
 
 ## Usage

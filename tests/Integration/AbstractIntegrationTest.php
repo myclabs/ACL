@@ -8,7 +8,7 @@ use Doctrine\ORM\Events;
 use Doctrine\ORM\Tools\ResolveTargetEntityListener;
 use Doctrine\ORM\Tools\SchemaTool;
 use Doctrine\ORM\Tools\Setup;
-use MyCLabs\ACL\ACLService;
+use MyCLabs\ACL\ACLManager;
 use MyCLabs\ACL\MetadataLoader;
 
 abstract class AbstractIntegrationTest extends \PHPUnit_Framework_TestCase
@@ -19,9 +19,9 @@ abstract class AbstractIntegrationTest extends \PHPUnit_Framework_TestCase
     protected $em;
 
     /**
-     * @var ACLService
+     * @var ACLManager
      */
-    protected $aclService;
+    protected $aclManager;
 
     public function setUp()
     {
@@ -57,6 +57,6 @@ abstract class AbstractIntegrationTest extends \PHPUnit_Framework_TestCase
         $tool = new SchemaTool($this->em);
         $tool->createSchema($this->em->getMetadataFactory()->getAllMetadata());
 
-        $this->aclService = new ACLService($this->em);
+        $this->aclManager = new ACLManager($this->em);
     }
 }

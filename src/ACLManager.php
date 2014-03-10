@@ -8,11 +8,11 @@ use MyCLabs\ACL\Model\Role;
 use MyCLabs\ACL\Model\SecurityIdentityInterface;
 
 /**
- * Service handling ACL.
+ * Manages ACL.
  *
  * @author Matthieu Napoli <matthieu@mnapoli.fr>
  */
-class ACLService
+class ACLManager
 {
     /**
      * @var EntityManager

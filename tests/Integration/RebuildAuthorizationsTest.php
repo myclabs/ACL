@@ -24,16 +24,16 @@ class RebuildAuthorizationTest extends AbstractIntegrationTest
         $user = new User();
         $this->em->persist($user);
 
-        $this->aclService->addRole($user, new ArticleEditorRole($user, $article2));
+        $this->aclManager->addRole($user, new ArticleEditorRole($user, $article2));
 
         $this->em->flush();
         $this->em->clear();
 
-        $this->aclService->rebuildAuthorizations();
+        $this->aclManager->rebuildAuthorizations();
 
-        $this->assertFalse($this->aclService->isAllowed($user, Actions::VIEW, $article1));
-        $this->assertFalse($this->aclService->isAllowed($user, Actions::EDIT, $article1));
-        $this->assertTrue($this->aclService->isAllowed($user, Actions::VIEW, $article2));
-        $this->assertTrue($this->aclService->isAllowed($user, Actions::EDIT, $article2));
+        $this->assertFalse($this->aclManager->isAllowed($user, Actions::VIEW, $article1));
+        $this->assertFalse($this->aclManager->isAllowed($user, Actions::EDIT, $article1));
+        $this->assertTrue($this->aclManager->isAllowed($user, Actions::VIEW, $article2));
+        $this->assertTrue($this->aclManager->isAllowed($user, Actions::EDIT, $article2));
     }
 }

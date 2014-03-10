@@ -22,7 +22,7 @@ class IsAllowedTest extends AbstractIntegrationTest
         $user = new User();
         $this->em->persist($user);
 
-        $this->aclService->addRole($user, new ArticleEditorRole($user, $article2));
+        $this->aclManager->addRole($user, new ArticleEditorRole($user, $article2));
 
         $this->em->flush();
 
@@ -32,10 +32,10 @@ class IsAllowedTest extends AbstractIntegrationTest
         $article2 = $this->em->find(get_class($article2), $article2->getId());
         $user = $this->em->find(get_class($user), $user->getId());
 
-        $this->assertFalse($this->aclService->isAllowed($user, Actions::VIEW, $article1));
-        $this->assertFalse($this->aclService->isAllowed($user, Actions::EDIT, $article1));
-        $this->assertTrue($this->aclService->isAllowed($user, Actions::VIEW, $article2));
-        $this->assertTrue($this->aclService->isAllowed($user, Actions::EDIT, $article2));
+        $this->assertFalse($this->aclManager->isAllowed($user, Actions::VIEW, $article1));
+        $this->assertFalse($this->aclManager->isAllowed($user, Actions::EDIT, $article1));
+        $this->assertTrue($this->aclManager->isAllowed($user, Actions::VIEW, $article2));
+        $this->assertTrue($this->aclManager->isAllowed($user, Actions::EDIT, $article2));
     }
 
     public function testFromMemory()
@@ -47,11 +47,11 @@ class IsAllowedTest extends AbstractIntegrationTest
 
         $user = new User();
 
-        $this->aclService->addRole($user, new ArticleEditorRole($user, $article2));
+        $this->aclManager->addRole($user, new ArticleEditorRole($user, $article2));
 
-        $this->assertFalse($this->aclService->isAllowed($user, Actions::VIEW, $article1));
-        $this->assertFalse($this->aclService->isAllowed($user, Actions::EDIT, $article1));
-        $this->assertTrue($this->aclService->isAllowed($user, Actions::VIEW, $article2));
-        $this->assertTrue($this->aclService->isAllowed($user, Actions::EDIT, $article2));
+        $this->assertFalse($this->aclManager->isAllowed($user, Actions::VIEW, $article1));
+        $this->assertFalse($this->aclManager->isAllowed($user, Actions::EDIT, $article1));
+        $this->assertTrue($this->aclManager->isAllowed($user, Actions::VIEW, $article2));
+        $this->assertTrue($this->aclManager->isAllowed($user, Actions::EDIT, $article2));
     }
 }

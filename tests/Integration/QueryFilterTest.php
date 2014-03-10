@@ -24,7 +24,7 @@ class QueryFilterTest extends AbstractIntegrationTest
         $user = new User();
         $this->em->persist($user);
 
-        $this->aclService->addRole($user, new ArticleEditorRole($user, $article2));
+        $this->aclManager->addRole($user, new ArticleEditorRole($user, $article2));
 
         $this->em->flush();
 
@@ -52,7 +52,7 @@ class QueryFilterTest extends AbstractIntegrationTest
         $user = new User();
         $this->em->persist($user);
 
-        $this->aclService->addRole($user, new ArticleEditorRole($user, $article2));
+        $this->aclManager->addRole($user, new ArticleEditorRole($user, $article2));
 
         $this->em->flush();
 

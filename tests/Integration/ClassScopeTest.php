@@ -28,7 +28,7 @@ class ClassScopeTest extends AbstractIntegrationTest
         $user = new User();
         $this->em->persist($user);
 
-        $this->aclService->addRole($user, new AllArticlesEditorRole($user, [$article1, $article2]));
+        $this->aclManager->addRole($user, new AllArticlesEditorRole($user, [$article1, $article2]));
 
         $this->em->flush();
 
@@ -38,12 +38,12 @@ class ClassScopeTest extends AbstractIntegrationTest
         $article2 = $this->em->find(get_class($article2), $article2->getId());
         $user = $this->em->find(get_class($user), $user->getId());
 
-        $this->assertTrue($this->aclService->isAllowed($user, Actions::VIEW, $article1));
-        $this->assertTrue($this->aclService->isAllowed($user, Actions::EDIT, $article1));
-        $this->assertFalse($this->aclService->isAllowed($user, Actions::DELETE, $article1));
-        $this->assertTrue($this->aclService->isAllowed($user, Actions::VIEW, $article2));
-        $this->assertTrue($this->aclService->isAllowed($user, Actions::EDIT, $article2));
-        $this->assertFalse($this->aclService->isAllowed($user, Actions::DELETE, $article2));
+        $this->assertTrue($this->aclManager->isAllowed($user, Actions::VIEW, $article1));
+        $this->assertTrue($this->aclManager->isAllowed($user, Actions::EDIT, $article1));
+        $this->assertFalse($this->aclManager->isAllowed($user, Actions::DELETE, $article1));
+        $this->assertTrue($this->aclManager->isAllowed($user, Actions::VIEW, $article2));
+        $this->assertTrue($this->aclManager->isAllowed($user, Actions::EDIT, $article2));
+        $this->assertFalse($this->aclManager->isAllowed($user, Actions::DELETE, $article2));
     }
 
     /**
@@ -61,7 +61,7 @@ class ClassScopeTest extends AbstractIntegrationTest
 
         $this->em->flush();
 
-        $this->aclService->addRole($user, new AllArticlesEditorRole($user, [$article1, $article2]));
+        $this->aclManager->addRole($user, new AllArticlesEditorRole($user, [$article1, $article2]));
 
         $this->em->flush();
 
@@ -71,12 +71,12 @@ class ClassScopeTest extends AbstractIntegrationTest
         $article2 = $this->em->find(get_class($article2), $article2->getId());
         $user = $this->em->find(get_class($user), $user->getId());
 
-        $this->assertTrue($this->aclService->isAllowed($user, Actions::VIEW, $article1));
-        $this->assertTrue($this->aclService->isAllowed($user, Actions::EDIT, $article1));
-        $this->assertFalse($this->aclService->isAllowed($user, Actions::DELETE, $article1));
-        $this->assertTrue($this->aclService->isAllowed($user, Actions::VIEW, $article2));
-        $this->assertTrue($this->aclService->isAllowed($user, Actions::EDIT, $article2));
-        $this->assertFalse($this->aclService->isAllowed($user, Actions::DELETE, $article2));
+        $this->assertTrue($this->aclManager->isAllowed($user, Actions::VIEW, $article1));
+        $this->assertTrue($this->aclManager->isAllowed($user, Actions::EDIT, $article1));
+        $this->assertFalse($this->aclManager->isAllowed($user, Actions::DELETE, $article1));
+        $this->assertTrue($this->aclManager->isAllowed($user, Actions::VIEW, $article2));
+        $this->assertTrue($this->aclManager->isAllowed($user, Actions::EDIT, $article2));
+        $this->assertFalse($this->aclManager->isAllowed($user, Actions::DELETE, $article2));
     }
 
     public function testFromMemory()
@@ -88,14 +88,14 @@ class ClassScopeTest extends AbstractIntegrationTest
 
         $user = new User();
 
-        $this->aclService->addRole($user, new ArticleEditorRole($user, $article2));
+        $this->aclManager->addRole($user, new ArticleEditorRole($user, $article2));
 
-        $this->assertTrue($this->aclService->isAllowed($user, Actions::VIEW, $article1));
-        $this->assertTrue($this->aclService->isAllowed($user, Actions::EDIT, $article1));
-        $this->assertFalse($this->aclService->isAllowed($user, Actions::DELETE, $article1));
-        $this->assertTrue($this->aclService->isAllowed($user, Actions::VIEW, $article2));
-        $this->assertTrue($this->aclService->isAllowed($user, Actions::EDIT, $article2));
-        $this->assertFalse($this->aclService->isAllowed($user, Actions::DELETE, $article2));
+        $this->assertTrue($this->aclManager->isAllowed($user, Actions::VIEW, $article1));
+        $this->assertTrue($this->aclManager->isAllowed($user, Actions::EDIT, $article1));
+        $this->assertFalse($this->aclManager->isAllowed($user, Actions::DELETE, $article1));
+        $this->assertTrue($this->aclManager->isAllowed($user, Actions::VIEW, $article2));
+        $this->assertTrue($this->aclManager->isAllowed($user, Actions::EDIT, $article2));
+        $this->assertFalse($this->aclManager->isAllowed($user, Actions::DELETE, $article2));
     }
 
     /**
@@ -111,13 +111,13 @@ class ClassScopeTest extends AbstractIntegrationTest
 
         $this->em->flush();
 
-        $this->aclService->addRole($user, new AllArticlesEditorRole($user, [$article1]));
+        $this->aclManager->addRole($user, new AllArticlesEditorRole($user, [$article1]));
 
         $this->em->flush();
 
         $article2 = new Article();
         $this->em->persist($article2);
-        $this->aclService->processNewResource($article2);
+        $this->aclManager->processNewResource($article2);
         $this->em->flush();
 
         // Clear the entity manager and reload the entities so that we make sure we hit the database
@@ -126,11 +126,11 @@ class ClassScopeTest extends AbstractIntegrationTest
         $article2 = $this->em->find(get_class($article2), $article2->getId());
         $user = $this->em->find(get_class($user), $user->getId());
 
-        $this->assertTrue($this->aclService->isAllowed($user, Actions::VIEW, $article1));
-        $this->assertTrue($this->aclService->isAllowed($user, Actions::EDIT, $article1));
-        $this->assertFalse($this->aclService->isAllowed($user, Actions::DELETE, $article1));
-        $this->assertTrue($this->aclService->isAllowed($user, Actions::VIEW, $article2));
-        $this->assertTrue($this->aclService->isAllowed($user, Actions::EDIT, $article2));
-        $this->assertFalse($this->aclService->isAllowed($user, Actions::DELETE, $article2));
+        $this->assertTrue($this->aclManager->isAllowed($user, Actions::VIEW, $article1));
+        $this->assertTrue($this->aclManager->isAllowed($user, Actions::EDIT, $article1));
+        $this->assertFalse($this->aclManager->isAllowed($user, Actions::DELETE, $article1));
+        $this->assertTrue($this->aclManager->isAllowed($user, Actions::VIEW, $article2));
+        $this->assertTrue($this->aclManager->isAllowed($user, Actions::EDIT, $article2));
+        $this->assertFalse($this->aclManager->isAllowed($user, Actions::DELETE, $article2));
     }
 }
