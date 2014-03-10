@@ -2,6 +2,7 @@
 
 namespace Tests\MyCLabs\ACL\Integration;
 
+use Doctrine\Common\Cache\ArrayCache;
 use Doctrine\Common\EventManager;
 use Doctrine\ORM\EntityManager;
 use Doctrine\ORM\Events;
@@ -52,7 +53,7 @@ abstract class AbstractIntegrationTest extends \PHPUnit_Framework_TestCase
         $evm->addEventListener(Events::onFlush, new ACLArticleListener());
 
         // Create the entity manager
-        $config = Setup::createAnnotationMetadataConfiguration($paths, true);
+        $config = Setup::createAnnotationMetadataConfiguration($paths, true, null, new ArrayCache(), false);
         $this->em = EntityManager::create($dbParams, $config, $evm);
 
         // Create the DB

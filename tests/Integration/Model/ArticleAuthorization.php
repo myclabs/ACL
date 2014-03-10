@@ -2,17 +2,18 @@
 
 namespace Tests\MyCLabs\ACL\Integration\Model;
 
+use Doctrine\ORM\Mapping as ORM;
 use MyCLabs\ACL\Model\Authorization;
 
 /**
- * @Entity(readOnly=true)
+ * @ORM\Entity(readOnly=true)
  */
 class ArticleAuthorization extends Authorization
 {
     /**
      * @var Article|null
-     * @ManyToOne(targetEntity="Article", inversedBy="authorizations")
-     * @JoinColumn(onDelete="CASCADE")
+     * @ORM\ManyToOne(targetEntity="Article", inversedBy="authorizations")
+     * @ORM\JoinColumn(onDelete="CASCADE")
      */
     protected $resource;
 }

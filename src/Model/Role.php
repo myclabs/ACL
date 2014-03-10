@@ -5,13 +5,14 @@ namespace MyCLabs\ACL\Model;
 use Doctrine\Common\Collections\ArrayCollection;
 use Doctrine\Common\Collections\Collection;
 use Doctrine\Common\Collections\Criteria;
+use Doctrine\ORM\Mapping as ORM;
 
 /**
  * Role.
  *
- * @Entity
- * @InheritanceType("JOINED")
- * @DiscriminatorColumn(name="type", type="string")
+ * @ORM\Entity
+ * @ORM\InheritanceType("JOINED")
+ * @ORM\DiscriminatorColumn(name="type", type="string")
  *
  * @author Matthieu Napoli <matthieu@mnapoli.fr>
  */
@@ -19,20 +20,20 @@ abstract class Role
 {
     /**
      * @var int
-     * @Id @GeneratedValue
-     * @Column(type="integer")
+     * @ORM\Id @ORM\GeneratedValue
+     * @ORM\Column(type="integer")
      */
     protected $id;
 
     /**
      * @var SecurityIdentityInterface
-     * @ManyToOne(targetEntity="SecurityIdentityInterface", inversedBy="roles")
+     * @ORM\ManyToOne(targetEntity="SecurityIdentityInterface", inversedBy="roles")
      */
     protected $securityIdentity;
 
     /**
      * @var Authorization[]|Collection
-     * @OneToMany(targetEntity="Authorization", mappedBy="role")
+     * @ORM\OneToMany(targetEntity="Authorization", mappedBy="role")
      */
     protected $authorizations;
 

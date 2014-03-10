@@ -2,10 +2,12 @@
 
 namespace MyCLabs\ACL\Model;
 
+use Doctrine\ORM\Mapping as ORM;
+
 /**
  * Actions that can be done on a resource.
  *
- * @Embeddable
+ * @ORM\Embeddable
  *
  * @author Matthieu Napoli <matthieu@mnapoli.fr>
  */
@@ -19,32 +21,32 @@ class Actions
     const ALLOW = 'allow';
 
     /**
-     * @Column(type = "boolean")
+     * @ORM\Column(type = "boolean")
      */
     public $view = false;
 
     /**
-     * @Column(type = "boolean")
+     * @ORM\Column(type = "boolean")
      */
     public $create = false;
 
     /**
-     * @Column(type = "boolean")
+     * @ORM\Column(type = "boolean")
      */
     public $edit = false;
 
     /**
-     * @Column(type = "boolean")
+     * @ORM\Column(type = "boolean")
      */
     public $delete = false;
 
     /**
-     * @Column(type = "boolean")
+     * @ORM\Column(type = "boolean")
      */
     public $undelete = false;
 
     /**
-     * @Column(type = "boolean")
+     * @ORM\Column(type = "boolean")
      */
     public $allow = false;
 

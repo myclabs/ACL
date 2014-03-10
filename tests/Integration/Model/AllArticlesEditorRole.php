@@ -2,10 +2,11 @@
 
 namespace Tests\MyCLabs\ACL\Integration\Model;
 
+use Doctrine\ORM\Mapping as ORM;
 use MyCLabs\ACL\Model\Role;
 
 /**
- * @Entity(readOnly=true)
+ * @ORM\Entity(readOnly=true)
  */
 class AllArticlesEditorRole extends Role
 {

@@ -2,16 +2,17 @@
 
 namespace Tests\MyCLabs\ACL\Integration\Model;
 
+use Doctrine\ORM\Mapping as ORM;
 use MyCLabs\ACL\Model\Role;
 
 /**
- * @Entity(readOnly=true)
+ * @ORM\Entity(readOnly=true)
  */
 class ArticleEditorRole extends Role
 {
     /**
      * @var Article
-     * @ManyToOne(targetEntity="Article", inversedBy="roles")
+     * @ORM\ManyToOne(targetEntity="Article", inversedBy="roles")
      */
     protected $article;
 

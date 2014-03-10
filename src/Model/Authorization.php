@@ -4,13 +4,14 @@ namespace MyCLabs\ACL\Model;
 
 use Doctrine\Common\Collections\ArrayCollection;
 use Doctrine\Common\Collections\Collection;
+use Doctrine\ORM\Mapping as ORM;
 
 /**
  * Authorization of a security identity to do something on a resource.
  *
- * @Entity(readOnly=true)
- * @InheritanceType("JOINED")
- * @DiscriminatorColumn(name="type", type="string")
+ * @ORM\Entity(readOnly=true)
+ * @ORM\InheritanceType("JOINED")
+ * @ORM\DiscriminatorColumn(name="type", type="string")
  *
  * @author Matthieu Napoli <matthieu@mnapoli.fr>
  */
@@ -18,8 +19,8 @@ abstract class Authorization
 {
     /**
      * @var int
-     * @Id @GeneratedValue
-     * @Column(type="integer")
+     * @ORM\Id @ORM\GeneratedValue
+     * @ORM\Column(type="integer")
      */
     protected $id;
 
@@ -27,21 +28,21 @@ abstract class Authorization
      * Role that created the authorization.
      *
      * @var Role
-     * @ManyToOne(targetEntity="Role", inversedBy="authorizations")
-     * @JoinColumn(nullable=false, onDelete="CASCADE")
+     * @ORM\ManyToOne(targetEntity="Role", inversedBy="authorizations")
+     * @ORM\JoinColumn(nullable=false, onDelete="CASCADE")
      */
     protected $role;
 
     /**
      * @var SecurityIdentityInterface
-     * @ManyToOne(targetEntity="SecurityIdentityInterface")
-     * @JoinColumn(nullable=false, onDelete="CASCADE")
+     * @ORM\ManyToOne(targetEntity="SecurityIdentityInterface")
+     * @ORM\JoinColumn(nullable=false, onDelete="CASCADE")
      */
     protected $securityIdentity;
 
     /**
      * @var Actions
-     * @Embedded(class="Actions")
+     * @ORM\Embedded(class="Actions")
      */
     protected $actions;
 
@@ -52,14 +53,14 @@ abstract class Authorization
 
     /**
      * @var Authorization
-     * @ManyToOne(targetEntity="Authorization", inversedBy="childAuthorizations")
-     * @JoinColumn(onDelete="CASCADE")
+     * @ORM\ManyToOne(targetEntity="Authorization", inversedBy="childAuthorizations")
+     * @ORM\JoinColumn(onDelete="CASCADE")
      */
     protected $parentAuthorization;
 
     /**
      * @var Authorization[]|Collection
-     * @OneToMany(targetEntity="Authorization", mappedBy="parentAuthorization")
+     * @ORM\OneToMany(targetEntity="Authorization", mappedBy="parentAuthorization")
      */
     protected $childAuthorizations;
 
