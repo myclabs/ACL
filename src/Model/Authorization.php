@@ -51,8 +51,6 @@ abstract class Authorization
     protected $resource;
 
     /**
-     * Héritage des droits entre ressources.
-     *
      * @var Authorization
      * @ManyToOne(targetEntity="Authorization", inversedBy="childAuthorizations")
      * @JoinColumn(onDelete="CASCADE")
@@ -81,10 +79,10 @@ abstract class Authorization
     }
 
     /**
-     * Crée une autorisation qui hérite d'une autre.
+     * Creates an authorizations that inherits from another.
      *
      * @param Authorization          $parentAuthorization
-     * @param ResourceInterface|null $resource Nouvelle ressource
+     * @param ResourceInterface|null $resource
      * @param Actions|null           $actions
      * @return static
      */

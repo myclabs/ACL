@@ -53,6 +53,8 @@ class Actions
         foreach ($actions as $action) {
             if (property_exists($this, $action)) {
                 $this->$action = true;
+            } else {
+                throw new \InvalidArgumentException('Unknown ACL action ' . $action);
             }
         }
     }

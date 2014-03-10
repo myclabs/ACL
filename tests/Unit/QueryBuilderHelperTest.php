@@ -1,6 +1,6 @@
 <?php
 
-namespace Tests\MyCLabs\ACL;
+namespace Tests\MyCLabs\ACL\Unit;
 
 use Doctrine\ORM\QueryBuilder;
 use MyCLabs\ACL\Model\Actions;
