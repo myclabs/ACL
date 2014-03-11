@@ -3,6 +3,7 @@
 namespace Tests\MyCLabs\ACL\Integration;
 
 use MyCLabs\ACL\Model\Actions;
+use MyCLabs\ACL\Model\Resource;
 use Tests\MyCLabs\ACL\Integration\Model\AllArticlesEditorRole;
 use Tests\MyCLabs\ACL\Integration\Model\Article;
 use Tests\MyCLabs\ACL\Integration\Model\User;
@@ -38,9 +39,10 @@ class ClassScopeTest extends AbstractIntegrationTest
         $user = $this->em->find(get_class($user), $user->getId());
 
         // Test on the resource class
-        $this->assertTrue($this->aclManager->isAllowed($user, Actions::VIEW, 'Tests\MyCLabs\ACL\Integration\Model\Article'));
-        $this->assertTrue($this->aclManager->isAllowed($user, Actions::EDIT, 'Tests\MyCLabs\ACL\Integration\Model\Article'));
-        $this->assertFalse($this->aclManager->isAllowed($user, Actions::DELETE, 'Tests\MyCLabs\ACL\Integration\Model\Article'));
+        $classResource = Resource::fromEntityClass('Tests\MyCLabs\ACL\Integration\Model\Article');
+        $this->assertTrue($this->aclManager->isAllowed($user, Actions::VIEW, $classResource));
+        $this->assertTrue($this->aclManager->isAllowed($user, Actions::EDIT, $classResource));
+        $this->assertFalse($this->aclManager->isAllowed($user, Actions::DELETE, $classResource));
 
         // Test on entities
         $this->assertTrue($this->aclManager->isAllowed($user, Actions::VIEW, $article1));
@@ -77,9 +79,10 @@ class ClassScopeTest extends AbstractIntegrationTest
         $user = $this->em->find(get_class($user), $user->getId());
 
         // Test on the resource class
-        $this->assertTrue($this->aclManager->isAllowed($user, Actions::VIEW, 'Tests\MyCLabs\ACL\Integration\Model\Article'));
-        $this->assertTrue($this->aclManager->isAllowed($user, Actions::EDIT, 'Tests\MyCLabs\ACL\Integration\Model\Article'));
-        $this->assertFalse($this->aclManager->isAllowed($user, Actions::DELETE, 'Tests\MyCLabs\ACL\Integration\Model\Article'));
+        $classResource = Resource::fromEntityClass('Tests\MyCLabs\ACL\Integration\Model\Article');
+        $this->assertTrue($this->aclManager->isAllowed($user, Actions::VIEW, $classResource));
+        $this->assertTrue($this->aclManager->isAllowed($user, Actions::EDIT, $classResource));
+        $this->assertFalse($this->aclManager->isAllowed($user, Actions::DELETE, $classResource));
 
         // Test on entities
         $this->assertTrue($this->aclManager->isAllowed($user, Actions::VIEW, $article1));
@@ -118,9 +121,10 @@ class ClassScopeTest extends AbstractIntegrationTest
         $user = $this->em->find(get_class($user), $user->getId());
 
         // Test on the resource class
-        $this->assertTrue($this->aclManager->isAllowed($user, Actions::VIEW, 'Tests\MyCLabs\ACL\Integration\Model\Article'));
-        $this->assertTrue($this->aclManager->isAllowed($user, Actions::EDIT, 'Tests\MyCLabs\ACL\Integration\Model\Article'));
-        $this->assertFalse($this->aclManager->isAllowed($user, Actions::DELETE, 'Tests\MyCLabs\ACL\Integration\Model\Article'));
+        $classResource = Resource::fromEntityClass('Tests\MyCLabs\ACL\Integration\Model\Article');
+        $this->assertTrue($this->aclManager->isAllowed($user, Actions::VIEW, $classResource));
+        $this->assertTrue($this->aclManager->isAllowed($user, Actions::EDIT, $classResource));
+        $this->assertFalse($this->aclManager->isAllowed($user, Actions::DELETE, $classResource));
 
         // Test on entities
         $this->assertTrue($this->aclManager->isAllowed($user, Actions::VIEW, $article1));

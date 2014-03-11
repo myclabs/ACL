@@ -6,6 +6,7 @@ use Doctrine\ORM\EntityManager;
 use Doctrine\ORM\Event\OnFlushEventArgs;
 use Doctrine\ORM\UnitOfWork;
 use MyCLabs\ACL\Model\Actions;
+use MyCLabs\ACL\Model\Resource;
 use MyCLabs\ACL\Model\Role;
 
 class ACLArticleListener
@@ -71,13 +72,13 @@ class ACLArticleListener
 
         if ($role instanceof ArticleEditorRole) {
             $authorizations = [
-                ArticleAuthorization::create($role, $editorActions, $role->getArticle()),
+                ArticleAuthorization::create($role, $editorActions, Resource::fromEntity($role->getArticle())),
             ];
         } elseif ($role instanceof AllArticlesEditorRole) {
-            $authorizations = [ArticleAuthorization::createOnResourceClass(
+            $authorizations = [ArticleAuthorization::create(
                 $role,
                 $editorActions,
-                'Tests\MyCLabs\ACL\Integration\Model\Article'
+                Resource::fromEntityClass('Tests\MyCLabs\ACL\Integration\Model\Article')
             )];
             $authorizations = array_merge($authorizations, $this->inherit($authorizations));
         }
@@ -96,7 +97,10 @@ class ACLArticleListener
         foreach ($repository->findAll() as $role) {
             /** @var AllArticlesEditorRole $role */
             foreach ($role->getRootAuthorizations() as $parentAuthorization) {
-                $authorizations[] = ArticleAuthorization::createChildAuthorization($parentAuthorization, $article);
+                $authorizations[] = ArticleAuthorization::createChildAuthorization(
+                    $parentAuthorization,
+                    Resource::fromEntity($article)
+                );
             }
         }
 
@@ -118,7 +122,10 @@ class ACLArticleListener
 
         foreach ($parentAuthorizations as $parentAuthorization) {
             foreach ($allArticles as $article) {
-                $authorizations[] = ArticleAuthorization::createChildAuthorization($parentAuthorization, $article);
+                $authorizations[] = ArticleAuthorization::createChildAuthorization(
+                    $parentAuthorization,
+                    Resource::fromEntity($article)
+                );
             }
         }
 

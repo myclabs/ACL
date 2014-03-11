@@ -15,5 +15,5 @@ class ArticleAuthorization extends Authorization
      * @ORM\ManyToOne(targetEntity="Article", inversedBy="authorizations")
      * @ORM\JoinColumn(onDelete="CASCADE")
      */
-    protected $resource;
+    protected $entity;
 }

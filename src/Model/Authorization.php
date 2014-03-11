@@ -47,21 +47,21 @@ abstract class Authorization
     protected $actions;
 
     /**
-     * The resource (entity) targeted by the authorization.
-     * If null, then $resourceClass is used and this authorization is at class-scope.
+     * The entity targeted by the authorization.
+     * If null, then $entityClass is used and this authorization is at class-scope.
      *
-     * @var ResourceInterface|null
+     * @var EntityResourceInterface|null
      */
-    protected $resource;
+    protected $entity;
 
     /**
-     * Must be defined when $resource is null.
+     * Must be defined when $entity is null.
      * If defined, then the authorization applies to all the entities of that class.
      *
      * @ORM\Column(nullable=true)
      * @var string|null
      */
-    protected $resourceClass;
+    protected $entityClass;
 
     /**
      * @var Authorization
@@ -77,42 +77,33 @@ abstract class Authorization
     protected $childAuthorizations;
 
     /**
-     * Creates an authorization on a entity resource.
+     * Creates an authorization on a resource.
      *
-     * @param Role              $role
-     * @param Actions           $actions
-     * @param ResourceInterface $resource
+     * @param Role     $role
+     * @param Actions  $actions
+     * @param Resource $resource
      * @return static
      */
-    public static function create(Role $role, Actions $actions, ResourceInterface $resource)
+    public static function create(Role $role, Actions $actions, Resource $resource)
     {
-        return new static($role, $actions, $resource);
-    }
-
-    /**
-     * Creates an authorization on a resource class.
-     *
-     * @param Role    $role
-     * @param Actions $actions
-     * @param string  $resourceClass
-     * @return static
-     */
-    public static function createOnResourceClass(Role $role, Actions $actions, $resourceClass)
-    {
-        return new static($role, $actions, null, $resourceClass);
+        if ($resource->isEntity()) {
+            return new static($role, $actions, $resource->getEntity());
+        } elseif ($resource->isEntityClass()) {
+            return new static($role, $actions, null, $resource->getEntityClass());
+        }
     }
 
     /**
      * Creates an authorizations that inherits from another.
      *
-     * @param Authorization     $parentAuthorization
-     * @param ResourceInterface $resource
-     * @param Actions|null      $actions
+     * @param Authorization $parentAuthorization
+     * @param Resource      $resource
+     * @param Actions|null  $actions
      * @return static
      */
     public static function createChildAuthorization(
         Authorization $parentAuthorization,
-        ResourceInterface $resource,
+        Resource $resource,
         Actions $actions = null
     ) {
         $actions = $actions ?: $parentAuthorization->getActions();
@@ -125,23 +116,23 @@ abstract class Authorization
     }
 
     /**
-     * @param Role                   $role
-     * @param Actions                $actions
-     * @param ResourceInterface|null $resource
-     * @param string                 $resourceClass
+     * @param Role                         $role
+     * @param Actions                      $actions
+     * @param EntityResourceInterface|null $entity
+     * @param string                       $entityClass
      */
     private function __construct(
         Role $role,
         Actions $actions,
-        ResourceInterface $resource = null,
-        $resourceClass = null
+        EntityResourceInterface $entity = null,
+        $entityClass = null
     ) {
         $this->role = $role;
         $this->securityIdentity = $role->getSecurityIdentity();
         $this->actions = $actions;
-        $this->resource = $resource;
-        if ($resource === null) {
-            $this->resourceClass = $resourceClass;
+        $this->entity = $entity;
+        if ($entity === null) {
+            $this->entityClass = $entityClass;
         }
 
         $this->childAuthorizations = new ArrayCollection();
@@ -168,19 +159,19 @@ abstract class Authorization
     }
 
     /**
-     * @return ResourceInterface|null
+     * @return EntityResourceInterface|null
      */
-    public function getResource()
+    public function getEntity()
     {
-        return $this->resource;
+        return $this->entity;
     }
 
     /**
      * @return string|null
      */
-    public function getResourceClass()
+    public function getEntityClass()
     {
-        return $this->resourceClass;
+        return $this->entityClass;
     }
 
     /**

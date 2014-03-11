@@ -39,7 +39,7 @@ You need to have your entity implement the `Resource` interface. Instead of impl
 of the interface, you can use the `ResourceTrait`:
 
 ```php
-class Article implements ResourceInterface
+class Article implements EntityResourceInterface
 {
     use ResourceTrait;
 

@@ -3,11 +3,11 @@
 namespace MyCLabs\ACL\Model;
 
 /**
- * ACL resource interface.
+ * Entity being a resource.
  *
  * @author Matthieu Napoli <matthieu@mnapoli.fr>
  */
-interface ResourceInterface
+interface EntityResourceInterface
 {
     /**
      * @return mixed
