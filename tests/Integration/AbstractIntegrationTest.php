@@ -46,7 +46,6 @@ abstract class AbstractIntegrationTest extends \PHPUnit_Framework_TestCase
 
         $metadataLoader = new MetadataLoader();
         $metadataLoader->registerRoleClass('Tests\MyCLabs\ACL\Integration\Model\ArticleEditorRole', 'articleEditor');
-        $metadataLoader->registerAuthorizationClass('Tests\MyCLabs\ACL\Integration\Model\ArticleAuthorization', 'article');
 
         $evm->addEventListener(Events::loadClassMetadata, $rtel);
         $evm->addEventListener(Events::loadClassMetadata, $metadataLoader);

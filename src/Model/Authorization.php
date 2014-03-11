@@ -15,7 +15,7 @@ use Doctrine\ORM\Mapping as ORM;
  *
  * @author Matthieu Napoli <matthieu@mnapoli.fr>
  */
-abstract class Authorization
+class Authorization
 {
     /**
      * @var int
@@ -50,15 +50,16 @@ abstract class Authorization
      * The entity targeted by the authorization.
      * If null, then $entityClass is used and this authorization is at class-scope.
      *
-     * @var EntityResourceInterface|null
+     * @ORM\Column(type="integer", nullable=true)
+     * @var int|null
      */
-    protected $entity;
+    protected $entityId;
 
     /**
      * Must be defined when $entity is null.
      * If defined, then the authorization applies to all the entities of that class.
      *
-     * @ORM\Column(nullable=true)
+     * @ORM\Column
      * @var string|null
      */
     protected $entityClass;
@@ -130,9 +131,13 @@ abstract class Authorization
         $this->role = $role;
         $this->securityIdentity = $role->getSecurityIdentity();
         $this->actions = $actions;
-        $this->entity = $entity;
+        if ($entity !== null) {
+            $this->entityId = $entity->getId();
+        }
         if ($entity === null) {
             $this->entityClass = $entityClass;
+        } else {
+            $this->entityClass = get_class($entity);
         }
 
         $this->childAuthorizations = new ArrayCollection();
@@ -159,11 +164,11 @@ abstract class Authorization
     }
 
     /**
-     * @return EntityResourceInterface|null
+     * @return int|null
      */
-    public function getEntity()
+    public function getEntityId()
     {
-        return $this->entity;
+        return $this->entityId;
     }
 
     /**

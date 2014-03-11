@@ -5,6 +5,7 @@ namespace Tests\MyCLabs\ACL\Integration\Model;
 use Doctrine\Common\Collections\ArrayCollection;
 use Doctrine\Common\Collections\Collection;
 use Doctrine\ORM\Mapping as ORM;
+use MyCLabs\ACL\Model\Authorization;
 use MyCLabs\ACL\Model\EntityResourceInterface;
 
 /**
@@ -19,12 +20,6 @@ class Article implements EntityResourceInterface
     protected $id;
 
     /**
-     * @var ArticleAuthorization[]|Collection
-     * @ORM\OneToMany(targetEntity="ArticleAuthorization", mappedBy="entity", fetch="EXTRA_LAZY")
-     */
-    protected $authorizations;
-
-    /**
      * @var ArticleEditorRole[]|Collection
      * @ORM\OneToMany(targetEntity="ArticleEditorRole", mappedBy="article")
      */
@@ -32,7 +27,6 @@ class Article implements EntityResourceInterface
 
     public function __construct()
     {
-        $this->authorizations = new ArrayCollection();
         $this->roles = new ArrayCollection();
     }
 
