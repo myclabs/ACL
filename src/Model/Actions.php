@@ -60,4 +60,21 @@ class Actions
             }
         }
     }
+
+    /**
+     * Return an object representing all actions.
+     *
+     * @return Actions
+     */
+    public static function all()
+    {
+        return new static([
+            static::VIEW,
+            static::CREATE,
+            static::EDIT,
+            static::DELETE,
+            static::UNDELETE,
+            static::ALLOW,
+        ]);
+    }
 }
