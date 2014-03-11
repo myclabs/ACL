@@ -74,7 +74,11 @@ class ACLArticleListener
                 ArticleAuthorization::create($role, $editorActions, $role->getArticle()),
             ];
         } elseif ($role instanceof AllArticlesEditorRole) {
-            $authorizations = [ArticleAuthorization::create($role, $editorActions)];
+            $authorizations = [ArticleAuthorization::createOnResourceClass(
+                $role,
+                $editorActions,
+                'Tests\MyCLabs\ACL\Integration\Model\Article'
+            )];
             $authorizations = array_merge($authorizations, $this->inherit($authorizations));
         }
 

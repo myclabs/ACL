@@ -29,31 +29,45 @@ class ACLManager
      *
      * @param SecurityIdentityInterface $identity
      * @param string                    $action
-     * @param ResourceInterface         $resource
+     * @param ResourceInterface|string  $resource Entity (ResourceInterface) or resource class (string)
      *
      * @throws \RuntimeException The resource is not persisted (ID must be not null).
      * @return boolean Is allowed, or not.
      */
-    public function isAllowed(SecurityIdentityInterface $identity, $action, ResourceInterface $resource)
+    public function isAllowed(SecurityIdentityInterface $identity, $action, $resource)
     {
-        if ($resource->getId() === null) {
-            throw new \RuntimeException(sprintf(
-                'The resource %s must be persisted (id not null) to be able to test the permissions',
-                get_class($resource)
-            ));
+        if ($resource instanceof ResourceInterface) {
+            if ($resource->getId() === null) {
+                throw new \RuntimeException(sprintf(
+                    'The resource %s must be persisted (id not null) to be able to test the permissions',
+                    get_class($resource)
+                ));
+            }
+
+            $resourceClass = get_class($resource);
+            $dql = "SELECT count(resource)
+                    FROM $resourceClass resource
+                    INNER JOIN resource.authorizations authorization
+                    WHERE resource = :resource
+                        AND authorization.securityIdentity = :securityIdentity
+                        AND authorization.actions.$action = true";
+
+            $query = $this->entityManager->createQuery($dql);
+            $query->setParameter('resource', $resource);
+        } else {
+            $dql = "SELECT count(authorization)
+                    FROM MyCLabs\\ACL\\Model\\Authorization authorization
+                    WHERE authorization.resourceClass = :resourceClass
+                        AND authorization.securityIdentity = :securityIdentity
+                        AND authorization.actions.$action = true";
+
+            $query = $this->entityManager->createQuery($dql);
+            $query->setParameter('resourceClass', $resource);
         }
 
-        $repository = $this->entityManager->getRepository(get_class($resource));
-        $qb = $repository->createQueryBuilder('resource');
-        $qb->select('count(resource)')
-            ->innerJoin('resource.authorizations', 'auth')
-            ->where('resource = :resource')
-            ->andWhere('auth.actions.' . $action . ' = true')
-            ->andWhere('auth.securityIdentity = :securityIdentity');
-        $qb->setParameter('resource', $resource);
-        $qb->setParameter('securityIdentity', $identity);
+        $query->setParameter('securityIdentity', $identity);
 
-        return ($qb->getQuery()->getSingleScalarResult() > 0);
+        return ($query->getSingleScalarResult() > 0);
     }
 
     /**

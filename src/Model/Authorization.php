@@ -47,9 +47,21 @@ abstract class Authorization
     protected $actions;
 
     /**
+     * The resource (entity) targeted by the authorization.
+     * If null, then $resourceClass is used and this authorization is at class-scope.
+     *
      * @var ResourceInterface|null
      */
     protected $resource;
+
+    /**
+     * Must be defined when $resource is null.
+     * If defined, then the authorization applies to all the entities of that class.
+     *
+     * @ORM\Column(nullable=true)
+     * @var string|null
+     */
+    protected $resourceClass;
 
     /**
      * @var Authorization
@@ -65,31 +77,42 @@ abstract class Authorization
     protected $childAuthorizations;
 
     /**
-     * @param Role                   $role
-     * @param Actions                $actions
-     * @param ResourceInterface|null $resource
+     * Creates an authorization on a entity resource.
+     *
+     * @param Role              $role
+     * @param Actions           $actions
+     * @param ResourceInterface $resource
      * @return static
      */
-    public static function create(Role $role, Actions $actions, ResourceInterface $resource = null)
+    public static function create(Role $role, Actions $actions, ResourceInterface $resource)
     {
-        $authorization = new static($role, $role->getSecurityIdentity(), $actions, $resource);
+        return new static($role, $actions, $resource);
+    }
 
-        $role->addAuthorization($authorization);
-
-        return $authorization;
+    /**
+     * Creates an authorization on a resource class.
+     *
+     * @param Role    $role
+     * @param Actions $actions
+     * @param string  $resourceClass
+     * @return static
+     */
+    public static function createOnResourceClass(Role $role, Actions $actions, $resourceClass)
+    {
+        return new static($role, $actions, null, $resourceClass);
     }
 
     /**
      * Creates an authorizations that inherits from another.
      *
-     * @param Authorization          $parentAuthorization
-     * @param ResourceInterface|null $resource
-     * @param Actions|null           $actions
+     * @param Authorization     $parentAuthorization
+     * @param ResourceInterface $resource
+     * @param Actions|null      $actions
      * @return static
      */
     public static function createChildAuthorization(
         Authorization $parentAuthorization,
-        ResourceInterface $resource = null,
+        ResourceInterface $resource,
         Actions $actions = null
     ) {
         $actions = $actions ?: $parentAuthorization->getActions();
@@ -102,23 +125,30 @@ abstract class Authorization
     }
 
     /**
-     * @param Role                      $role
-     * @param SecurityIdentityInterface $identity
-     * @param Actions                   $actions
-     * @param ResourceInterface|null    $resource
+     * @param Role                   $role
+     * @param Actions                $actions
+     * @param ResourceInterface|null $resource
+     * @param string                 $resourceClass
      */
     private function __construct(
         Role $role,
-        SecurityIdentityInterface $identity,
         Actions $actions,
-        ResourceInterface $resource = null
+        ResourceInterface $resource = null,
+        $resourceClass = null
     ) {
         $this->role = $role;
-        $this->securityIdentity = $identity;
+        $this->securityIdentity = $role->getSecurityIdentity();
         $this->actions = $actions;
         $this->resource = $resource;
+        if ($resource === null) {
+            $this->resourceClass = $resourceClass;
+        }
 
         $this->childAuthorizations = new ArrayCollection();
+
+        // Add to the role because the role might need its root authorizations
+        // for cascading (in case new resources are created later in the same thread)
+        $role->addAuthorization($this);
     }
 
     /**
@@ -143,6 +173,14 @@ abstract class Authorization
     public function getResource()
     {
         return $this->resource;
+    }
+
+    /**
+     * @return string|null
+     */
+    public function getResourceClass()
+    {
+        return $this->resourceClass;
     }
 
     /**
