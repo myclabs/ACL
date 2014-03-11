@@ -28,13 +28,13 @@ class QueryFilterTest extends AbstractIntegrationTest
         $this->em->flush();
 
         $query = $this->em->createQuery(
-            'SELECT a
-            FROM Tests\MyCLabs\ACL\Integration\Model\Article a
+            'SELECT a FROM Tests\MyCLabs\ACL\Integration\Model\Article a
             JOIN MyCLabs\ACL\Model\Authorization authorization WITH a.id = authorization.entityId
-            WHERE authorization.securityIdentity = :identity AND authorization.entityClass = :entityClass
+            WHERE authorization.securityIdentity = :identity
+            AND authorization.entityClass = :entityClass
             AND authorization.actions.view = true'
         );
-        $query->setParameter('entityClass', $user);
+        $query->setParameter('entityClass', 'Tests\MyCLabs\ACL\Integration\Model\Article');
         $query->setParameter('identity', $user);
         $articles = $query->getResult();
 

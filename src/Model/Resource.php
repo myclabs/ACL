@@ -36,10 +36,18 @@ class Resource
     /**
      * Returns the resource representing the given entity.
      * @param EntityResourceInterface $entity
+     * @throws \RuntimeException The entity is not persisted (ID must be not null).
      * @return Resource
      */
     public static function fromEntity(EntityResourceInterface $entity)
     {
+        if ($entity->getId() === null) {
+            throw new \RuntimeException(sprintf(
+                'The entity resource %s must be persisted (id not null) to be able to test the permissions',
+                get_class($entity)
+            ));
+        }
+
         return new static($entity);
     }
 
@@ -56,11 +64,19 @@ class Resource
     /**
      * Returns the resource representing the field of the entity.
      * @param EntityResourceInterface $entity
-     * @param string            $field
+     * @param string                  $field
+     * @throws \RuntimeException The entity is not persisted (ID must be not null).
      * @return Resource
      */
     public static function fromEntityField(EntityResourceInterface $entity, $field)
     {
+        if ($entity->getId() === null) {
+            throw new \RuntimeException(sprintf(
+                'The entity resource %s must be persisted (id not null) to be able to test the permissions',
+                get_class($entity)
+            ));
+        }
+
         return new static($entity, null, $field);
     }
 

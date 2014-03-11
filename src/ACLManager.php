@@ -32,7 +32,7 @@ class ACLManager
      * @param string                           $action
      * @param Resource|EntityResourceInterface $resource Resource expected, but an entity can be directly given too.
      *
-     * @throws \RuntimeException The resource is not persisted (ID must be not null).
+     * @throws \RuntimeException The entity is not persisted (ID must be not null).
      * @return boolean Is allowed, or not.
      */
     public function isAllowed(SecurityIdentityInterface $identity, $action, $resource)
