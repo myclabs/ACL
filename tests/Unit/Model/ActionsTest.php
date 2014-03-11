@@ -7,7 +7,7 @@ use MyCLabs\ACL\Model\Actions;
 /**
  * @covers \MyCLabs\ACL\Model\Actions
  */
-class QueryBuilderHelperTest extends \PHPUnit_Framework_TestCase
+class ActionsTest extends \PHPUnit_Framework_TestCase
 {
     public function testConstructor()
     {
@@ -31,5 +31,17 @@ class QueryBuilderHelperTest extends \PHPUnit_Framework_TestCase
     public function testUnknownAction()
     {
         new Actions(['foo']);
+    }
+
+    public function testAll()
+    {
+        $actions = Actions::all();
+
+        $this->assertTrue($actions->view);
+        $this->assertTrue($actions->edit);
+        $this->assertTrue($actions->create);
+        $this->assertTrue($actions->delete);
+        $this->assertTrue($actions->undelete);
+        $this->assertTrue($actions->allow);
     }
 }
