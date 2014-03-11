@@ -14,7 +14,7 @@ Test permissions:
 $aclManager->isAllowed($user, Actions::EDIT, $article);
 ```
 
-### Pros
+### Features
 
 - extremely optimized:
   - filters queries at database level (you don't load entities the user can't access)
@@ -22,6 +22,13 @@ $aclManager->isAllowed($user, Actions::EDIT, $article);
 - authorization cascading/inheritance
 - you can use custom actions on top of the standards VIEW, EDIT, CREATE, DELETE, etc.
 - authorizations are rebuildable: you can change what an "ArticleEditor" can do afterwards and just rebuild the ACL
+
+Scopes of access available:
+
+- [X] entity (example: article #123)
+- [X] entity class (example: all articles)
+- [ ] entity field (example: comments of article #123)
+- [ ] entity class field (example: comments of all articles)
 
 ### Cons
 
@@ -35,16 +42,13 @@ $aclManager->isAllowed($user, Actions::EDIT, $article);
 
 Let's say you want to control the access to an entity named `Article`.
 
-You need to have your entity implement the `Resource` interface. Instead of implementing the methods
-of the interface, you can use the `ResourceTrait`:
+You need to have your entity implement the `EntityResourceInterface` interface and map some fields:
 
 ```php
 class Article implements EntityResourceInterface
 {
-    use ResourceTrait;
-
     /**
-     * @OneToMany(targetEntity="ArticleAuthorization", mappedBy="resource", fetch="EXTRA_LAZY")
+     * @OneToMany(targetEntity="ArticleAuthorization", mappedBy="entity", fetch="EXTRA_LAZY")
      */
     protected $authorizations;
 
@@ -67,7 +71,7 @@ class ArticleAuthorization extends Authorization
      * @ManyToOne(targetEntity="Article", inversedBy="authorizations")
      * @JoinColumn(onDelete="CASCADE")
      */
-    protected $resource;
+    protected $entity;
 }
 ```
 
@@ -92,13 +96,6 @@ class ArticleEditorRole extends Role
         $this->article = $article;
 
         parent::__construct($user);
-    }
-
-    public function createAuthorizations()
-    {
-        return [
-            ArticleAuthorization::create($this, new Actions([Actions::VIEW, Actions::EDIT], $this->article);
-        ];
     }
 }
 ```
