@@ -10,8 +10,6 @@ use Doctrine\ORM\Mapping as ORM;
  * Authorization of a security identity to do something on a resource.
  *
  * @ORM\Entity(readOnly=true)
- * @ORM\InheritanceType("JOINED")
- * @ORM\DiscriminatorColumn(name="type", type="string")
  *
  * @author Matthieu Napoli <matthieu@mnapoli.fr>
  */
