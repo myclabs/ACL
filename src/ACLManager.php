@@ -49,6 +49,7 @@ class ACLManager
         } elseif ($resource->isEntityClass()) {
             return $this->isAllowedOnEntityClass($identity, $action, $resource->getEntityClass());
         }
+        // TODO field authorization
     }
 
     public function grant(SecurityIdentityInterface $identity, Role $role)
@@ -97,9 +98,7 @@ class ACLManager
         // Regenerate
         foreach ($roleRepository->findAll() as $role) {
             /** @var Role $role */
-            foreach ($role->createAuthorizations($this->entityManager) as $authorization) {
-                $this->entityManager->persist($authorization);
-            }
+            $this->persistAuthorizations($role->createAuthorizations($this->entityManager));
         }
         $this->entityManager->flush();
         $this->entityManager->clear();
