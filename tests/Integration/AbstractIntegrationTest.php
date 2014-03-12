@@ -11,7 +11,6 @@ use Doctrine\ORM\Tools\SchemaTool;
 use Doctrine\ORM\Tools\Setup;
 use MyCLabs\ACL\ACLManager;
 use MyCLabs\ACL\MetadataLoader;
-use Tests\MyCLabs\ACL\Integration\Model\ACLArticleListener;
 
 abstract class AbstractIntegrationTest extends \PHPUnit_Framework_TestCase
 {
@@ -49,7 +48,6 @@ abstract class AbstractIntegrationTest extends \PHPUnit_Framework_TestCase
 
         $evm->addEventListener(Events::loadClassMetadata, $rtel);
         $evm->addEventListener(Events::loadClassMetadata, $metadataLoader);
-        $evm->addEventListener(Events::onFlush, new ACLArticleListener());
 
         // Create the entity manager
         $config = Setup::createAnnotationMetadataConfiguration($paths, true, null, new ArrayCache(), false);

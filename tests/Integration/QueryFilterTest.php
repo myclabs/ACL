@@ -23,9 +23,9 @@ class QueryFilterTest extends AbstractIntegrationTest
         $user = new User();
         $this->em->persist($user);
 
-        $user->addRole(new ArticleEditorRole($user, $article2));
-
         $this->em->flush();
+
+        $this->aclManager->grant($user, new ArticleEditorRole($user, $article2));
 
         $query = $this->em->createQuery(
             'SELECT a FROM Tests\MyCLabs\ACL\Integration\Model\Article a
@@ -52,14 +52,13 @@ class QueryFilterTest extends AbstractIntegrationTest
         $user = new User();
         $this->em->persist($user);
 
-        $user->addRole(new ArticleEditorRole($user, $article2));
-
         $this->em->flush();
 
+        $this->aclManager->grant($user, new ArticleEditorRole($user, $article2));
+
         $qb = $this->em->createQueryBuilder();
-        $qb->select('a')
-            ->from('Tests\MyCLabs\ACL\Integration\Model\Article', 'a');
-        QueryBuilderHelper::joinACL($qb, 'a', $user, Actions::VIEW);
+        $qb->select('a')->from('Tests\MyCLabs\ACL\Integration\Model\Article', 'a');
+        QueryBuilderHelper::joinACL($qb, 'Tests\MyCLabs\ACL\Integration\Model\Article', 'a', $user, Actions::VIEW);
         $articles = $qb->getQuery()->getResult();
 
         $this->assertCount(1, $articles);

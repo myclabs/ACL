@@ -16,20 +16,30 @@ class QueryBuilderHelper
      * Joins with the authorizations and filters the results to keep only those authorized.
      *
      * @param QueryBuilder              $qb
-     * @param string                    $resourceAlias Alias of the class that is the resource in the query.
+     * @param string                    $entityClass Class name of the entity that is the resource in the query.
+     * @param string                    $entityAlias Alias of the entity that is the resource in the query.
      * @param SecurityIdentityInterface $identity
      * @param string                    $action
      */
     public static function joinACL(
         QueryBuilder $qb,
-        $resourceAlias,
+        $entityClass,
+        $entityAlias,
         SecurityIdentityInterface $identity,
         $action
     ) {
-        $qb->innerJoin($resourceAlias . '.authorizations', 'authorization');
+
+        $qb->innerJoin(
+            'MyCLabs\ACL\Model\Authorization',
+            'authorization',
+            'WITH',
+            $entityAlias . '.id = authorization.entityId'
+        );
+        $qb->andWhere('authorization.entityClass = :acl_entity_class');
         $qb->andWhere('authorization.securityIdentity = :acl_identity');
         $qb->andWhere('authorization.actions.' . $action . ' = true');
 
         $qb->setParameter('acl_identity', $identity);
+        $qb->setParameter('acl_entity_class', $entityClass);
     }
 }

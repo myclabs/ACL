@@ -10,6 +10,11 @@ namespace MyCLabs\ACL\Model;
 interface SecurityIdentityInterface
 {
     /**
+     * @return mixed
+     */
+    public function getId();
+
+    /**
      * @return Role[]
      */
     public function getRoles();

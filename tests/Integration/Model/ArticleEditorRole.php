@@ -2,7 +2,11 @@
 
 namespace Tests\MyCLabs\ACL\Integration\Model;
 
+use Doctrine\ORM\EntityManager;
 use Doctrine\ORM\Mapping as ORM;
+use MyCLabs\ACL\Model\Actions;
+use MyCLabs\ACL\Model\Authorization;
+use MyCLabs\ACL\Model\Resource;
 use MyCLabs\ACL\Model\Role;
 
 /**
@@ -21,6 +25,15 @@ class ArticleEditorRole extends Role
         $this->article = $article;
 
         parent::__construct($identity);
+    }
+
+    public function createAuthorizations(EntityManager $entityManager)
+    {
+        $editorActions = new Actions([Actions::VIEW, Actions::EDIT]);
+
+        return [
+            Authorization::create($this, $editorActions, Resource::fromEntity($this->article)),
+        ];
     }
 
     /**

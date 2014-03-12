@@ -4,6 +4,7 @@ namespace MyCLabs\ACL\Model;
 
 use Doctrine\Common\Collections\ArrayCollection;
 use Doctrine\Common\Collections\Collection;
+use Doctrine\Common\Util\ClassUtils;
 use Doctrine\ORM\Mapping as ORM;
 
 /**
@@ -27,14 +28,14 @@ class Authorization
      *
      * @var Role
      * @ORM\ManyToOne(targetEntity="Role", inversedBy="authorizations")
-     * @ORM\JoinColumn(nullable=false, onDelete="CASCADE")
+     * @ORM\JoinColumn(name="role_id", nullable=false, onDelete="CASCADE")
      */
     protected $role;
 
     /**
      * @var SecurityIdentityInterface
      * @ORM\ManyToOne(targetEntity="SecurityIdentityInterface")
-     * @ORM\JoinColumn(nullable=false, onDelete="CASCADE")
+     * @ORM\JoinColumn(name="securityIdentity_id", nullable=false, onDelete="CASCADE")
      */
     protected $securityIdentity;
 
@@ -48,7 +49,7 @@ class Authorization
      * The entity targeted by the authorization.
      * If null, then $entityClass is used and this authorization is at class-scope.
      *
-     * @ORM\Column(type="integer", nullable=true)
+     * @ORM\Column(name="entity_id", type="integer", nullable=true)
      * @var int|null
      */
     protected $entityId;
@@ -57,7 +58,7 @@ class Authorization
      * Must be defined when $entity is null.
      * If defined, then the authorization applies to all the entities of that class.
      *
-     * @ORM\Column
+     * @ORM\Column(name="entity_class")
      * @var string|null
      */
     protected $entityClass;
@@ -65,7 +66,7 @@ class Authorization
     /**
      * @var Authorization
      * @ORM\ManyToOne(targetEntity="Authorization", inversedBy="childAuthorizations")
-     * @ORM\JoinColumn(onDelete="CASCADE")
+     * @ORM\JoinColumn(name="parentAuthorization_id", onDelete="CASCADE")
      */
     protected $parentAuthorization;
 
@@ -93,28 +94,6 @@ class Authorization
     }
 
     /**
-     * Creates an authorizations that inherits from another.
-     *
-     * @param Authorization $parentAuthorization
-     * @param Resource      $resource
-     * @param Actions|null  $actions
-     * @return static
-     */
-    public static function createChildAuthorization(
-        Authorization $parentAuthorization,
-        Resource $resource,
-        Actions $actions = null
-    ) {
-        $actions = $actions ?: $parentAuthorization->getActions();
-
-        $authorization = self::create($parentAuthorization->role, $actions, $resource);
-
-        $authorization->parentAuthorization = $parentAuthorization;
-
-        return $authorization;
-    }
-
-    /**
      * @param Role                         $role
      * @param Actions                      $actions
      * @param EntityResourceInterface|null $entity
@@ -135,14 +114,28 @@ class Authorization
         if ($entity === null) {
             $this->entityClass = $entityClass;
         } else {
-            $this->entityClass = get_class($entity);
+            $this->entityClass = ClassUtils::getClass($entity);
         }
 
         $this->childAuthorizations = new ArrayCollection();
+    }
 
-        // Add to the role because the role might need its root authorizations
-        // for cascading (in case new resources are created later in the same thread)
-        $role->addAuthorization($this);
+    /**
+     * Cascade an authorization to another resource (will return a child authorization).
+     *
+     * @param Resource     $resource
+     * @param Actions|null $actions  If not specified, the actions of the current authorization are used.
+     * @return static
+     */
+    public function createChildAuthorization(Resource $resource, Actions $actions = null)
+    {
+        $actions = $actions ?: $this->actions;
+
+        $authorization = self::create($this->role, $actions, $resource);
+
+        $authorization->parentAuthorization = $this;
+
+        return $authorization;
     }
 
     /**
@@ -207,6 +200,14 @@ class Authorization
     public function getRole()
     {
         return $this->role;
+    }
+
+    /**
+     * @param int $id
+     */
+    public function setId($id)
+    {
+        $this->id = $id;
     }
 
     /**

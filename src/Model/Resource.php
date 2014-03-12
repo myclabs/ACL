@@ -2,6 +2,7 @@
 
 namespace MyCLabs\ACL\Model;
 
+use Doctrine\Common\Util\ClassUtils;
 use Doctrine\ORM\Mapping as ORM;
 
 /**
@@ -44,7 +45,7 @@ class Resource
         if ($entity->getId() === null) {
             throw new \RuntimeException(sprintf(
                 'The entity resource %s must be persisted (id not null) to be able to test the permissions',
-                get_class($entity)
+                ClassUtils::getClass($entity)
             ));
         }
 
@@ -73,7 +74,7 @@ class Resource
         if ($entity->getId() === null) {
             throw new \RuntimeException(sprintf(
                 'The entity resource %s must be persisted (id not null) to be able to test the permissions',
-                get_class($entity)
+                ClassUtils::getClass($entity)
             ));
         }
 

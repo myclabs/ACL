@@ -4,7 +4,7 @@ namespace MyCLabs\ACL\Model;
 
 use Doctrine\Common\Collections\ArrayCollection;
 use Doctrine\Common\Collections\Collection;
-use Doctrine\Common\Collections\Criteria;
+use Doctrine\ORM\EntityManager;
 use Doctrine\ORM\Mapping as ORM;
 
 /**
@@ -33,7 +33,7 @@ abstract class Role
 
     /**
      * @var Authorization[]|Collection
-     * @ORM\OneToMany(targetEntity="Authorization", mappedBy="role")
+     * @ORM\OneToMany(targetEntity="Authorization", mappedBy="role", fetch="EXTRA_LAZY")
      */
     protected $authorizations;
 
@@ -44,21 +44,17 @@ abstract class Role
     }
 
     /**
+     * @param EntityManager $entityManager
+     * @return Authorization[]
+     */
+    abstract public function createAuthorizations(EntityManager $entityManager);
+
+    /**
      * @return int
      */
     public function getId()
     {
         return $this->id;
-    }
-    /**
-     * @return Authorization[]
-     */
-    public function getRootAuthorizations()
-    {
-        $criteria = new Criteria();
-        $criteria->where($criteria->expr()->isNull('parentAuthorization'));
-
-        return $this->authorizations->matching($criteria);
     }
 
     /**
@@ -67,10 +63,5 @@ abstract class Role
     public function getSecurityIdentity()
     {
         return $this->securityIdentity;
-    }
-
-    public function addAuthorization(Authorization $authorization)
-    {
-        $this->authorizations[] = $authorization;
     }
 }
