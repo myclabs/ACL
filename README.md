@@ -19,6 +19,7 @@ You can also filter your queries to get only the entities the user has access to
 ```php
 $qb = $entityManager->createQueryBuilder();
 $qb->select('article')->from('Model\Article', 'article');
+
 QueryBuilderHelper::joinACL($qb, 'Model\Article', 'article', $user, Actions::EDIT);
 
 // This query will return only the articles the user can edit
@@ -36,14 +37,13 @@ $articles = $qb->getQuery()->getResult();
 
 Scopes of access available:
 
-- [X] entity (example: article #123)
-- [X] entity class (example: all articles)
-- [ ] entity field (example: comments of article #123)
-- [ ] entity class field (example: comments of all articles)
+- entity (example: article #123)
+- entity class (example: all articles)
+- entity field (example: comments of article #123)
+- entity class field (example: comments of all articles)
 
 ### Cons
 
-- some extra code: you need to write classes for authorizations and roles because of Doctrine limitations
 - you can't authorize a user directly on a resource: you have to use roles (e.g. an Article Editor, or a Administrator)
 - because of Doctrine limitations you need to flush your resources before giving or testing authorizations
 
@@ -107,6 +107,15 @@ class ArticleEditorRole extends Role
         $this->article = $article;
 
         parent::__construct($user);
+    }
+
+    public function createAuthorizations(EntityManager $entityManager)
+    {
+        $editorActions = new Actions([Actions::VIEW, Actions::EDIT]);
+
+        return [
+            Authorization::create($this, $editorActions, Resource::fromEntity($this->article)),
+        ];
     }
 }
 ```
