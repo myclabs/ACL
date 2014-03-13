@@ -49,7 +49,7 @@ class ACLManager
         } elseif ($resource->isEntityClass()) {
             return $this->isAllowedOnEntityClass($identity, $action, $resource->getEntityClass());
         } elseif ($resource->isEntityField()) {
-            return $this->isAllowedOnEntityField($identity, $action, $resource->getEntity(), $resource->getField());
+            return $this->isAllowedOnEntityField($identity, $action, $resource->getEntity(), $resource->getEntityField());
         }
         // TODO class field authorization
     }

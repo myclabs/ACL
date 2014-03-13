@@ -99,9 +99,9 @@ class Authorization
         } elseif ($resource->isEntityClass()) {
             return new static($role, $actions, null, $resource->getEntityClass());
         } elseif ($resource->isEntityField()) {
-            return new static($role, $actions, $resource->getEntity(), null, $resource->getField());
+            return new static($role, $actions, $resource->getEntity(), null, $resource->getEntityField());
         } elseif ($resource->isEntityClassField()) {
-            return new static($role, $actions, null, $resource->getEntityClass(), $resource->getField());
+            return new static($role, $actions, null, $resource->getEntityClass(), $resource->getEntityField());
         }
 
         throw new \LogicException();

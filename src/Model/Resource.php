@@ -138,7 +138,7 @@ class Resource
     /**
      * @return string|null
      */
-    public function getField()
+    public function getEntityField()
     {
         return $this->field;
     }
