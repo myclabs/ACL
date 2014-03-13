@@ -49,6 +49,15 @@ class ACLManager
         // TODO field authorization
     }
 
+    /**
+     * Grant a role to a user.
+     *
+     * The role will be flushed in database.
+     * The authorizations related to this role will be automatically created.
+     *
+     * @param SecurityIdentityInterface $identity
+     * @param Role                      $role
+     */
     public function grant(SecurityIdentityInterface $identity, Role $role)
     {
         $identity->addRole($role);
@@ -56,6 +65,24 @@ class ACLManager
         $this->entityManager->flush($role);
 
         $this->persistAuthorizations($role->createAuthorizations($this->entityManager));
+    }
+
+    /**
+     * Remove a role from a user.
+     *
+     * The role deletion will be flushed in database.
+     * The authorizations will be automatically removed.
+     *
+     * @param SecurityIdentityInterface $identity
+     * @param Role                      $role
+     */
+    public function unGrant(SecurityIdentityInterface $identity, Role $role)
+    {
+        $identity->removeRole($role);
+        $this->entityManager->remove($role);
+
+        // Authorizations are deleted in cascade in database
+        $this->entityManager->flush($role);
     }
 
     public function processNewResource(EntityResourceInterface $entity)

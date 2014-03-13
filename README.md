@@ -8,6 +8,12 @@ You give permissions to a user by adding it a role:
 $aclManager->grant($user, new ArticleEditorRole($user, $article));
 ```
 
+You remove permissions to a user by removing the role:
+
+```php
+$aclManager->unGrant($user, $role);
+```
+
 Test permissions:
 
 ```php
