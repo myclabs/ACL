@@ -30,9 +30,10 @@ class ACLManager
     /**
      * Checks if the identity is allowed to do the action on the resource.
      *
-     * @param SecurityIdentityInterface        $identity
-     * @param string                           $action
-     * @param Resource|EntityResourceInterface $resource Resource expected, but an entity can be directly given too.
+     * @param SecurityIdentityInterface              $identity
+     * @param string                                 $action
+     * @param Model\Resource|EntityResourceInterface $resource Resource expected, but an entity
+     *                                                         can be directly given too.
      *
      * @throws \RuntimeException The entity is not persisted (ID must be not null).
      * @return boolean Is allowed, or not.
@@ -41,12 +42,16 @@ class ACLManager
     {
         if (! $resource instanceof Resource) {
             return $this->isAllowedOnEntity($identity, $action, $resource);
-        } elseif ($resource->isEntity()) {
+        }
+
+        if ($resource->isEntity()) {
             return $this->isAllowedOnEntity($identity, $action, $resource->getEntity());
         } elseif ($resource->isEntityClass()) {
             return $this->isAllowedOnEntityClass($identity, $action, $resource->getEntityClass());
+        } elseif ($resource->isEntityField()) {
+            return $this->isAllowedOnEntityField($identity, $action, $resource->getEntity(), $resource->getField());
         }
-        // TODO field authorization
+        // TODO class field authorization
     }
 
     /**
@@ -144,6 +149,7 @@ class ACLManager
                 JOIN MyCLabs\\ACL\\Model\\Authorization authorization WITH entity.id = authorization.entityId
                 WHERE entity = :entity
                     AND authorization.entityClass = :entityClass
+                    AND authorization.entityField IS NULL
                     AND authorization.securityIdentity = :securityIdentity
                     AND authorization.actions.$action = true";
 
@@ -160,11 +166,45 @@ class ACLManager
         $dql = "SELECT count(authorization)
                 FROM MyCLabs\\ACL\\Model\\Authorization authorization
                 WHERE authorization.entityClass = :entityClass
+                    AND authorization.entityField IS NULL
                     AND authorization.securityIdentity = :securityIdentity
                     AND authorization.actions.$action = true";
 
         $query = $this->entityManager->createQuery($dql);
         $query->setParameter('entityClass', $entityClass);
+        $query->setParameter('securityIdentity', $identity);
+
+        return ($query->getSingleScalarResult() > 0);
+    }
+
+    private function isAllowedOnEntityField(
+        SecurityIdentityInterface $identity,
+        $action,
+        EntityResourceInterface $entity,
+        $field
+    ) {
+        $entityClass = ClassUtils::getClass($entity);
+
+        if ($entity->getId() === null) {
+            throw new \RuntimeException(sprintf(
+                'The entity resource %s must be persisted (id not null) to be able to test the permissions',
+                $entityClass
+            ));
+        }
+
+        $dql = "SELECT count(entity)
+                FROM $entityClass entity
+                JOIN MyCLabs\\ACL\\Model\\Authorization authorization WITH entity.id = authorization.entityId
+                WHERE entity = :entity
+                    AND authorization.entityClass = :entityClass
+                    AND authorization.entityField = :entityField
+                    AND authorization.securityIdentity = :securityIdentity
+                    AND authorization.actions.$action = true";
+
+        $query = $this->entityManager->createQuery($dql);
+        $query->setParameter('entity', $entity);
+        $query->setParameter('entityClass', $entityClass);
+        $query->setParameter('entityField', $field);
         $query->setParameter('securityIdentity', $identity);
 
         return ($query->getSingleScalarResult() > 0);
@@ -205,6 +245,7 @@ class ACLManager
                 'parentAuthorization_id' => $parent ? $parent->getId() : null,
                 'entity_class'           => $authorization->getEntityClass(),
                 'entity_id'              => $authorization->getEntityId(),
+                'entity_field'           => $authorization->getEntityField(),
             ];
 
             foreach ($authorization->getActions()->toArray() as $action => $value) {

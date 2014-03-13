@@ -10,6 +10,7 @@ use Doctrine\ORM\Tools\ResolveTargetEntityListener;
 use Doctrine\ORM\Tools\SchemaTool;
 use Doctrine\ORM\Tools\Setup;
 use MyCLabs\ACL\ACLManager;
+use MyCLabs\ACL\EntityManagerListener;
 use MyCLabs\ACL\MetadataLoader;
 
 abstract class AbstractIntegrationTest extends \PHPUnit_Framework_TestCase
@@ -58,5 +59,11 @@ abstract class AbstractIntegrationTest extends \PHPUnit_Framework_TestCase
         $tool->createSchema($this->em->getMetadataFactory()->getAllMetadata());
 
         $this->aclManager = new ACLManager($this->em);
+
+        // The entity manager listener
+        $listener = new EntityManagerListener(function () {
+            return $this->aclManager;
+        });
+        $evm->addEventSubscriber($listener);
     }
 }

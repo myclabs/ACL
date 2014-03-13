@@ -38,7 +38,7 @@ class Resource
      * Returns the resource representing the given entity.
      * @param EntityResourceInterface $entity
      * @throws \RuntimeException The entity is not persisted (ID must be not null).
-     * @return Resource
+     * @return \MyCLabs\ACL\Model\Resource
      */
     public static function fromEntity(EntityResourceInterface $entity)
     {
@@ -55,7 +55,7 @@ class Resource
     /**
      * Returns the resource representing all entities of the given class.
      * @param string $entityClass
-     * @return Resource
+     * @return \MyCLabs\ACL\Model\Resource
      */
     public static function fromEntityClass($entityClass)
     {
@@ -67,7 +67,7 @@ class Resource
      * @param EntityResourceInterface $entity
      * @param string                  $field
      * @throws \RuntimeException The entity is not persisted (ID must be not null).
-     * @return Resource
+     * @return \MyCLabs\ACL\Model\Resource
      */
     public static function fromEntityField(EntityResourceInterface $entity, $field)
     {
@@ -85,7 +85,7 @@ class Resource
      * Returns the resource representing the field of all entities of the class.
      * @param string $entityClass
      * @param string $field
-     * @return Resource
+     * @return \MyCLabs\ACL\Model\Resource
      */
     public static function fromEntityClassField($entityClass, $field)
     {

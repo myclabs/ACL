@@ -36,6 +36,7 @@ class QueryBuilderHelper
             $entityAlias . '.id = authorization.entityId'
         );
         $qb->andWhere('authorization.entityClass = :acl_entity_class');
+        $qb->andWhere('authorization.entityField IS NULL');
         $qb->andWhere('authorization.securityIdentity = :acl_identity');
         $qb->andWhere('authorization.actions.' . $action . ' = true');
 

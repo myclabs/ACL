@@ -26,6 +26,7 @@ class QueryBuilderHelperTest extends \PHPUnit_Framework_TestCase
         $dql = 'SELECT test FROM test test INNER JOIN MyCLabs\ACL\Model\Authorization authorization '
             . 'WITH test.id = authorization.entityId '
             . 'WHERE authorization.entityClass = :acl_entity_class '
+            . 'AND authorization.entityField IS NULL '
             . 'AND authorization.securityIdentity = :acl_identity '
             . 'AND authorization.actions.view = true';
         $this->assertEquals($dql, $qb->getDQL());

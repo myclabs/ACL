@@ -55,13 +55,20 @@ class Authorization
     protected $entityId;
 
     /**
-     * Must be defined when $entity is null.
-     * If defined, then the authorization applies to all the entities of that class.
+     * The class of the entity.
      *
      * @ORM\Column(name="entity_class")
-     * @var string|null
+     * @var string
      */
     protected $entityClass;
+
+    /**
+     * Field name for authorizations that apply on a class or entity field.
+     *
+     * @ORM\Column(name="entity_field", nullable=true)
+     * @var string|null
+     */
+    protected $entityField;
 
     /**
      * @var Authorization
@@ -79,9 +86,10 @@ class Authorization
     /**
      * Creates an authorization on a resource.
      *
-     * @param Role     $role
-     * @param Actions  $actions
-     * @param Resource $resource
+     * @param Role                        $role
+     * @param Actions                     $actions
+     * @param \MyCLabs\ACL\Model\Resource $resource
+     * @throws \LogicException
      * @return static
      */
     public static function create(Role $role, Actions $actions, Resource $resource)
@@ -90,20 +98,28 @@ class Authorization
             return new static($role, $actions, $resource->getEntity());
         } elseif ($resource->isEntityClass()) {
             return new static($role, $actions, null, $resource->getEntityClass());
+        } elseif ($resource->isEntityField()) {
+            return new static($role, $actions, $resource->getEntity(), null, $resource->getField());
+        } elseif ($resource->isEntityClassField()) {
+            return new static($role, $actions, null, $resource->getEntityClass(), $resource->getField());
         }
+
+        throw new \LogicException();
     }
 
     /**
      * @param Role                         $role
      * @param Actions                      $actions
      * @param EntityResourceInterface|null $entity
-     * @param string                       $entityClass
+     * @param string|null                  $entityClass
+     * @param string|null                  $entityField
      */
     private function __construct(
         Role $role,
         Actions $actions,
         EntityResourceInterface $entity = null,
-        $entityClass = null
+        $entityClass = null,
+        $entityField = null
     ) {
         $this->role = $role;
         $this->securityIdentity = $role->getSecurityIdentity();
@@ -116,6 +132,7 @@ class Authorization
         } else {
             $this->entityClass = ClassUtils::getClass($entity);
         }
+        $this->entityField = $entityField;
 
         $this->childAuthorizations = new ArrayCollection();
     }
@@ -123,8 +140,8 @@ class Authorization
     /**
      * Cascade an authorization to another resource (will return a child authorization).
      *
-     * @param Resource     $resource
-     * @param Actions|null $actions  If not specified, the actions of the current authorization are used.
+     * @param \MyCLabs\ACL\Model\Resource $resource
+     * @param Actions|null                $actions If not specified, the actions of the current authorization are used.
      * @return static
      */
     public function createChildAuthorization(Resource $resource, Actions $actions = null)
@@ -168,6 +185,14 @@ class Authorization
     public function getEntityClass()
     {
         return $this->entityClass;
+    }
+
+    /**
+     * @return null|string
+     */
+    public function getEntityField()
+    {
+        return $this->entityField;
     }
 
     /**
