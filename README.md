@@ -49,45 +49,27 @@ Scopes of access available:
 
 ## Usage
 
-### 1. Creating a new resource
+### 1. Mark your entity as a resource
 
 Let's say you want to control the access to an entity named `Article`.
 
-You need to have your entity implement the `EntityResourceInterface` interface and map some fields:
+You need to have your entity implement the `EntityResourceInterface` interface:
 
 ```php
 class Article implements EntityResourceInterface
 {
-    /**
-     * @OneToMany(targetEntity="ArticleAuthorization", mappedBy="entity", fetch="EXTRA_LAZY")
-     */
-    protected $authorizations;
+    // ...
 
-    public function __construct()
+    public function getId()
     {
-        $this->authorizations = new ArrayCollection();
+        return $this->id;
     }
 }
 ```
 
-To create authorizations on the new resource, you need to create a new kind of authorization:
-
-```php
-/**
- * @Entity(readOnly=true)
- */
-class ArticleAuthorization extends Authorization
-{
-    /**
-     * @ManyToOne(targetEntity="Article", inversedBy="authorizations")
-     * @JoinColumn(onDelete="CASCADE")
-     */
-    protected $entity;
-}
-```
-
-
 ### 2. Creating a new role
+
+The role will create the authorizations.
 
 To create a new role, extend the `Role` abstract class:
 
