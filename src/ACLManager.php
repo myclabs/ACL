@@ -25,9 +25,6 @@ class ACLManager
     public function __construct(EntityManager $entityManager)
     {
         $this->entityManager = $entityManager;
-
-        // Register the event listener
-        $entityManager->getEventManager()->addEventSubscriber(new EntityManagerListener($this));
     }
 
     /**
