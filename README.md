@@ -111,11 +111,13 @@ class ArticleEditorRole extends Role
 
     public function createAuthorizations(EntityManager $entityManager)
     {
-        $editorActions = new Actions([Actions::VIEW, Actions::EDIT]);
+        $authorization = Authorization::create(
+            $this,
+            new Actions([Actions::VIEW, Actions::EDIT]),
+            Resource::fromEntity($this->article)
+        );
 
-        return [
-            Authorization::create($this, $editorActions, Resource::fromEntity($this->article)),
-        ];
+        return [ $authorization ];
     }
 }
 ```
