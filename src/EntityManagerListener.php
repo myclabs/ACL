@@ -4,7 +4,6 @@ namespace MyCLabs\ACL;
 
 use Doctrine\Common\EventSubscriber;
 use Doctrine\ORM\Event\OnFlushEventArgs;
-use Doctrine\ORM\Event\PostFlushEventArgs;
 use Doctrine\ORM\Events;
 use MyCLabs\ACL\Model\EntityResourceInterface;
 
@@ -16,7 +15,12 @@ use MyCLabs\ACL\Model\EntityResourceInterface;
 class EntityManagerListener implements EventSubscriber
 {
     /**
-     * @var ACLManager
+     * @var callable
+     */
+    private $aclManagerLocator;
+
+    /**
+     * @var ACLManager|null
      */
     private $aclManager;
 
@@ -25,9 +29,16 @@ class EntityManagerListener implements EventSubscriber
      */
     private $newResources = [];
 
-    public function __construct(ACLManager $aclManager)
+    /**
+     * Because of a circular dependency, we can't require to inject directly the ACL manager.
+     * You need to inject a "locator", i.e. a callable that returns the ACL manager,
+     * so that the ACL manager can be fetched lazily.
+     *
+     * @param callable $aclManagerLocator Callable that returns the ACL manager.
+     */
+    public function __construct(callable $aclManagerLocator)
     {
-        $this->aclManager = $aclManager;
+        $this->aclManagerLocator = $aclManagerLocator;
     }
 
     public function getSubscribedEvents()
@@ -51,12 +62,25 @@ class EntityManagerListener implements EventSubscriber
         }
     }
 
-    public function postFlush(PostFlushEventArgs $args)
+    public function postFlush()
     {
+        $aclManager = $this->getACLManager();
+
         foreach ($this->newResources as $resource) {
-            $this->aclManager->processNewResource($resource);
+            $aclManager->processNewResource($resource);
         }
 
         $this->newResources = [];
+    }
+
+    private function getACLManager()
+    {
+        if ($this->aclManager === null) {
+            // Resolve the ACL manager
+            $locator = $this->aclManagerLocator;
+            $this->aclManager = $locator();
+        }
+
+        return $this->aclManager;
     }
 }

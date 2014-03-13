@@ -104,6 +104,10 @@ class ArticleEditorRole extends Role
 }
 ```
 
+## Setup
+
+TODO
+
 ## Performances
 
 To ensure the best performances, you need to make sure of the followings:
@@ -131,3 +135,12 @@ Namespace\ArticleEditorRole:
   type: entity
   readOnly: true
 ```
+
+## Customizing
+
+MyCLabs\ACL was built to give you as much liberty as possible.
+Here is a non exhaustive list of things you can do but are not described in the documentation:
+
+- You can add a reverse association from an entity (resource) to its role.
+
+That can be useful if you need to fetch all the "editors" of article X for example.
