@@ -71,7 +71,7 @@ class ACLManager
         $authorizations = [ $authorization ];
 
         if ($resource instanceof CascadingResource) {
-            foreach ($resource->getSubResources($this->entityManager) as $subResource) {
+            foreach ($this->getAllSubResources($resource) as $subResource) {
                 $authorizations[] = $authorization->createChildAuthorization($subResource);
             }
         }
@@ -165,6 +165,7 @@ class ACLManager
     }
 
     /**
+     * Get all parent resources recursively.
      * @param CascadingResource $resource
      * @return ResourceInterface[]
      */
@@ -179,6 +180,38 @@ class ACLManager
             }
         }
 
-        return $parents;
+        return $this->unique($parents);
+    }
+
+    /**
+     * Get all sub-resources recursively.
+     * @param CascadingResource $resource
+     * @return ResourceInterface[]
+     */
+    private function getAllSubResources(CascadingResource $resource)
+    {
+        $subResources = [];
+
+        foreach ($resource->getSubResources($this->entityManager) as $subResource) {
+            $subResources[] = $subResource;
+            if ($subResource instanceof CascadingResource) {
+                $subResources = array_merge($subResources, $this->getAllSubResources($subResource));
+            }
+        }
+
+        return $this->unique($subResources);
+    }
+
+    private function unique(array $array)
+    {
+        $result  = [];
+
+        foreach ($array as $item) {
+            if (! in_array($item, $result, true)) {
+                $result[] = $item;
+            }
+        }
+
+        return $result;
     }
 }

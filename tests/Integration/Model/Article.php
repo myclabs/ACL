@@ -6,6 +6,7 @@ use Doctrine\Common\Collections\ArrayCollection;
 use Doctrine\Common\Collections\Collection;
 use Doctrine\ORM\EntityManager;
 use Doctrine\ORM\Mapping as ORM;
+use MyCLabs\ACL\Model\CascadingResource;
 use MyCLabs\ACL\Model\ClassResource;
 use MyCLabs\ACL\Model\EntityResource;
 use MyCLabs\ACL\Model\ResourceInterface;
@@ -13,7 +14,7 @@ use MyCLabs\ACL\Model\ResourceInterface;
 /**
  * @ORM\Entity
  */
-class Article implements EntityResource
+class Article implements EntityResource, CascadingResource
 {
     /**
      * @ORM\Id @ORM\GeneratedValue
