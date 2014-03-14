@@ -102,7 +102,7 @@ class ArticleEditorRole extends Role
         $authorization = Authorization::create(
             $this,
             new Actions([Actions::VIEW, Actions::EDIT]),
-            Resource::fromEntity($this->article)
+            $this->article
         );
 
         return [ $authorization ];

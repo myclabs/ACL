@@ -6,7 +6,7 @@ use Doctrine\ORM\EntityManager;
 use Doctrine\ORM\Mapping as ORM;
 use MyCLabs\ACL\Model\Actions;
 use MyCLabs\ACL\Model\Authorization;
-use MyCLabs\ACL\Model\Resource;
+use MyCLabs\ACL\Model\EntityFieldResource;
 use MyCLabs\ACL\Model\Role;
 
 /**
@@ -35,14 +35,14 @@ class ArticlePublisherRole extends Role
         $authorizations[] = Authorization::create(
             $this,
             new Actions([Actions::VIEW]),
-            Resource::fromEntity($this->article)
+            $this->article
         );
 
         // The publisher can publish the article
         $authorizations[] = Authorization::create(
             $this,
             new Actions([Actions::EDIT]),
-            Resource::fromEntityField($this->article, 'published')
+            new EntityFieldResource($this->article, 'published')
         );
 
         return $authorizations;

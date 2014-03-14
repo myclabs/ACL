@@ -3,9 +3,9 @@
 namespace Tests\MyCLabs\ACL\Integration;
 
 use MyCLabs\ACL\Model\Actions;
-use MyCLabs\ACL\Model\Resource;
+use MyCLabs\ACL\Model\ClassFieldResource;
+use MyCLabs\ACL\Model\EntityFieldResource;
 use Tests\MyCLabs\ACL\Integration\Model\Article;
-use Tests\MyCLabs\ACL\Integration\Model\ArticlePublisherRole;
 use Tests\MyCLabs\ACL\Integration\Model\CommentArticlesRole;
 use Tests\MyCLabs\ACL\Integration\Model\User;
 
@@ -38,13 +38,13 @@ class ClassFieldScopeTest extends AbstractIntegrationTest
         $this->assertFalse($this->aclManager->isAllowed($user, Actions::DELETE, $article2));
 
         // Check is allowed at class-field scope
-        $fieldResource = Resource::fromEntityClassField('Tests\MyCLabs\ACL\Integration\Model\Article', 'comments');
+        $fieldResource = new ClassFieldResource('Tests\MyCLabs\ACL\Integration\Model\Article', 'comments');
         $this->assertTrue($this->aclManager->isAllowed($user, Actions::EDIT, $fieldResource));
 
         // Check is allowed at entity-field scope
-        $fieldResource = Resource::fromEntityField($article1, 'comments');
+        $fieldResource = new EntityFieldResource($article1, 'comments');
         $this->assertTrue($this->aclManager->isAllowed($user, Actions::EDIT, $fieldResource));
-        $fieldResource = Resource::fromEntityField($article2, 'comments');
+        $fieldResource = new EntityFieldResource($article2, 'comments');
         $this->assertTrue($this->aclManager->isAllowed($user, Actions::EDIT, $fieldResource));
     }
 }

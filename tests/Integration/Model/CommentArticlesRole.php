@@ -6,7 +6,7 @@ use Doctrine\ORM\EntityManager;
 use Doctrine\ORM\Mapping as ORM;
 use MyCLabs\ACL\Model\Actions;
 use MyCLabs\ACL\Model\Authorization;
-use MyCLabs\ACL\Model\Resource;
+use MyCLabs\ACL\Model\ClassFieldResource;
 use MyCLabs\ACL\Model\Role;
 
 /**
@@ -21,7 +21,7 @@ class CommentArticlesRole extends Role
         return [Authorization::create(
             $this,
             new Actions([Actions::VIEW, Actions::EDIT]),
-            Resource::fromEntityClassField('Tests\MyCLabs\ACL\Integration\Model\Article', 'comments')
+            new ClassFieldResource('Tests\MyCLabs\ACL\Integration\Model\Article', 'comments')
         )];
     }
 }

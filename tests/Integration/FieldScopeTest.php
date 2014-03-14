@@ -3,7 +3,7 @@
 namespace Tests\MyCLabs\ACL\Integration;
 
 use MyCLabs\ACL\Model\Actions;
-use MyCLabs\ACL\Model\Resource;
+use MyCLabs\ACL\Model\EntityFieldResource;
 use Tests\MyCLabs\ACL\Integration\Model\Article;
 use Tests\MyCLabs\ACL\Integration\Model\ArticlePublisherRole;
 use Tests\MyCLabs\ACL\Integration\Model\User;
@@ -38,7 +38,7 @@ class FieldScopeTest extends AbstractIntegrationTest
         $this->assertFalse($this->aclManager->isAllowed($user, Actions::DELETE, $article2));
 
         // Test on the field
-        $fieldResource = Resource::fromEntityField($article2, 'published');
+        $fieldResource = new EntityFieldResource($article2, 'published');
         $this->assertTrue($this->aclManager->isAllowed($user, Actions::EDIT, $fieldResource));
     }
 }

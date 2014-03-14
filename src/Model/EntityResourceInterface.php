@@ -7,7 +7,7 @@ namespace MyCLabs\ACL\Model;
  *
  * @author Matthieu Napoli <matthieu@mnapoli.fr>
  */
-interface EntityResourceInterface
+interface EntityResourceInterface extends ResourceInterface
 {
     /**
      * @return mixed

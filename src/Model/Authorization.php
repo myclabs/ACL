@@ -86,25 +86,25 @@ class Authorization
     /**
      * Creates an authorization on a resource.
      *
-     * @param Role                        $role
-     * @param Actions                     $actions
-     * @param \MyCLabs\ACL\Model\Resource $resource
-     * @throws \LogicException
+     * @param Role              $role
+     * @param Actions           $actions
+     * @param ResourceInterface $resource
+     * @throws \RuntimeException
      * @return static
      */
-    public static function create(Role $role, Actions $actions, Resource $resource)
+    public static function create(Role $role, Actions $actions, ResourceInterface $resource)
     {
-        if ($resource->isEntity()) {
-            return new static($role, $actions, $resource->getEntity());
-        } elseif ($resource->isEntityClass()) {
-            return new static($role, $actions, null, $resource->getEntityClass());
-        } elseif ($resource->isEntityField()) {
-            return new static($role, $actions, $resource->getEntity(), null, $resource->getEntityField());
-        } elseif ($resource->isEntityClassField()) {
-            return new static($role, $actions, null, $resource->getEntityClass(), $resource->getEntityField());
+        if ($resource instanceof EntityResourceInterface) {
+            return new static($role, $actions, $resource);
+        } elseif ($resource instanceof ClassResource) {
+            return new static($role, $actions, null, $resource->getClass());
+        } elseif ($resource instanceof EntityFieldResource) {
+            return new static($role, $actions, $resource->getEntity(), null, $resource->getField());
+        } elseif ($resource instanceof ClassFieldResource) {
+            return new static($role, $actions, null, $resource->getClass(), $resource->getField());
         }
 
-        throw new \LogicException();
+        throw new \RuntimeException('Unknown type of resource: ' . get_class($resource));
     }
 
     /**
@@ -140,11 +140,11 @@ class Authorization
     /**
      * Cascade an authorization to another resource (will return a child authorization).
      *
-     * @param \MyCLabs\ACL\Model\Resource $resource
-     * @param Actions|null                $actions If not specified, the actions of the current authorization are used.
+     * @param ResourceInterface $resource
+     * @param Actions|null      $actions If not specified, the actions of the current authorization are used.
      * @return static
      */
-    public function createChildAuthorization(Resource $resource, Actions $actions = null)
+    public function createChildAuthorization(ResourceInterface $resource, Actions $actions = null)
     {
         $actions = $actions ?: $this->actions;
 

@@ -5,8 +5,11 @@ namespace MyCLabs\ACL;
 use Doctrine\Common\Util\ClassUtils;
 use Doctrine\ORM\EntityManager;
 use MyCLabs\ACL\Model\Authorization;
+use MyCLabs\ACL\Model\ClassFieldResource;
+use MyCLabs\ACL\Model\ClassResource;
+use MyCLabs\ACL\Model\EntityFieldResource;
 use MyCLabs\ACL\Model\EntityResourceInterface;
-use MyCLabs\ACL\Model\Resource;
+use MyCLabs\ACL\Model\ResourceInterface;
 use MyCLabs\ACL\Model\Role;
 use MyCLabs\ACL\Model\SecurityIdentityInterface;
 
@@ -30,40 +33,26 @@ class ACLManager
     /**
      * Checks if the identity is allowed to do the action on the resource.
      *
-     * @param SecurityIdentityInterface              $identity
-     * @param string                                 $action
-     * @param Model\Resource|EntityResourceInterface $resource Resource expected, but an entity
-     *                                                         can be directly given too.
+     * @param SecurityIdentityInterface $identity
+     * @param string                    $action
+     * @param ResourceInterface         $resource
      *
      * @throws \RuntimeException The entity is not persisted (ID must be not null).
      * @return boolean Is allowed, or not.
      */
-    public function isAllowed(SecurityIdentityInterface $identity, $action, $resource)
+    public function isAllowed(SecurityIdentityInterface $identity, $action, ResourceInterface $resource)
     {
-        if (! $resource instanceof Resource) {
+        if ($resource instanceof EntityResourceInterface) {
             return $this->isAllowedOnEntity($identity, $action, $resource);
+        } elseif ($resource instanceof ClassResource) {
+            return $this->isAllowedOnEntityClass($identity, $action, $resource->getClass());
+        } elseif ($resource instanceof EntityFieldResource) {
+            return $this->isAllowedOnEntityField($identity, $action, $resource->getEntity(), $resource->getField());
+        } elseif ($resource instanceof ClassFieldResource) {
+            return $this->isAllowedOnEntityClassField($identity, $action, $resource->getClass(), $resource->getField());
         }
 
-        if ($resource->isEntity()) {
-            return $this->isAllowedOnEntity($identity, $action, $resource->getEntity());
-        } elseif ($resource->isEntityClass()) {
-            return $this->isAllowedOnEntityClass($identity, $action, $resource->getEntityClass());
-        } elseif ($resource->isEntityField()) {
-            return $this->isAllowedOnEntityField(
-                $identity,
-                $action,
-                $resource->getEntity(),
-                $resource->getEntityField()
-            );
-        } elseif ($resource->isEntityClassField()) {
-            return $this->isAllowedOnEntityClassField(
-                $identity,
-                $action,
-                $resource->getEntityClass(),
-                $resource->getEntityField()
-            );
-        }
-        // TODO class field authorization
+        throw new \RuntimeException('Unknown type of resource: ' . get_class($resource));
     }
 
     /**
@@ -114,7 +103,7 @@ class ACLManager
         $authorizations = [];
         foreach ($query->getResult() as $rootAuthorization) {
             /** @var Authorization $rootAuthorization */
-            $authorizations[] = $rootAuthorization->createChildAuthorization(Resource::fromEntity($entity));
+            $authorizations[] = $rootAuthorization->createChildAuthorization($entity);
         }
 
         $this->persistAuthorizations($authorizations);

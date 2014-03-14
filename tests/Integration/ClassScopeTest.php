@@ -3,7 +3,7 @@
 namespace Tests\MyCLabs\ACL\Integration;
 
 use MyCLabs\ACL\Model\Actions;
-use MyCLabs\ACL\Model\Resource;
+use MyCLabs\ACL\Model\ClassResource;
 use Tests\MyCLabs\ACL\Integration\Model\AllArticlesEditorRole;
 use Tests\MyCLabs\ACL\Integration\Model\Article;
 use Tests\MyCLabs\ACL\Integration\Model\User;
@@ -33,7 +33,7 @@ class ClassScopeTest extends AbstractIntegrationTest
         $this->aclManager->grant($user, new AllArticlesEditorRole($user));
 
         // Test on the resource class
-        $classResource = Resource::fromEntityClass('Tests\MyCLabs\ACL\Integration\Model\Article');
+        $classResource = new ClassResource('Tests\MyCLabs\ACL\Integration\Model\Article');
         $this->assertTrue($this->aclManager->isAllowed($user, Actions::VIEW, $classResource));
         $this->assertTrue($this->aclManager->isAllowed($user, Actions::EDIT, $classResource));
         $this->assertFalse($this->aclManager->isAllowed($user, Actions::DELETE, $classResource));
@@ -68,7 +68,7 @@ class ClassScopeTest extends AbstractIntegrationTest
         $this->em->flush();
 
         // Test on the resource class
-        $classResource = Resource::fromEntityClass('Tests\MyCLabs\ACL\Integration\Model\Article');
+        $classResource = new ClassResource('Tests\MyCLabs\ACL\Integration\Model\Article');
         $this->assertTrue($this->aclManager->isAllowed($user, Actions::VIEW, $classResource));
         $this->assertTrue($this->aclManager->isAllowed($user, Actions::EDIT, $classResource));
         $this->assertFalse($this->aclManager->isAllowed($user, Actions::DELETE, $classResource));
