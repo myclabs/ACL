@@ -49,7 +49,19 @@ class ACLManager
         } elseif ($resource->isEntityClass()) {
             return $this->isAllowedOnEntityClass($identity, $action, $resource->getEntityClass());
         } elseif ($resource->isEntityField()) {
-            return $this->isAllowedOnEntityField($identity, $action, $resource->getEntity(), $resource->getEntityField());
+            return $this->isAllowedOnEntityField(
+                $identity,
+                $action,
+                $resource->getEntity(),
+                $resource->getEntityField()
+            );
+        } elseif ($resource->isEntityClassField()) {
+            return $this->isAllowedOnEntityClassField(
+                $identity,
+                $action,
+                $resource->getEntityClass(),
+                $resource->getEntityField()
+            );
         }
         // TODO class field authorization
     }
@@ -192,6 +204,11 @@ class ACLManager
             ));
         }
 
+        // Check first if the user has access to the field at class-scope
+        if ($this->isAllowedOnEntityClassField($identity, $action, $entityClass, $field)) {
+            return true;
+        }
+
         $dql = "SELECT count(entity)
                 FROM $entityClass entity
                 JOIN MyCLabs\\ACL\\Model\\Authorization authorization WITH entity.id = authorization.entityId
@@ -203,6 +220,23 @@ class ACLManager
 
         $query = $this->entityManager->createQuery($dql);
         $query->setParameter('entity', $entity);
+        $query->setParameter('entityClass', $entityClass);
+        $query->setParameter('entityField', $field);
+        $query->setParameter('securityIdentity', $identity);
+
+        return ($query->getSingleScalarResult() > 0);
+    }
+
+    private function isAllowedOnEntityClassField(SecurityIdentityInterface $identity, $action, $entityClass, $field)
+    {
+        $dql = "SELECT count(authorization)
+                FROM MyCLabs\\ACL\\Model\\Authorization authorization
+                WHERE authorization.entityClass = :entityClass
+                    AND authorization.entityField = :entityField
+                    AND authorization.securityIdentity = :securityIdentity
+                    AND authorization.actions.$action = true";
+
+        $query = $this->entityManager->createQuery($dql);
         $query->setParameter('entityClass', $entityClass);
         $query->setParameter('entityField', $field);
         $query->setParameter('securityIdentity', $identity);
