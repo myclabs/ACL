@@ -2,7 +2,6 @@
 
 namespace MyCLabs\ACL;
 
-use Doctrine\Common\Util\ClassUtils;
 use Doctrine\ORM\EntityManager;
 use MyCLabs\ACL\Model\Actions;
 use MyCLabs\ACL\Model\Authorization;
@@ -51,14 +50,15 @@ class ACLManager
      */
     public function isAllowed(SecurityIdentityInterface $identity, $action, ResourceInterface $resource)
     {
+        $repo = $this->authorizationRepository;
         if ($resource instanceof EntityResource) {
-            return $this->isAllowedOnEntity($identity, $action, $resource);
+            return $repo->isAllowedOnEntity($identity, $action, $resource);
         } elseif ($resource instanceof ClassResource) {
-            return $this->isAllowedOnEntityClass($identity, $action, $resource->getClass());
+            return $repo->isAllowedOnEntityClass($identity, $action, $resource->getClass());
         } elseif ($resource instanceof EntityFieldResource) {
-            return $this->isAllowedOnEntityField($identity, $action, $resource->getEntity(), $resource->getField());
+            return $repo->isAllowedOnEntityField($identity, $action, $resource->getEntity(), $resource->getField());
         } elseif ($resource instanceof ClassFieldResource) {
-            return $this->isAllowedOnEntityClassField($identity, $action, $resource->getClass(), $resource->getField());
+            return $repo->isAllowedOnEntityClassField($identity, $action, $resource->getClass(), $resource->getField());
         }
 
         throw new \RuntimeException('Unknown type of resource: ' . get_class($resource));
@@ -162,105 +162,6 @@ class ACLManager
         }
         $this->entityManager->flush();
         $this->entityManager->clear();
-    }
-
-    private function isAllowedOnEntity(SecurityIdentityInterface $identity, $action, EntityResource $entity)
-    {
-        $entityClass = ClassUtils::getClass($entity);
-
-        if ($entity->getId() === null) {
-            throw new \RuntimeException(sprintf(
-                'The entity resource %s must be persisted (id not null) to be able to test the permissions',
-                $entityClass
-            ));
-        }
-
-        $dql = "SELECT count(entity)
-                FROM $entityClass entity
-                JOIN MyCLabs\\ACL\\Model\\Authorization authorization WITH entity.id = authorization.entityId
-                WHERE entity = :entity
-                    AND authorization.entityClass = :entityClass
-                    AND authorization.entityField IS NULL
-                    AND authorization.securityIdentity = :securityIdentity
-                    AND authorization.actions.$action = true";
-
-        $query = $this->entityManager->createQuery($dql);
-        $query->setParameter('entity', $entity);
-        $query->setParameter('entityClass', $entityClass);
-        $query->setParameter('securityIdentity', $identity);
-
-        return ($query->getSingleScalarResult() > 0);
-    }
-
-    private function isAllowedOnEntityClass(SecurityIdentityInterface $identity, $action, $entityClass)
-    {
-        $dql = "SELECT count(authorization)
-                FROM MyCLabs\\ACL\\Model\\Authorization authorization
-                WHERE authorization.entityClass = :entityClass
-                    AND authorization.entityField IS NULL
-                    AND authorization.securityIdentity = :securityIdentity
-                    AND authorization.actions.$action = true";
-
-        $query = $this->entityManager->createQuery($dql);
-        $query->setParameter('entityClass', $entityClass);
-        $query->setParameter('securityIdentity', $identity);
-
-        return ($query->getSingleScalarResult() > 0);
-    }
-
-    private function isAllowedOnEntityField(
-        SecurityIdentityInterface $identity,
-        $action,
-        EntityResource $entity,
-        $field
-    ) {
-        $entityClass = ClassUtils::getClass($entity);
-
-        if ($entity->getId() === null) {
-            throw new \RuntimeException(sprintf(
-                'The entity resource %s must be persisted (id not null) to be able to test the permissions',
-                $entityClass
-            ));
-        }
-
-        // Check first if the user has access to the field at class-scope
-        if ($this->isAllowedOnEntityClassField($identity, $action, $entityClass, $field)) {
-            return true;
-        }
-
-        $dql = "SELECT count(entity)
-                FROM $entityClass entity
-                JOIN MyCLabs\\ACL\\Model\\Authorization authorization WITH entity.id = authorization.entityId
-                WHERE entity = :entity
-                    AND authorization.entityClass = :entityClass
-                    AND authorization.entityField = :entityField
-                    AND authorization.securityIdentity = :securityIdentity
-                    AND authorization.actions.$action = true";
-
-        $query = $this->entityManager->createQuery($dql);
-        $query->setParameter('entity', $entity);
-        $query->setParameter('entityClass', $entityClass);
-        $query->setParameter('entityField', $field);
-        $query->setParameter('securityIdentity', $identity);
-
-        return ($query->getSingleScalarResult() > 0);
-    }
-
-    private function isAllowedOnEntityClassField(SecurityIdentityInterface $identity, $action, $entityClass, $field)
-    {
-        $dql = "SELECT count(authorization)
-                FROM MyCLabs\\ACL\\Model\\Authorization authorization
-                WHERE authorization.entityClass = :entityClass
-                    AND authorization.entityField = :entityField
-                    AND authorization.securityIdentity = :securityIdentity
-                    AND authorization.actions.$action = true";
-
-        $query = $this->entityManager->createQuery($dql);
-        $query->setParameter('entityClass', $entityClass);
-        $query->setParameter('entityField', $field);
-        $query->setParameter('securityIdentity', $identity);
-
-        return ($query->getSingleScalarResult() > 0);
     }
 
     /**
