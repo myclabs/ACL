@@ -5,7 +5,7 @@ namespace MyCLabs\ACL;
 use Doctrine\Common\EventSubscriber;
 use Doctrine\ORM\Event\OnFlushEventArgs;
 use Doctrine\ORM\Events;
-use MyCLabs\ACL\Model\EntityResourceInterface;
+use MyCLabs\ACL\Model\EntityResource;
 
 /**
  * Listens the entity manager for new resources.
@@ -25,7 +25,7 @@ class EntityManagerListener implements EventSubscriber
     private $aclManager;
 
     /**
-     * @var EntityResourceInterface[]
+     * @var EntityResource[]
      */
     private $newResources = [];
 
@@ -56,7 +56,7 @@ class EntityManagerListener implements EventSubscriber
         // Remember new resources
         $this->newResources = [];
         foreach ($uow->getScheduledEntityInsertions() as $entity) {
-            if ($entity instanceof EntityResourceInterface) {
+            if ($entity instanceof EntityResource) {
                 $this->newResources[] = $entity;
             }
         }

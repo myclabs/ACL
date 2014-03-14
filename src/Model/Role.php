@@ -4,8 +4,8 @@ namespace MyCLabs\ACL\Model;
 
 use Doctrine\Common\Collections\ArrayCollection;
 use Doctrine\Common\Collections\Collection;
-use Doctrine\ORM\EntityManager;
 use Doctrine\ORM\Mapping as ORM;
+use MyCLabs\ACL\ACLManager;
 
 /**
  * Role.
@@ -44,10 +44,10 @@ abstract class Role
     }
 
     /**
-     * @param EntityManager $entityManager
+     * @param ACLManager $aclManager
      * @return Authorization[]
      */
-    abstract public function createAuthorizations(EntityManager $entityManager);
+    abstract public function createAuthorizations(ACLManager $aclManager);
 
     /**
      * @return int

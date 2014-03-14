@@ -10,7 +10,7 @@ use Doctrine\ORM\Mapping as ORM;
 /**
  * Authorization of a security identity to do something on a resource.
  *
- * @ORM\Entity(readOnly=true)
+ * @ORM\Entity(readOnly=true, repositoryClass="MyCLabs\ACL\Repository\AuthorizationRepository")
  *
  * @author Matthieu Napoli <matthieu@mnapoli.fr>
  */
@@ -94,7 +94,7 @@ class Authorization
      */
     public static function create(Role $role, Actions $actions, ResourceInterface $resource)
     {
-        if ($resource instanceof EntityResourceInterface) {
+        if ($resource instanceof EntityResource) {
             return new static($role, $actions, $resource);
         } elseif ($resource instanceof ClassResource) {
             return new static($role, $actions, null, $resource->getClass());
@@ -110,14 +110,14 @@ class Authorization
     /**
      * @param Role                         $role
      * @param Actions                      $actions
-     * @param EntityResourceInterface|null $entity
+     * @param EntityResource|null $entity
      * @param string|null                  $entityClass
      * @param string|null                  $entityField
      */
     private function __construct(
         Role $role,
         Actions $actions,
-        EntityResourceInterface $entity = null,
+        EntityResource $entity = null,
         $entityClass = null,
         $entityField = null
     ) {
@@ -141,14 +141,11 @@ class Authorization
      * Cascade an authorization to another resource (will return a child authorization).
      *
      * @param ResourceInterface $resource
-     * @param Actions|null      $actions If not specified, the actions of the current authorization are used.
      * @return static
      */
-    public function createChildAuthorization(ResourceInterface $resource, Actions $actions = null)
+    public function createChildAuthorization(ResourceInterface $resource)
     {
-        $actions = $actions ?: $this->actions;
-
-        $authorization = self::create($this->role, $actions, $resource);
+        $authorization = self::create($this->role, $this->actions, $resource);
 
         $authorization->parentAuthorization = $this;
 

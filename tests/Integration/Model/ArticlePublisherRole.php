@@ -2,10 +2,9 @@
 
 namespace Tests\MyCLabs\ACL\Integration\Model;
 
-use Doctrine\ORM\EntityManager;
 use Doctrine\ORM\Mapping as ORM;
+use MyCLabs\ACL\ACLManager;
 use MyCLabs\ACL\Model\Actions;
-use MyCLabs\ACL\Model\Authorization;
 use MyCLabs\ACL\Model\EntityFieldResource;
 use MyCLabs\ACL\Model\Role;
 
@@ -27,25 +26,13 @@ class ArticlePublisherRole extends Role
         parent::__construct($identity);
     }
 
-    public function createAuthorizations(EntityManager $entityManager)
+    public function createAuthorizations(ACLManager $aclManager)
     {
-        $authorizations = [];
-
         // The publisher can view the article
-        $authorizations[] = Authorization::create(
-            $this,
-            new Actions([Actions::VIEW]),
-            $this->article
-        );
+        $aclManager->allow($this, new Actions([Actions::VIEW]), $this->article);
 
         // The publisher can publish the article
-        $authorizations[] = Authorization::create(
-            $this,
-            new Actions([Actions::EDIT]),
-            new EntityFieldResource($this->article, 'published')
-        );
-
-        return $authorizations;
+        $aclManager->allow($this, new Actions([Actions::EDIT]), new EntityFieldResource($this->article, 'published'));
     }
 
     /**

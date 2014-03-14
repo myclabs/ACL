@@ -10,7 +10,7 @@ namespace MyCLabs\ACL\Model;
 final class EntityFieldResource implements ResourceInterface
 {
     /**
-     * @var EntityResourceInterface
+     * @var EntityResource
      */
     private $entity;
 
@@ -20,17 +20,17 @@ final class EntityFieldResource implements ResourceInterface
     private $field;
 
     /**
-     * @param EntityResourceInterface $entity
+     * @param EntityResource $entity
      * @param string         $field Field name.
      */
-    public function __construct(EntityResourceInterface $entity, $field)
+    public function __construct(EntityResource $entity, $field)
     {
         $this->entity = $entity;
         $this->field = $field;
     }
 
     /**
-     * @return EntityResourceInterface
+     * @return EntityResource
      */
     public function getEntity()
     {

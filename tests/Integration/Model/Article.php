@@ -4,13 +4,16 @@ namespace Tests\MyCLabs\ACL\Integration\Model;
 
 use Doctrine\Common\Collections\ArrayCollection;
 use Doctrine\Common\Collections\Collection;
+use Doctrine\ORM\EntityManager;
 use Doctrine\ORM\Mapping as ORM;
-use MyCLabs\ACL\Model\EntityResourceInterface;
+use MyCLabs\ACL\Model\ClassResource;
+use MyCLabs\ACL\Model\EntityResource;
+use MyCLabs\ACL\Model\ResourceInterface;
 
 /**
  * @ORM\Entity
  */
-class Article implements EntityResourceInterface
+class Article implements EntityResource
 {
     /**
      * @ORM\Id @ORM\GeneratedValue
@@ -53,5 +56,17 @@ class Article implements EntityResourceInterface
     public function setPublished($published)
     {
         $this->published = (boolean) $published;
+    }
+
+    public function getParentResources(EntityManager $entityManager)
+    {
+        return [
+            new ClassResource(get_class()),
+        ];
+    }
+
+    public function getSubResources(EntityManager $entityManager)
+    {
+        return [];
     }
 }

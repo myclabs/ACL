@@ -2,10 +2,9 @@
 
 namespace Tests\MyCLabs\ACL\Integration\Model;
 
-use Doctrine\ORM\EntityManager;
 use Doctrine\ORM\Mapping as ORM;
+use MyCLabs\ACL\ACLManager;
 use MyCLabs\ACL\Model\Actions;
-use MyCLabs\ACL\Model\Authorization;
 use MyCLabs\ACL\Model\ClassFieldResource;
 use MyCLabs\ACL\Model\Role;
 
@@ -16,12 +15,12 @@ use MyCLabs\ACL\Model\Role;
  */
 class CommentArticlesRole extends Role
 {
-    public function createAuthorizations(EntityManager $entityManager)
+    public function createAuthorizations(ACLManager $aclManager)
     {
-        return [Authorization::create(
+        $aclManager->allow(
             $this,
             new Actions([Actions::VIEW, Actions::EDIT]),
             new ClassFieldResource('Tests\MyCLabs\ACL\Integration\Model\Article', 'comments')
-        )];
+        );
     }
 }

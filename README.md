@@ -59,10 +59,10 @@ Scopes of access available:
 
 Let's say you want to control the access to an entity named `Article`.
 
-You need to have your entity implement the `EntityResourceInterface` interface:
+You need to have your entity implement the `EntityResource` interface:
 
 ```php
-class Article implements EntityResourceInterface
+class Article implements EntityResource
 {
     // ...
 
