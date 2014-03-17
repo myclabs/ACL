@@ -21,12 +21,17 @@ class QueryBuilderHelperTest extends \PHPUnit_Framework_TestCase
         $qb->select('test')
             ->from('test', 'test');
 
-        QueryBuilderHelper::joinACL($qb, 'test', $identity, Actions::VIEW);
+        QueryBuilderHelper::joinACL($qb, 'test', 'test', $identity, Actions::VIEW);
 
-        $dql = 'SELECT test FROM test test INNER JOIN test.authorizations authorization '
-            . 'WHERE authorization.securityIdentity = :acl_identity AND authorization.actions.view = true';
+        $dql = 'SELECT test FROM test test INNER JOIN MyCLabs\ACL\Model\Authorization authorization '
+            . 'WITH test.id = authorization.entityId '
+            . 'WHERE authorization.entityClass = :acl_entity_class '
+            . 'AND authorization.entityField IS NULL '
+            . 'AND authorization.securityIdentity = :acl_identity '
+            . 'AND authorization.actions.view = true';
         $this->assertEquals($dql, $qb->getDQL());
 
+        $this->assertSame('test', $qb->getParameter('acl_entity_class')->getValue());
         $this->assertSame($identity, $qb->getParameter('acl_identity')->getValue());
     }
 }

@@ -10,8 +10,8 @@ use Doctrine\ORM\Tools\ResolveTargetEntityListener;
 use Doctrine\ORM\Tools\SchemaTool;
 use Doctrine\ORM\Tools\Setup;
 use MyCLabs\ACL\ACLManager;
+use MyCLabs\ACL\EntityManagerListener;
 use MyCLabs\ACL\MetadataLoader;
-use Tests\MyCLabs\ACL\Integration\Model\ACLArticleListener;
 
 abstract class AbstractIntegrationTest extends \PHPUnit_Framework_TestCase
 {
@@ -46,11 +46,9 @@ abstract class AbstractIntegrationTest extends \PHPUnit_Framework_TestCase
 
         $metadataLoader = new MetadataLoader();
         $metadataLoader->registerRoleClass('Tests\MyCLabs\ACL\Integration\Model\ArticleEditorRole', 'articleEditor');
-        $metadataLoader->registerAuthorizationClass('Tests\MyCLabs\ACL\Integration\Model\ArticleAuthorization', 'article');
 
         $evm->addEventListener(Events::loadClassMetadata, $rtel);
         $evm->addEventListener(Events::loadClassMetadata, $metadataLoader);
-        $evm->addEventListener(Events::onFlush, new ACLArticleListener());
 
         // Create the entity manager
         $config = Setup::createAnnotationMetadataConfiguration($paths, true, null, new ArrayCache(), false);
@@ -61,5 +59,11 @@ abstract class AbstractIntegrationTest extends \PHPUnit_Framework_TestCase
         $tool->createSchema($this->em->getMetadataFactory()->getAllMetadata());
 
         $this->aclManager = new ACLManager($this->em);
+
+        // The entity manager listener
+        $listener = new EntityManagerListener(function () {
+            return $this->aclManager;
+        });
+        $evm->addEventSubscriber($listener);
     }
 }

@@ -19,12 +19,6 @@ class MetadataLoader
     private $roles = [];
 
     /**
-     * Discriminator map for authorizations.
-     * @var string[]
-     */
-    private $authorizations = [];
-
-    /**
      * Dynamically register a role subclass in the discriminator map for the Doctrine mapping.
      *
      * @param string $class
@@ -33,17 +27,6 @@ class MetadataLoader
     public function registerRoleClass($class, $shortName)
     {
         $this->roles[$shortName] = $class;
-    }
-
-    /**
-     * Dynamically register an authorization subclass in the discriminator map for the Doctrine mapping.
-     *
-     * @param string $class
-     * @param string $shortName
-     */
-    public function registerAuthorizationClass($class, $shortName)
-    {
-        $this->authorizations[$shortName] = $class;
     }
 
     /**
@@ -56,8 +39,6 @@ class MetadataLoader
 
         if ($metadata->getName() === 'MyCLabs\ACL\Model\Role') {
             $metadata->setDiscriminatorMap($this->roles);
-        } elseif ($metadata->getName() === 'MyCLabs\ACL\Model\Authorization') {
-            $metadata->setDiscriminatorMap($this->authorizations);
         }
     }
 }

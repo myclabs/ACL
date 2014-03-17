@@ -4,18 +4,17 @@ namespace MyCLabs\ACL\Model;
 
 use Doctrine\Common\Collections\ArrayCollection;
 use Doctrine\Common\Collections\Collection;
+use Doctrine\Common\Util\ClassUtils;
 use Doctrine\ORM\Mapping as ORM;
 
 /**
  * Authorization of a security identity to do something on a resource.
  *
- * @ORM\Entity(readOnly=true)
- * @ORM\InheritanceType("JOINED")
- * @ORM\DiscriminatorColumn(name="type", type="string")
+ * @ORM\Entity(readOnly=true, repositoryClass="MyCLabs\ACL\Repository\AuthorizationRepository")
  *
  * @author Matthieu Napoli <matthieu@mnapoli.fr>
  */
-abstract class Authorization
+class Authorization
 {
     /**
      * @var int
@@ -29,14 +28,14 @@ abstract class Authorization
      *
      * @var Role
      * @ORM\ManyToOne(targetEntity="Role", inversedBy="authorizations")
-     * @ORM\JoinColumn(nullable=false, onDelete="CASCADE")
+     * @ORM\JoinColumn(name="role_id", nullable=false, onDelete="CASCADE")
      */
     protected $role;
 
     /**
      * @var SecurityIdentityInterface
      * @ORM\ManyToOne(targetEntity="SecurityIdentityInterface")
-     * @ORM\JoinColumn(nullable=false, onDelete="CASCADE")
+     * @ORM\JoinColumn(name="securityIdentity_id", nullable=false, onDelete="CASCADE")
      */
     protected $securityIdentity;
 
@@ -50,23 +49,31 @@ abstract class Authorization
      * The entity targeted by the authorization.
      * If null, then $entityClass is used and this authorization is at class-scope.
      *
-     * @var EntityResourceInterface|null
+     * @ORM\Column(name="entity_id", type="integer", nullable=true)
+     * @var int|null
      */
-    protected $entity;
+    protected $entityId;
 
     /**
-     * Must be defined when $entity is null.
-     * If defined, then the authorization applies to all the entities of that class.
+     * The class of the entity.
      *
-     * @ORM\Column(nullable=true)
-     * @var string|null
+     * @ORM\Column(name="entity_class")
+     * @var string
      */
     protected $entityClass;
 
     /**
+     * Field name for authorizations that apply on a class or entity field.
+     *
+     * @ORM\Column(name="entity_field", nullable=true)
+     * @var string|null
+     */
+    protected $entityField;
+
+    /**
      * @var Authorization
      * @ORM\ManyToOne(targetEntity="Authorization", inversedBy="childAuthorizations")
-     * @ORM\JoinColumn(onDelete="CASCADE")
+     * @ORM\JoinColumn(name="parentAuthorization_id", onDelete="CASCADE")
      */
     protected $parentAuthorization;
 
@@ -79,67 +86,70 @@ abstract class Authorization
     /**
      * Creates an authorization on a resource.
      *
-     * @param Role     $role
-     * @param Actions  $actions
-     * @param Resource $resource
+     * @param Role              $role
+     * @param Actions           $actions
+     * @param ResourceInterface $resource
+     * @throws \RuntimeException
      * @return static
      */
-    public static function create(Role $role, Actions $actions, Resource $resource)
+    public static function create(Role $role, Actions $actions, ResourceInterface $resource)
     {
-        if ($resource->isEntity()) {
-            return new static($role, $actions, $resource->getEntity());
-        } elseif ($resource->isEntityClass()) {
-            return new static($role, $actions, null, $resource->getEntityClass());
+        if ($resource instanceof EntityResource) {
+            return new static($role, $actions, $resource);
+        } elseif ($resource instanceof ClassResource) {
+            return new static($role, $actions, null, $resource->getClass());
+        } elseif ($resource instanceof EntityFieldResource) {
+            return new static($role, $actions, $resource->getEntity(), null, $resource->getField());
+        } elseif ($resource instanceof ClassFieldResource) {
+            return new static($role, $actions, null, $resource->getClass(), $resource->getField());
         }
-    }
 
-    /**
-     * Creates an authorizations that inherits from another.
-     *
-     * @param Authorization $parentAuthorization
-     * @param Resource      $resource
-     * @param Actions|null  $actions
-     * @return static
-     */
-    public static function createChildAuthorization(
-        Authorization $parentAuthorization,
-        Resource $resource,
-        Actions $actions = null
-    ) {
-        $actions = $actions ?: $parentAuthorization->getActions();
-
-        $authorization = self::create($parentAuthorization->role, $actions, $resource);
-
-        $authorization->parentAuthorization = $parentAuthorization;
-
-        return $authorization;
+        throw new \RuntimeException('Unknown type of resource: ' . get_class($resource));
     }
 
     /**
      * @param Role                         $role
      * @param Actions                      $actions
-     * @param EntityResourceInterface|null $entity
-     * @param string                       $entityClass
+     * @param EntityResource|null $entity
+     * @param string|null                  $entityClass
+     * @param string|null                  $entityField
      */
     private function __construct(
         Role $role,
         Actions $actions,
-        EntityResourceInterface $entity = null,
-        $entityClass = null
+        EntityResource $entity = null,
+        $entityClass = null,
+        $entityField = null
     ) {
         $this->role = $role;
         $this->securityIdentity = $role->getSecurityIdentity();
         $this->actions = $actions;
-        $this->entity = $entity;
+        if ($entity !== null) {
+            $this->entityId = $entity->getId();
+        }
         if ($entity === null) {
             $this->entityClass = $entityClass;
+        } else {
+            $this->entityClass = ClassUtils::getClass($entity);
         }
+        $this->entityField = $entityField;
 
         $this->childAuthorizations = new ArrayCollection();
+    }
 
-        // Add to the role because the role might need its root authorizations
-        // for cascading (in case new resources are created later in the same thread)
-        $role->addAuthorization($this);
+    /**
+     * Cascade an authorization to another resource (will return a child authorization).
+     *
+     * @param ResourceInterface $resource
+     * @return static
+     */
+    public function createChildAuthorization(ResourceInterface $resource)
+    {
+        $authorization = self::create($this->role, $this->actions, $resource);
+
+        $authorization->parentAuthorization = $this;
+
+        return $authorization;
     }
 
     /**
@@ -159,11 +169,11 @@ abstract class Authorization
     }
 
     /**
-     * @return EntityResourceInterface|null
+     * @return int|null
      */
-    public function getEntity()
+    public function getEntityId()
     {
-        return $this->entity;
+        return $this->entityId;
     }
 
     /**
@@ -172,6 +182,14 @@ abstract class Authorization
     public function getEntityClass()
     {
         return $this->entityClass;
+    }
+
+    /**
+     * @return null|string
+     */
+    public function getEntityField()
+    {
+        return $this->entityField;
     }
 
     /**
@@ -204,6 +222,14 @@ abstract class Authorization
     public function getRole()
     {
         return $this->role;
+    }
+
+    /**
+     * @param int $id
+     */
+    public function setId($id)
+    {
+        $this->id = $id;
     }
 
     /**
