@@ -6,10 +6,10 @@ MyCLabs ACL is a library that helps managing permissions on resources.
 
 Vocabulary:
 
-- Security identity: the entity which will be granted some access (this is generally the user)
-- Resource: a *thing* to which we want to control the access
-- Authorization: allows a security identity (user) to do something on a resource
-- Role: a role gives authorizations to a user (e.g. an administrator, an article editor, a project owner, …)
+- **Security identity**: the entity which will be granted some access (this is generally the user)
+- **Resource**: a *thing* to which we want to control the access
+- **Authorization**: allows a security identity (user) to do something on a resource
+- **Role**: a role gives authorizations to a user (e.g. an administrator, an article editor, a project owner, …)
 
 There are 2 kinds of resources:
 
@@ -91,7 +91,6 @@ class Article implements EntityResource
     // ...
 
     /**
-     * @var ArticleEditorRole[]|Collection
      * @ORM\OneToMany(targetEntity="ArticleEditorRole", mappedBy="article", cascade={"remove"})
      */
     protected $roles;
@@ -131,7 +130,11 @@ class ArticleEditorRole extends Role
 
     public function createAuthorizations(ACLManager $aclManager)
     {
-        $aclManager->allow($this, new Actions([Actions::VIEW, Actions::EDIT]), $this->article);
+        $aclManager->allow(
+            $this,
+            new Actions([Actions::VIEW, Actions::EDIT]),
+            $this->article
+        );
     }
 }
 ```
@@ -149,7 +152,11 @@ give access to all entities of that type:
 
 ```php
 // This will allow the users having the role to be able to view ALL the articles
-$aclManager->allow($this, new Actions([Actions::VIEW]), new ClassResource('My\Model\Article'));
+$aclManager->allow(
+    $this,
+    new Actions([Actions::VIEW]),
+    new ClassResource('My\Model\Article')
+);
 ```
 
 ## Setup
