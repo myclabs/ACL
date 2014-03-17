@@ -2,12 +2,14 @@
 
 namespace MyCLabs\ACL\Model;
 
+use Doctrine\ORM\EntityManager;
+
 /**
  * Class field resource.
  *
  * @author Matthieu Napoli <matthieu@mnapoli.fr>
  */
-final class ClassFieldResource implements ResourceInterface
+final class ClassFieldResource implements ResourceInterface, CascadingResource
 {
     /**
      * @var string
@@ -45,5 +47,22 @@ final class ClassFieldResource implements ResourceInterface
     public function getField()
     {
         return $this->field;
+    }
+
+    public function getParentResources(EntityManager $entityManager)
+    {
+        return [];
+    }
+
+    public function getSubResources(EntityManager $entityManager)
+    {
+        $repository = $entityManager->getRepository($this->class);
+
+        $resources = [];
+        foreach ($repository->findAll() as $entity) {
+            $resources[] = new EntityFieldResource($entity, $this->field);
+        }
+
+        return $resources;
     }
 }
