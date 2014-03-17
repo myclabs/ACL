@@ -5,9 +5,7 @@ namespace MyCLabs\ACL\Repository;
 use Doctrine\Common\Util\ClassUtils;
 use Doctrine\ORM\EntityRepository;
 use MyCLabs\ACL\Model\Authorization;
-use MyCLabs\ACL\Model\ClassFieldResource;
 use MyCLabs\ACL\Model\ClassResource;
-use MyCLabs\ACL\Model\EntityFieldResource;
 use MyCLabs\ACL\Model\EntityResource;
 use MyCLabs\ACL\Model\ResourceInterface;
 use MyCLabs\ACL\Model\SecurityIdentityInterface;
@@ -54,7 +52,6 @@ class AuthorizationRepository extends EntityRepository
                 'parentAuthorization_id' => $parent ? $parent->getId() : null,
                 'entity_class'           => $authorization->getEntityClass(),
                 'entity_id'              => $authorization->getEntityId(),
-                'entity_field'           => $authorization->getEntityField(),
             ];
 
             foreach ($authorization->getActions()->toArray() as $action => $value) {
@@ -94,7 +91,6 @@ class AuthorizationRepository extends EntityRepository
                 JOIN MyCLabs\\ACL\\Model\\Authorization authorization WITH entity.id = authorization.entityId
                 WHERE entity = :entity
                     AND authorization.entityClass = :entityClass
-                    AND authorization.entityField IS NULL
                     AND authorization.securityIdentity = :securityIdentity
                     AND authorization.actions.$action = true";
 
@@ -111,67 +107,11 @@ class AuthorizationRepository extends EntityRepository
         $dql = "SELECT count(authorization)
                 FROM MyCLabs\\ACL\\Model\\Authorization authorization
                 WHERE authorization.entityClass = :entityClass
-                    AND authorization.entityField IS NULL
                     AND authorization.securityIdentity = :securityIdentity
                     AND authorization.actions.$action = true";
 
         $query = $this->_em->createQuery($dql);
         $query->setParameter('entityClass', $entityClass);
-        $query->setParameter('securityIdentity', $identity);
-
-        return ($query->getSingleScalarResult() > 0);
-    }
-
-    public function isAllowedOnEntityField(
-        SecurityIdentityInterface $identity,
-        $action,
-        EntityResource $entity,
-        $field
-    ) {
-        $entityClass = ClassUtils::getClass($entity);
-
-        if ($entity->getId() === null) {
-            throw new \RuntimeException(sprintf(
-                'The entity resource %s must be persisted (id not null) to be able to test the permissions',
-                $entityClass
-            ));
-        }
-
-        // Check first if the user has access to the field at class-scope
-        if ($this->isAllowedOnEntityClassField($identity, $action, $entityClass, $field)) {
-            return true;
-        }
-
-        $dql = "SELECT count(entity)
-                FROM $entityClass entity
-                JOIN MyCLabs\\ACL\\Model\\Authorization authorization WITH entity.id = authorization.entityId
-                WHERE entity = :entity
-                    AND authorization.entityClass = :entityClass
-                    AND authorization.entityField = :entityField
-                    AND authorization.securityIdentity = :securityIdentity
-                    AND authorization.actions.$action = true";
-
-        $query = $this->_em->createQuery($dql);
-        $query->setParameter('entity', $entity);
-        $query->setParameter('entityClass', $entityClass);
-        $query->setParameter('entityField', $field);
-        $query->setParameter('securityIdentity', $identity);
-
-        return ($query->getSingleScalarResult() > 0);
-    }
-
-    public function isAllowedOnEntityClassField(SecurityIdentityInterface $identity, $action, $entityClass, $field)
-    {
-        $dql = "SELECT count(authorization)
-                FROM MyCLabs\\ACL\\Model\\Authorization authorization
-                WHERE authorization.entityClass = :entityClass
-                    AND authorization.entityField = :entityField
-                    AND authorization.securityIdentity = :securityIdentity
-                    AND authorization.actions.$action = true";
-
-        $query = $this->_em->createQuery($dql);
-        $query->setParameter('entityClass', $entityClass);
-        $query->setParameter('entityField', $field);
         $query->setParameter('securityIdentity', $identity);
 
         return ($query->getSingleScalarResult() > 0);
@@ -194,30 +134,13 @@ class AuthorizationRepository extends EntityRepository
         if ($resource instanceof EntityResource) {
             $qb->andWhere('a.entityClass = :entityClass');
             $qb->andWhere('a.entityId = :entityId');
-            $qb->andWhere('a.entityField IS NULL');
             $qb->setParameter('entityClass', ClassUtils::getClass($resource));
             $qb->setParameter('entityId', $resource->getId());
         }
         if ($resource instanceof ClassResource) {
             $qb->andWhere('a.entityClass = :entityClass');
             $qb->andWhere('a.entityId IS NULL');
-            $qb->andWhere('a.entityField IS NULL');
             $qb->setParameter('entityClass', $resource->getClass());
-        }
-        if ($resource instanceof EntityFieldResource) {
-            $qb->andWhere('a.entityClass = :entityClass');
-            $qb->andWhere('a.entityId = :entityId');
-            $qb->andWhere('a.entityField = :entityField');
-            $qb->setParameter('entityClass', ClassUtils::getClass($resource));
-            $qb->setParameter('entityId', $resource->getEntity()->getId());
-            $qb->setParameter('entityField', $resource->getField());
-        }
-        if ($resource instanceof ClassFieldResource) {
-            $qb->andWhere('a.entityClass = :entityClass');
-            $qb->andWhere('a.entityId IS NULL');
-            $qb->andWhere('a.entityField = :entityField');
-            $qb->setParameter('entityClass', $resource->getClass());
-            $qb->setParameter('entityField', $resource->getField());
         }
 
         return $qb->getQuery()->getResult();

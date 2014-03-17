@@ -7,9 +7,7 @@ use MyCLabs\ACL\CascadeStrategy\CascadeStrategy;
 use MyCLabs\ACL\CascadeStrategy\SimpleCascadeStrategy;
 use MyCLabs\ACL\Model\Actions;
 use MyCLabs\ACL\Model\Authorization;
-use MyCLabs\ACL\Model\ClassFieldResource;
 use MyCLabs\ACL\Model\ClassResource;
-use MyCLabs\ACL\Model\EntityFieldResource;
 use MyCLabs\ACL\Model\EntityResource;
 use MyCLabs\ACL\Model\ResourceInterface;
 use MyCLabs\ACL\Model\Role;
@@ -67,10 +65,6 @@ class ACLManager
             return $repo->isAllowedOnEntity($identity, $action, $resource);
         } elseif ($resource instanceof ClassResource) {
             return $repo->isAllowedOnEntityClass($identity, $action, $resource->getClass());
-        } elseif ($resource instanceof EntityFieldResource) {
-            return $repo->isAllowedOnEntityField($identity, $action, $resource->getEntity(), $resource->getField());
-        } elseif ($resource instanceof ClassFieldResource) {
-            return $repo->isAllowedOnEntityClassField($identity, $action, $resource->getClass(), $resource->getField());
         }
 
         throw new \RuntimeException('Unknown type of resource: ' . get_class($resource));

@@ -63,14 +63,6 @@ class Authorization
     protected $entityClass;
 
     /**
-     * Field name for authorizations that apply on a class or entity field.
-     *
-     * @ORM\Column(name="entity_field", nullable=true)
-     * @var string|null
-     */
-    protected $entityField;
-
-    /**
      * @var Authorization
      * @ORM\ManyToOne(targetEntity="Authorization", inversedBy="childAuthorizations")
      * @ORM\JoinColumn(name="parentAuthorization_id", onDelete="CASCADE")
@@ -98,28 +90,22 @@ class Authorization
             return new static($role, $actions, $resource);
         } elseif ($resource instanceof ClassResource) {
             return new static($role, $actions, null, $resource->getClass());
-        } elseif ($resource instanceof EntityFieldResource) {
-            return new static($role, $actions, $resource->getEntity(), null, $resource->getField());
-        } elseif ($resource instanceof ClassFieldResource) {
-            return new static($role, $actions, null, $resource->getClass(), $resource->getField());
         }
 
         throw new \RuntimeException('Unknown type of resource: ' . get_class($resource));
     }
 
     /**
-     * @param Role                         $role
-     * @param Actions                      $actions
+     * @param Role                $role
+     * @param Actions             $actions
      * @param EntityResource|null $entity
-     * @param string|null                  $entityClass
-     * @param string|null                  $entityField
+     * @param string|null         $entityClass
      */
     private function __construct(
         Role $role,
         Actions $actions,
         EntityResource $entity = null,
-        $entityClass = null,
-        $entityField = null
+        $entityClass = null
     ) {
         $this->role = $role;
         $this->securityIdentity = $role->getSecurityIdentity();
@@ -132,7 +118,6 @@ class Authorization
         } else {
             $this->entityClass = ClassUtils::getClass($entity);
         }
-        $this->entityField = $entityField;
 
         $this->childAuthorizations = new ArrayCollection();
     }
@@ -182,14 +167,6 @@ class Authorization
     public function getEntityClass()
     {
         return $this->entityClass;
-    }
-
-    /**
-     * @return null|string
-     */
-    public function getEntityField()
-    {
-        return $this->entityField;
     }
 
     /**

@@ -32,7 +32,6 @@ class QueryFilterTest extends AbstractIntegrationTest
             JOIN MyCLabs\ACL\Model\Authorization authorization WITH a.id = authorization.entityId
             WHERE authorization.securityIdentity = :identity
             AND authorization.entityClass = :entityClass
-            AND authorization.entityField IS NULL
             AND authorization.actions.view = true'
         );
         $query->setParameter('entityClass', 'Tests\MyCLabs\ACL\Integration\Model\Article');
