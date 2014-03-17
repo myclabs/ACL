@@ -161,7 +161,37 @@ $aclManager->allow(
 
 ## Setup
 
-TODO
+WIP
+
+You first need to register the annotation mapping to your Doctrine metadata driver.
+
+Then you can configure the ACLManager:
+
+```php
+$aclManager = new ACLManager($entityManager);
+
+$evm = $entityManager->getEventManager();
+
+// Configure which entity implements the SecurityIdentityInterface
+$rtel = new ResolveTargetEntityListener();
+$rtel->addResolveTargetEntity('MyCLabs\ACL\Model\SecurityIdentityInterface', 'My\Model\User', []);
+$evm->addEventListener(Events::loadClassMetadata, $rtel);
+
+// Register the roles
+$metadataLoader = new MetadataLoader();
+$metadataLoader->registerRoleClass('My\Model\ArticleEditorRole', 'articleEditor');
+$evm->addEventListener(Events::loadClassMetadata, $metadataLoader);
+
+// Register the listener that looks for new resources
+$aclManagerLocator = function () use ($aclManager) {
+    return $aclManager;
+};
+$evm->addEventSubscriber(new EntityManagerListener($aclManagerLocator));
+```
+
+## Authorization cascade
+
+WIP
 
 ## Performances
 
