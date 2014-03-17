@@ -9,7 +9,6 @@ use Doctrine\ORM\Mapping as ORM;
 use MyCLabs\ACL\Model\CascadingResource;
 use MyCLabs\ACL\Model\ClassResource;
 use MyCLabs\ACL\Model\EntityResource;
-use MyCLabs\ACL\Model\ResourceInterface;
 
 /**
  * @ORM\Entity
@@ -24,14 +23,9 @@ class Article implements EntityResource, CascadingResource
 
     /**
      * @var ArticleEditorRole[]|Collection
-     * @ORM\OneToMany(targetEntity="ArticleEditorRole", mappedBy="article")
+     * @ORM\OneToMany(targetEntity="ArticleEditorRole", mappedBy="article", cascade={"remove"})
      */
     protected $roles;
-
-    /**
-     * @ORM\Column(type="boolean")
-     */
-    protected $published = false;
 
     public function __construct()
     {
@@ -41,22 +35,6 @@ class Article implements EntityResource, CascadingResource
     public function getId()
     {
         return $this->id;
-    }
-
-    /**
-     * @return boolean
-     */
-    public function getPublished()
-    {
-        return $this->published;
-    }
-
-    /**
-     * @param boolean $published
-     */
-    public function setPublished($published)
-    {
-        $this->published = (boolean) $published;
     }
 
     public function getParentResources(EntityManager $entityManager)
