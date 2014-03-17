@@ -4,13 +4,16 @@ namespace Tests\MyCLabs\ACL\Integration\Model;
 
 use Doctrine\Common\Collections\ArrayCollection;
 use Doctrine\Common\Collections\Collection;
+use Doctrine\ORM\EntityManager;
 use Doctrine\ORM\Mapping as ORM;
-use MyCLabs\ACL\Model\EntityResourceInterface;
+use MyCLabs\ACL\Model\CascadingResource;
+use MyCLabs\ACL\Model\ClassResource;
+use MyCLabs\ACL\Model\EntityResource;
 
 /**
  * @ORM\Entity
  */
-class Article implements EntityResourceInterface
+class Article implements EntityResource, CascadingResource
 {
     /**
      * @ORM\Id @ORM\GeneratedValue
@@ -19,25 +22,30 @@ class Article implements EntityResourceInterface
     protected $id;
 
     /**
-     * @var ArticleAuthorization[]|Collection
-     * @ORM\OneToMany(targetEntity="ArticleAuthorization", mappedBy="entity", fetch="EXTRA_LAZY")
-     */
-    protected $authorizations;
-
-    /**
      * @var ArticleEditorRole[]|Collection
-     * @ORM\OneToMany(targetEntity="ArticleEditorRole", mappedBy="article")
+     * @ORM\OneToMany(targetEntity="ArticleEditorRole", mappedBy="article", cascade={"remove"})
      */
     protected $roles;
 
     public function __construct()
     {
-        $this->authorizations = new ArrayCollection();
         $this->roles = new ArrayCollection();
     }
 
     public function getId()
     {
         return $this->id;
+    }
+
+    public function getParentResources(EntityManager $entityManager)
+    {
+        return [
+            new ClassResource(get_class()),
+        ];
+    }
+
+    public function getSubResources(EntityManager $entityManager)
+    {
+        return [];
     }
 }

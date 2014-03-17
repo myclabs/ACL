@@ -62,6 +62,16 @@ class Actions
     }
 
     /**
+     * Returns all actions as an array of values (boolean) indexed by the action name.
+     *
+     * @return array
+     */
+    public function toArray()
+    {
+        return get_object_vars($this);
+    }
+
+    /**
      * Return an object representing all actions.
      *
      * @return Actions

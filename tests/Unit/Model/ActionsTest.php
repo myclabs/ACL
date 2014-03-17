@@ -33,6 +33,23 @@ class ActionsTest extends \PHPUnit_Framework_TestCase
         new Actions(['foo']);
     }
 
+    public function testToArray()
+    {
+        $actions = new Actions([
+            Actions::VIEW,
+            Actions::EDIT,
+        ]);
+
+        $this->assertEquals([
+            Actions::VIEW => true,
+            Actions::EDIT => true,
+            Actions::CREATE => false,
+            Actions::DELETE => false,
+            Actions::UNDELETE => false,
+            Actions::ALLOW => false,
+        ], $actions->toArray());
+    }
+
     public function testAll()
     {
         $actions = Actions::all();

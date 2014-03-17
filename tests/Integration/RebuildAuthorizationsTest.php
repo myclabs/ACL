@@ -14,7 +14,6 @@ class RebuildAuthorizationTest extends AbstractIntegrationTest
 {
     public function testRebuildAuthorizations()
     {
-        $this->markTestSkipped('Feature to be implemented');
         $article1 = new Article();
         $this->em->persist($article1);
         $article2 = new Article();
@@ -22,10 +21,10 @@ class RebuildAuthorizationTest extends AbstractIntegrationTest
 
         $user = new User();
         $this->em->persist($user);
-
-        $user->addRole(new ArticleEditorRole($user, $article2));
-
         $this->em->flush();
+
+        $this->aclManager->grant($user, new ArticleEditorRole($user, $article2));
+
         $this->em->clear();
 
         $this->aclManager->rebuildAuthorizations();
