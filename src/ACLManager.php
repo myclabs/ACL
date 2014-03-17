@@ -3,9 +3,10 @@
 namespace MyCLabs\ACL;
 
 use Doctrine\ORM\EntityManager;
+use MyCLabs\ACL\CascadeStrategy\CascadeStrategy;
+use MyCLabs\ACL\CascadeStrategy\SimpleCascadeStrategy;
 use MyCLabs\ACL\Model\Actions;
 use MyCLabs\ACL\Model\Authorization;
-use MyCLabs\ACL\Model\CascadingResource;
 use MyCLabs\ACL\Model\ClassFieldResource;
 use MyCLabs\ACL\Model\ClassResource;
 use MyCLabs\ACL\Model\EntityFieldResource;
@@ -32,10 +33,21 @@ class ACLManager
      */
     private $authorizationRepository;
 
-    public function __construct(EntityManager $entityManager)
+    /**
+     * @var CascadeStrategy
+     */
+    private $cascadeStrategy;
+
+    /**
+     * @param EntityManager        $entityManager
+     * @param CascadeStrategy|null $cascadeStrategy The strategy to use for cascading authorizations.
+     */
+    public function __construct(EntityManager $entityManager, CascadeStrategy $cascadeStrategy = null)
     {
         $this->entityManager = $entityManager;
         $this->authorizationRepository = $entityManager->getRepository('MyCLabs\ACL\Model\Authorization');
+
+        $this->cascadeStrategy = $cascadeStrategy ?: new SimpleCascadeStrategy($entityManager);
     }
 
     /**
@@ -68,13 +80,9 @@ class ACLManager
     {
         $authorization = Authorization::create($role, $actions, $resource);
 
-        $authorizations = [ $authorization ];
+        $cascadedAuthorizations = $this->cascadeStrategy->cascadeAuthorization($authorization, $resource);
 
-        if ($resource instanceof CascadingResource) {
-            foreach ($this->getAllSubResources($resource) as $subResource) {
-                $authorizations[] = $authorization->createChildAuthorization($subResource);
-            }
-        }
+        $authorizations = array_merge([$authorization], $cascadedAuthorizations);
 
         $this->authorizationRepository->insertBulk($authorizations);
     }
@@ -115,28 +123,18 @@ class ACLManager
         $this->entityManager->flush($role);
     }
 
-    public function processNewResource(EntityResource $entity)
+    /**
+     * Process a new resource that has been persisted.
+     *
+     * Called by the EntityManagerListener.
+     *
+     * @param EntityResource $resource
+     */
+    public function processNewResource(EntityResource $resource)
     {
-        if (! $entity instanceof CascadingResource) {
-            return;
-        }
+        $cascadedAuthorizations = $this->cascadeStrategy->processNewResource($resource);
 
-        // Find non cascaded authorizations on the parent resources
-        $authorizationsToCascade = [];
-        foreach ($this->getAllParentResources($entity) as $parentResource) {
-            $authorizationsToCascade = array_merge(
-                $authorizationsToCascade,
-                $this->authorizationRepository->findNonCascadedAuthorizationsForResource($parentResource)
-            );
-        }
-
-        $authorizations = [];
-        foreach ($authorizationsToCascade as $authorizationToCascade) {
-            /** @var Authorization $authorizationToCascade */
-            $authorizations[] = $authorizationToCascade->createChildAuthorization($entity);
-        }
-
-        $this->authorizationRepository->insertBulk($authorizations);
+        $this->authorizationRepository->insertBulk($cascadedAuthorizations);
     }
 
     /**
@@ -162,56 +160,5 @@ class ACLManager
         }
         $this->entityManager->flush();
         $this->entityManager->clear();
-    }
-
-    /**
-     * Get all parent resources recursively.
-     * @param CascadingResource $resource
-     * @return ResourceInterface[]
-     */
-    private function getAllParentResources(CascadingResource $resource)
-    {
-        $parents = [];
-
-        foreach ($resource->getParentResources($this->entityManager) as $parentResource) {
-            $parents[] = $parentResource;
-            if ($parentResource instanceof CascadingResource) {
-                $parents = array_merge($parents, $this->getAllParentResources($parentResource));
-            }
-        }
-
-        return $this->unique($parents);
-    }
-
-    /**
-     * Get all sub-resources recursively.
-     * @param CascadingResource $resource
-     * @return ResourceInterface[]
-     */
-    private function getAllSubResources(CascadingResource $resource)
-    {
-        $subResources = [];
-
-        foreach ($resource->getSubResources($this->entityManager) as $subResource) {
-            $subResources[] = $subResource;
-            if ($subResource instanceof CascadingResource) {
-                $subResources = array_merge($subResources, $this->getAllSubResources($subResource));
-            }
-        }
-
-        return $this->unique($subResources);
-    }
-
-    private function unique(array $array)
-    {
-        $result  = [];
-
-        foreach ($array as $item) {
-            if (! in_array($item, $result, true)) {
-                $result[] = $item;
-            }
-        }
-
-        return $result;
     }
 }
