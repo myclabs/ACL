@@ -61,6 +61,7 @@ class ACLManager
     public function isAllowed(SecurityIdentityInterface $identity, $action, ResourceInterface $resource)
     {
         $repo = $this->authorizationRepository;
+
         if ($resource instanceof EntityResource) {
             return $repo->isAllowedOnEntity($identity, $action, $resource);
         } elseif ($resource instanceof ClassResource) {

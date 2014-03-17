@@ -75,6 +75,16 @@ class AuthorizationRepository extends EntityRepository
         $connection->commit();
     }
 
+    /**
+     * Checks if the identity is allowed to do the action on the entity by searching for at least 1 authorization.
+     *
+     * @param SecurityIdentityInterface $identity
+     * @param string                    $action
+     * @param EntityResource            $entity
+     *
+     * @throws \RuntimeException The entity is not persisted (ID must be not null).
+     * @return boolean Is allowed, or not.
+     */
     public function isAllowedOnEntity(SecurityIdentityInterface $identity, $action, EntityResource $entity)
     {
         $entityClass = ClassUtils::getClass($entity);
@@ -102,6 +112,15 @@ class AuthorizationRepository extends EntityRepository
         return ($query->getSingleScalarResult() > 0);
     }
 
+    /**
+     * Checks if the identity is allowed to do the action on the entity class by searching for at least 1 authorization.
+     *
+     * @param SecurityIdentityInterface $identity
+     * @param string                    $action
+     * @param string                    $entityClass
+     *
+     * @return boolean Is allowed, or not.
+     */
     public function isAllowedOnEntityClass(SecurityIdentityInterface $identity, $action, $entityClass)
     {
         $dql = "SELECT count(authorization)

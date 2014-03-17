@@ -2,11 +2,13 @@
 
 namespace MyCLabs\ACL\CascadeStrategy;
 
+use Doctrine\Common\Util\ClassUtils;
 use Doctrine\ORM\EntityManager;
 use MyCLabs\ACL\Model\Authorization;
 use MyCLabs\ACL\Model\CascadingResource;
 use MyCLabs\ACL\Model\ResourceInterface;
 use MyCLabs\ACL\Repository\AuthorizationRepository;
+use MyCLabs\ACL\ResourceGraph\ResourceGraphTraverser;
 
 /**
  * Simple cascade: authorizations are cascaded from a resource to its sub-resources.
@@ -25,6 +27,11 @@ class SimpleCascadeStrategy implements CascadeStrategy
      */
     private $authorizationRepository;
 
+    /**
+     * @var ResourceGraphTraverser[]
+     */
+    private $resourceGraphTraversers = [];
+
     public function __construct(EntityManager $entityManager)
     {
         $this->entityManager = $entityManager;
@@ -36,12 +43,22 @@ class SimpleCascadeStrategy implements CascadeStrategy
      */
     public function cascadeAuthorization(Authorization $authorization, ResourceInterface $resource)
     {
-        $authorizations = [];
-
+        // Find sub-resources
+        $subResources = [];
         if ($resource instanceof CascadingResource) {
-            foreach ($this->getAllSubResources($resource) as $subResource) {
-                $authorizations[] = $authorization->createChildAuthorization($subResource);
+            $subResources = $this->getAllSubResources($resource);
+        } else {
+            $traverser = $this->getResourceGraphTraverser(ClassUtils::getClass($resource));
+
+            if ($traverser) {
+                $subResources = $traverser->getAllSubResources($resource);
             }
+        }
+
+        // Cascade authorizations
+        $authorizations = [];
+        foreach ($subResources as $subResource) {
+            $authorizations[] = $authorization->createChildAuthorization($subResource);
         }
 
         return $authorizations;
@@ -52,19 +69,28 @@ class SimpleCascadeStrategy implements CascadeStrategy
      */
     public function processNewResource(ResourceInterface $resource)
     {
-        if (! $resource instanceof CascadingResource) {
-            return [];
+        // Find parent resources
+        $parentResources = [];
+        if ($resource instanceof CascadingResource) {
+            $parentResources = $this->getAllParentResources($resource);
+        } else {
+            $traverser = $this->getResourceGraphTraverser(ClassUtils::getClass($resource));
+
+            if ($traverser) {
+                $parentResources = $traverser->getAllParentResources($resource);
+            }
         }
 
-        // Find non cascaded authorizations on the parent resources
+        // Find root authorizations on the parent resources
         $authorizationsToCascade = [];
-        foreach ($this->getAllParentResources($resource) as $parentResource) {
+        foreach ($parentResources as $parentResource) {
             $authorizationsToCascade = array_merge(
                 $authorizationsToCascade,
                 $this->authorizationRepository->findNonCascadedAuthorizationsForResource($parentResource)
             );
         }
 
+        // Cascade them
         $authorizations = [];
         foreach ($authorizationsToCascade as $authorizationToCascade) {
             /** @var Authorization $authorizationToCascade */
@@ -123,5 +149,27 @@ class SimpleCascadeStrategy implements CascadeStrategy
         }
 
         return $result;
+    }
+
+    /**
+     * @param string                 $entityClass
+     * @param ResourceGraphTraverser $resourceGraphTraverser
+     */
+    public function setResourceGraphTraverser($entityClass, $resourceGraphTraverser)
+    {
+        $this->resourceGraphTraversers[$entityClass] = $resourceGraphTraverser;
+    }
+
+    /**
+     * @param string $entityClass
+     * @return ResourceGraphTraverser|null
+     */
+    private function getResourceGraphTraverser($entityClass)
+    {
+        if (isset($this->resourceGraphTraversers[$entityClass])) {
+            return $this->resourceGraphTraversers[$entityClass];
+        }
+
+        return null;
     }
 }
