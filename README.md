@@ -2,6 +2,22 @@
 
 ## Introduction
 
+MyCLabs ACL is a library that helps managing permissions on resources.
+
+Vocabulary:
+
+- Security identity: the entity which will be granted some access (this is generally the user)
+- Resource: a *thing* to which we want to control the access
+- Authorization: allows a security identity (user) to do something on a resource
+- Role: a role gives authorizations to a user (e.g. an administrator, an article editor, a project owner, …)
+
+There are 2 kinds of resources:
+
+- an entity (example: article #123)
+- all entities of a given type (example: all articles), which is represented by the classname of the entity
+
+## Overview
+
 You give permissions to a user by adding it a role:
 
 ```php
@@ -38,20 +54,12 @@ $articles = $qb->getQuery()->getResult();
   - filters queries at database level (you don't load entities the user can't access)
   - joins with only 1 extra table
 - authorization cascading/inheritance
-- you can use custom actions on top of the standards VIEW, EDIT, CREATE, DELETE, etc.
 - authorizations are rebuildable: you can change what an "ArticleEditor" can do afterwards and just rebuild the ACL
 
-Scopes of access available:
+### Limitations
 
-- entity (example: article #123)
-- entity class (example: all articles)
-- entity field (example: comments of article #123)
-- entity class field (example: comments of all articles)
-
-### Cons
-
-- you can't authorize a user directly on a resource: you have to use roles (e.g. an Article Editor, or a Administrator)
 - because of Doctrine limitations you need to flush your resources before giving or testing authorizations
+- backed up by the database: testing `isAllowed` means one call to the database
 
 ## Usage
 
@@ -73,9 +81,33 @@ class Article implements EntityResource
 }
 ```
 
+You can also add an association to the roles that apply on this resource.
+Such association is very useful so that the roles (and their authorizations) are deleted in cascade
+when the resource is deleted:
+
+```php
+class Article implements EntityResource
+{
+    // ...
+
+    /**
+     * @var ArticleEditorRole[]|Collection
+     * @ORM\OneToMany(targetEntity="ArticleEditorRole", mappedBy="article", cascade={"remove"})
+     */
+    protected $roles;
+
+    public function __construct()
+    {
+        $this->roles = new ArrayCollection();
+    }
+}
+```
+
+This association can also be useful if you need to find all the "editors" of an article for example.
+
 ### 2. Creating a new role
 
-The role will create the authorizations.
+The role gives the authorizations.
 
 To create a new role, extend the `Role` abstract class:
 
@@ -97,17 +129,27 @@ class ArticleEditorRole extends Role
         parent::__construct($user);
     }
 
-    public function createAuthorizations(EntityManager $entityManager)
+    public function createAuthorizations(ACLManager $aclManager)
     {
-        $authorization = Authorization::create(
-            $this,
-            new Actions([Actions::VIEW, Actions::EDIT]),
-            $this->article
-        );
-
-        return [ $authorization ];
+        $aclManager->allow($this, new Actions([Actions::VIEW, Actions::EDIT]), $this->article);
     }
 }
+```
+
+The authorizations given by the role are created in the `createAuthorizations()` method.
+
+For creating an authorization, you need to call `$aclManager->allow()` with:
+
+- the role (which will also provide the user/security identity that is being given access)
+- the actions that are included in the authorization
+- the resource
+
+The resource can be either an entity instance (as shown above) or an entity classname, which will
+give access to all entities of that type:
+
+```php
+// This will allow the users having the role to be able to view ALL the articles
+$aclManager->allow($this, new Actions([Actions::VIEW]), new ClassResource('My\Model\Article'));
 ```
 
 ## Setup
@@ -141,12 +183,3 @@ Namespace\ArticleEditorRole:
   type: entity
   readOnly: true
 ```
-
-## Customizing
-
-MyCLabs\ACL was built to give you as much liberty as possible.
-Here is a non exhaustive list of things you can do but are not described in the documentation:
-
-- You can add a reverse association from an entity (resource) to its role.
-
-That can be useful if you need to fetch all the "editors" of article X for example.
