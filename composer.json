@@ -1,5 +1,9 @@
 {
     "name": "myclabs/acl",
+    "description": "ACL library for Doctrine",
+    "keywords": ["acl", "doctrine", "permission"],
+    "homepage": "https://github.com/myclabs/ACL",
+    "license": "MIT",
     "type": "library",
     "autoload": {
         "psr-4": {
