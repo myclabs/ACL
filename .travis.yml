@@ -6,7 +6,7 @@ php:
   - hhvm
 
 before_script:
-  - composer install --dev --no-interaction --prefer-source
+  - composer require satooshi/php-coveralls:dev-master --dev --no-interaction --prefer-source
 
 script:
   - mkdir -p build/logs
