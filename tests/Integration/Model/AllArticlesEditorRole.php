@@ -4,7 +4,6 @@ namespace Tests\MyCLabs\ACL\Integration\Model;
 
 use Doctrine\ORM\Mapping as ORM;
 use MyCLabs\ACL\ACLManager;
-use MyCLabs\ACL\Model\Actions;
 use MyCLabs\ACL\Model\ClassResource;
 use MyCLabs\ACL\Model\Role;
 

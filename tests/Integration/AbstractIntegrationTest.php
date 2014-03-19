@@ -10,6 +10,7 @@ use Doctrine\ORM\Tools\ResolveTargetEntityListener;
 use Doctrine\ORM\Tools\SchemaTool;
 use Doctrine\ORM\Tools\Setup;
 use MyCLabs\ACL\ACLManager;
+use MyCLabs\ACL\ActionsOverrider;
 use MyCLabs\ACL\EntityManagerListener;
 use MyCLabs\ACL\MetadataLoader;
 
@@ -45,6 +46,7 @@ abstract class AbstractIntegrationTest extends \PHPUnit_Framework_TestCase
         );
 
         $metadataLoader = new MetadataLoader();
+        $metadataLoader->registerActionsClass('Tests\MyCLabs\ACL\Integration\Model\Actions');
         $metadataLoader->registerRoleClass('Tests\MyCLabs\ACL\Integration\Model\ArticleEditorRole', 'articleEditor');
 
         $evm->addEventListener(Events::loadClassMetadata, $rtel);

@@ -57,6 +57,7 @@ $articles = $qb->getQuery()->getResult();
   - joins with only 1 extra table
 - authorization cascading/inheritance
 - authorizations are rebuildable: you can change what an "ArticleEditor" can do afterwards and just rebuild the ACL
+- supports your custom actions on top of standard actions like "view", "edit", "delete", …
 
 ### Limitations
 
@@ -194,6 +195,62 @@ $evm->addEventSubscriber(new EntityManagerListener($aclManagerLocator));
 ## Authorization cascade
 
 WIP
+
+## Custom actions
+
+The default actions that you can use are:
+
+- view
+- edit
+- delete
+- undelete
+- allow (= manage permissions on the resource)
+- create
+
+You can add your own actions by overriding the `Actions` class:
+
+```php
+namespace My\Model;
+
+use Doctrine\ORM\Mapping as ORM;
+use MyCLabs\ACL\Model\Actions as BaseActions;
+
+/**
+ * @ORM\Embeddable
+ */
+class Actions extends BaseActions
+{
+    const PUBLISH = 'publish';
+
+    /**
+     * @ORM\Column(type = "boolean")
+     */
+    public $publish = false;
+
+    /**
+     * {@inheritdoc}
+     */
+    public static function all()
+    {
+        return new static([
+            static::VIEW,
+            static::CREATE,
+            static::EDIT,
+            static::DELETE,
+            static::UNDELETE,
+            static::ALLOW,
+            static::PUBLISH,
+        ]);
+    }
+}
+```
+
+Here we added a "publish" action to restrict who can publish articles.
+Now we need to configure MyCLabs\ACL to use this class instead of the base class:
+
+```php
+$metadataLoader->registerActionsClass('My\Model\Actions');
+```
 
 ## Performances
 

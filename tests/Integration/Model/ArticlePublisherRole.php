@@ -9,7 +9,7 @@ use MyCLabs\ACL\Model\Role;
 /**
  * @ORM\Entity(readOnly=true)
  */
-class ArticleEditorRole extends Role
+class ArticlePublisherRole extends Role
 {
     /**
      * @var Article
@@ -26,7 +26,7 @@ class ArticleEditorRole extends Role
 
     public function createAuthorizations(ACLManager $aclManager)
     {
-        $aclManager->allow($this, new Actions([Actions::VIEW, Actions::EDIT]), $this->article);
+        $aclManager->allow($this, new Actions([Actions::VIEW, Actions::PUBLISH]), $this->article);
     }
 
     /**
