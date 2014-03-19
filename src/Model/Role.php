@@ -13,6 +13,7 @@ use MyCLabs\ACL\ACLManager;
  * @ORM\Entity
  * @ORM\InheritanceType("JOINED")
  * @ORM\DiscriminatorColumn(name="type", type="string")
+ * @Table(name="ACL_Role")
  *
  * @author Matthieu Napoli <matthieu@mnapoli.fr>
  */

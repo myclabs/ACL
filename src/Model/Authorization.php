@@ -11,6 +11,7 @@ use Doctrine\ORM\Mapping as ORM;
  * Authorization of a security identity to do something on a resource.
  *
  * @ORM\Entity(readOnly=true, repositoryClass="MyCLabs\ACL\Repository\AuthorizationRepository")
+ * @Table(name="ACL_Authorization")
  *
  * @author Matthieu Napoli <matthieu@mnapoli.fr>
  */
