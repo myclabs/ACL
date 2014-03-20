@@ -71,13 +71,27 @@ class ACLManager
         throw new \RuntimeException('Unknown type of resource: ' . get_class($resource));
     }
 
-    public function allow(Role $role, Actions $actions, ResourceInterface $resource)
+    /**
+     * Give an authorization from a role to a resource.
+     *
+     * This method should only be called in roles.
+     *
+     * @param Role              $role
+     * @param Actions           $actions
+     * @param ResourceInterface $resource
+     * @param bool              $cascade  Should the authorization cascade to sub-resources?
+     */
+    public function allow(Role $role, Actions $actions, ResourceInterface $resource, $cascade = true)
     {
-        $authorization = Authorization::create($role, $actions, $resource);
+        $authorization = Authorization::create($role, $actions, $resource, $cascade);
 
-        $cascadedAuthorizations = $this->cascadeStrategy->cascadeAuthorization($authorization, $resource);
+        if ($cascade) {
+            $cascadedAuthorizations = $this->cascadeStrategy->cascadeAuthorization($authorization, $resource);
 
-        $authorizations = array_merge([$authorization], $cascadedAuthorizations);
+            $authorizations = array_merge([$authorization], $cascadedAuthorizations);
+        } else {
+            $authorizations = [ $authorization ];
+        }
 
         $this->authorizationRepository->insertBulk($authorizations);
     }

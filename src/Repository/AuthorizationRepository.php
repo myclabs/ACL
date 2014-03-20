@@ -52,6 +52,7 @@ class AuthorizationRepository extends EntityRepository
                 'parentAuthorization_id' => $parent ? $parent->getId() : null,
                 'entity_class'           => $authorization->getEntityClass(),
                 'entity_id'              => $authorization->getEntityId(),
+                'cascadable'             => $authorization->isCascadable(),
             ];
 
             foreach ($authorization->getActions()->toArray() as $action => $value) {
@@ -137,15 +138,18 @@ class AuthorizationRepository extends EntityRepository
     }
 
     /**
-     * Returns authorization for the given resource that are not cascaded authorizations,
-     * i.e. they have no parent authorization.
+     * Returns authorization for the given resource that are cascadable to sub-resources,
+     * i.e. they are "cascadable" and have no parent authorization (we only want "root" authorizations).
      *
      * @param ResourceInterface $resource
      * @return Authorization[]
      */
-    public function findNonCascadedAuthorizationsForResource(ResourceInterface $resource)
+    public function findCascadableAuthorizationsForResource(ResourceInterface $resource)
     {
         $qb = $this->createQueryBuilder('a');
+
+        // Cascadable
+        $qb->where('a.cascadable = true');
 
         // Root authorizations means no parent
         $qb->where('a.parentAuthorization IS NULL');

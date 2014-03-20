@@ -80,48 +80,52 @@ class Authorization
     protected $childAuthorizations;
 
     /**
+     * @var boolean
+     * @ORM\Column(name="cascadable", type="boolean")
+     */
+    protected $cascadable;
+
+    /**
      * Creates an authorization on a resource.
      *
      * @param Role              $role
      * @param Actions           $actions
      * @param ResourceInterface $resource
+     * @param bool              $cascade  Should this authorization cascade?
      * @throws \RuntimeException
      * @return static
      */
-    public static function create(Role $role, Actions $actions, ResourceInterface $resource)
+    public static function create(Role $role, Actions $actions, ResourceInterface $resource, $cascade = true)
     {
         if ($resource instanceof EntityResource) {
-            return new static($role, $actions, $resource);
+            return new static($role, $actions, $cascade, ClassUtils::getClass($resource), $resource->getId());
         } elseif ($resource instanceof ClassResource) {
-            return new static($role, $actions, null, $resource->getClass());
+            return new static($role, $actions, $cascade, $resource->getClass());
         }
 
         throw new \RuntimeException('Unknown type of resource: ' . get_class($resource));
     }
 
     /**
-     * @param Role                $role
-     * @param Actions             $actions
-     * @param EntityResource|null $entity
-     * @param string|null         $entityClass
+     * @param Role    $role
+     * @param Actions $actions
+     * @param bool    $cascade Should this authorization cascade?
+     * @param string  $entityClass
+     * @param int     $entityId
      */
     private function __construct(
         Role $role,
         Actions $actions,
-        EntityResource $entity = null,
-        $entityClass = null
+        $cascade,
+        $entityClass,
+        $entityId = null
     ) {
         $this->role = $role;
         $this->securityIdentity = $role->getSecurityIdentity();
         $this->actions = $actions;
-        if ($entity !== null) {
-            $this->entityId = $entity->getId();
-        }
-        if ($entity === null) {
-            $this->entityClass = $entityClass;
-        } else {
-            $this->entityClass = ClassUtils::getClass($entity);
-        }
+        $this->cascadable = $cascade;
+        $this->entityClass = $entityClass;
+        $this->entityId = $entityId;
 
         $this->childAuthorizations = new ArrayCollection();
     }
@@ -219,5 +223,13 @@ class Authorization
     public function getId()
     {
         return $this->id;
+    }
+
+    /**
+     * @return boolean
+     */
+    public function isCascadable()
+    {
+        return $this->cascadable;
     }
 }

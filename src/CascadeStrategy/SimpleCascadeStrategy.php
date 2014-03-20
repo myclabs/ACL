@@ -86,7 +86,7 @@ class SimpleCascadeStrategy implements CascadeStrategy
         foreach ($parentResources as $parentResource) {
             $authorizationsToCascade = array_merge(
                 $authorizationsToCascade,
-                $this->authorizationRepository->findNonCascadedAuthorizationsForResource($parentResource)
+                $this->authorizationRepository->findCascadableAuthorizationsForResource($parentResource)
             );
         }
 
