@@ -9,6 +9,13 @@ use MyCLabs\ACL\Model\ClassResource;
  */
 class ClassResourceTest extends \PHPUnit_Framework_TestCase
 {
+    public function testGetClass()
+    {
+        $resource = new ClassResource('foo');
+
+        $this->assertEquals('foo', $resource->getClass());
+    }
+
     public function testParentResources()
     {
         $em = $this->getMock('Doctrine\ORM\EntityManager', [], [], '', false);
