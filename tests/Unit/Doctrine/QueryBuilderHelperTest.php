@@ -1,10 +1,10 @@
 <?php
 
-namespace Tests\MyCLabs\ACL\Unit;
+namespace Tests\MyCLabs\ACL\Unit\Doctrine;
 
 use Doctrine\ORM\QueryBuilder;
 use MyCLabs\ACL\Model\Actions;
-use MyCLabs\ACL\QueryBuilderHelper;
+use MyCLabs\ACL\Doctrine\ACLQueryHelper;
 
 /**
  * @covers \MyCLabs\ACL\QueryBuilderHelper
@@ -21,7 +21,7 @@ class QueryBuilderHelperTest extends \PHPUnit_Framework_TestCase
         $qb->select('test')
             ->from('test', 'test');
 
-        QueryBuilderHelper::joinACL($qb, $identity, Actions::VIEW, 'test', 'test');
+        ACLQueryHelper::joinACL($qb, $identity, Actions::VIEW, 'test', 'test');
 
         $dql = 'SELECT test FROM test test INNER JOIN MyCLabs\ACL\Model\Authorization authorization '
             . 'WITH test.id = authorization.entityId '
@@ -44,7 +44,7 @@ class QueryBuilderHelperTest extends \PHPUnit_Framework_TestCase
         $qb->select('test')
             ->from('test', 'test');
 
-        QueryBuilderHelper::joinACL($qb, $identity, Actions::VIEW);
+        ACLQueryHelper::joinACL($qb, $identity, Actions::VIEW);
 
         $dql = 'SELECT test FROM test test INNER JOIN MyCLabs\ACL\Model\Authorization authorization '
             . 'WITH test.id = authorization.entityId '

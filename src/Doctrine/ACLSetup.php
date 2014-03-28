@@ -1,6 +1,6 @@
 <?php
 
-namespace MyCLabs\ACL;
+namespace MyCLabs\ACL\Doctrine;
 
 use Doctrine\ORM\EntityManager;
 use Doctrine\ORM\Events;
@@ -12,10 +12,10 @@ use MyCLabs\ACL\Model\SecurityIdentityInterface;
  *
  * @author Matthieu Napoli <matthieu@mnapoli.fr>
  */
-class EntityManagerSetup
+class ACLSetup
 {
     /**
-     * @var MetadataLoader
+     * @var ACLMetadataLoader
      */
     private $metadataLoader;
 
@@ -26,7 +26,7 @@ class EntityManagerSetup
 
     public function __construct()
     {
-        $this->metadataLoader = new MetadataLoader();
+        $this->metadataLoader = new ACLMetadataLoader();
     }
 
     public function setUpEntityManager(EntityManager $entityManager, callable $aclManagerLocator)
@@ -48,7 +48,7 @@ class EntityManagerSetup
         $evm->addEventListener(Events::loadClassMetadata, $this->metadataLoader);
 
         // Register the listener that looks for new resources
-        $evm->addEventSubscriber(new EntityManagerListener($aclManagerLocator));
+        $evm->addEventSubscriber(new EntityResourcesListener($aclManagerLocator));
     }
 
     /**

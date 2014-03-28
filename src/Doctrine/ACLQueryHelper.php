@@ -1,16 +1,16 @@
 <?php
 
-namespace MyCLabs\ACL;
+namespace MyCLabs\ACL\Doctrine;
 
 use Doctrine\ORM\QueryBuilder;
 use MyCLabs\ACL\Model\SecurityIdentityInterface;
 
 /**
- * Helper for the query builder to use ACL.
+ * Helper for the Doctrine query builder to use ACL.
  *
  * @author Matthieu Napoli <matthieu@mnapoli.fr>
  */
-class QueryBuilderHelper
+class ACLQueryHelper
 {
     /**
      * Joins with the authorizations and filters the results to keep only those authorized.

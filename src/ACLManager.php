@@ -135,7 +135,7 @@ class ACLManager
     /**
      * Process a new resource that has been persisted.
      *
-     * Called by the EntityManagerListener.
+     * Called by the EntityResourcesListener.
      *
      * @param EntityResource $resource
      */

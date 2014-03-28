@@ -1,6 +1,6 @@
 <?php
 
-namespace MyCLabs\ACL;
+namespace MyCLabs\ACL\Doctrine;
 
 use Doctrine\ORM\Event\LoadClassMetadataEventArgs;
 use Doctrine\ORM\Mapping\ClassMetadata;
@@ -13,7 +13,7 @@ use MyCLabs\ACL\Model\Role;
  *
  * @author Matthieu Napoli <matthieu@mnapoli.fr>
  */
-class MetadataLoader
+class ACLMetadataLoader
 {
     /**
      * Discriminator map for roles.

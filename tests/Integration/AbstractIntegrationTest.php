@@ -7,7 +7,7 @@ use Doctrine\ORM\EntityManager;
 use Doctrine\ORM\Tools\SchemaTool;
 use Doctrine\ORM\Tools\Setup;
 use MyCLabs\ACL\ACLManager;
-use MyCLabs\ACL\EntityManagerSetup;
+use MyCLabs\ACL\Doctrine\ACLSetup;
 
 abstract class AbstractIntegrationTest extends \PHPUnit_Framework_TestCase
 {
@@ -32,7 +32,7 @@ abstract class AbstractIntegrationTest extends \PHPUnit_Framework_TestCase
             'memory' => true,
         ];
 
-        $setup = new EntityManagerSetup();
+        $setup = new ACLSetup();
         $setup->setSecurityIdentityClass('Tests\MyCLabs\ACL\Integration\Model\User');
         $setup->registerRoleClass('Tests\MyCLabs\ACL\Integration\Model\ArticleEditorRole', 'articleEditor');
         $setup->setActionsClass('Tests\MyCLabs\ACL\Integration\Model\Actions');

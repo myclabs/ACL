@@ -1,10 +1,11 @@
 <?php
 
-namespace MyCLabs\ACL;
+namespace MyCLabs\ACL\Doctrine;
 
 use Doctrine\Common\EventSubscriber;
 use Doctrine\ORM\Event\OnFlushEventArgs;
 use Doctrine\ORM\Events;
+use MyCLabs\ACL\ACLManager;
 use MyCLabs\ACL\Model\EntityResource;
 
 /**
@@ -12,7 +13,7 @@ use MyCLabs\ACL\Model\EntityResource;
  *
  * @author Matthieu Napoli <matthieu@mnapoli.fr>
  */
-class EntityManagerListener implements EventSubscriber
+class EntityResourcesListener implements EventSubscriber
 {
     /**
      * @var callable

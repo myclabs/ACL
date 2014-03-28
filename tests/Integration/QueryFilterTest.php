@@ -3,7 +3,7 @@
 namespace Tests\MyCLabs\ACL\Integration;
 
 use MyCLabs\ACL\Model\Actions;
-use MyCLabs\ACL\QueryBuilderHelper;
+use MyCLabs\ACL\Doctrine\ACLQueryHelper;
 use Tests\MyCLabs\ACL\Integration\Model\Article;
 use Tests\MyCLabs\ACL\Integration\Model\ArticleEditorRole;
 use Tests\MyCLabs\ACL\Integration\Model\User;
@@ -58,7 +58,7 @@ class QueryFilterTest extends AbstractIntegrationTest
 
         $qb = $this->em->createQueryBuilder();
         $qb->select('a')->from('Tests\MyCLabs\ACL\Integration\Model\Article', 'a');
-        QueryBuilderHelper::joinACL($qb, $user, Actions::VIEW);
+        ACLQueryHelper::joinACL($qb, $user, Actions::VIEW);
         $articles = $qb->getQuery()->getResult();
 
         $this->assertCount(1, $articles);

@@ -42,7 +42,7 @@ You can also filter your queries to get only the entities the user has access to
 $qb = $entityManager->createQueryBuilder();
 $qb->select('article')->from('Model\Article', 'article');
 
-QueryBuilderHelper::joinACL($qb, $user, Actions::EDIT);
+ACLQueryHelper::joinACL($qb, $user, Actions::EDIT);
 
 // This query will return only the articles the user can edit
 $articles = $qb->getQuery()->getResult();
@@ -173,7 +173,7 @@ $aclManager = new ACLManager($entityManager);
 However, you must register some listener on the entity manager:
 
 ```php
-$aclSetup = new \MyCLabs\ACL\EntityManagerSetup();
+$aclSetup = new \MyCLabs\ACL\Doctrine\ACLSetup();
 // Set which class implements the SecurityIdentityInterface (must be called once)
 $aclSetup->setSecurityIdentityClass('My\Model\User')
 // Register role classes
