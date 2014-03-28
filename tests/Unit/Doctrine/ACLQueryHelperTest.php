@@ -7,9 +7,9 @@ use MyCLabs\ACL\Model\Actions;
 use MyCLabs\ACL\Doctrine\ACLQueryHelper;
 
 /**
- * @covers \MyCLabs\ACL\QueryBuilderHelper
+ * @covers \MyCLabs\ACL\Doctrine\ACLQueryHelper
  */
-class QueryBuilderHelperTest extends \PHPUnit_Framework_TestCase
+class ACLQueryHelperTest extends \PHPUnit_Framework_TestCase
 {
     public function testJoinACL()
     {
