@@ -36,7 +36,7 @@ class ACLMetadataLoader
      */
     public function registerRoleClass($class, $shortName)
     {
-        if (! $class instanceof Role) {
+        if (! is_subclass_of($class, 'MyCLabs\ACL\Model\Role')) {
             throw new \InvalidArgumentException('The given class doesn\'t extend MyCLabs\ACL\Model\Role');
         }
 
@@ -54,7 +54,7 @@ class ACLMetadataLoader
      */
     public function setActionsClass($class)
     {
-        if (! $class instanceof Actions) {
+        if (! is_subclass_of($class, 'MyCLabs\ACL\Model\Actions')) {
             throw new \InvalidArgumentException('The given class doesn\'t extend MyCLabs\ACL\Model\Actions');
         }
 
