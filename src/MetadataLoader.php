@@ -38,7 +38,7 @@ class MetadataLoader
     /**
      * @param string $class
      */
-    public function registerActionsClass($class)
+    public function setActionsClass($class)
     {
         $this->actionsClass = $class;
     }

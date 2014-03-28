@@ -162,32 +162,31 @@ $aclManager->allow(
 
 ## Setup
 
-WIP
-
 You first need to register the annotation mapping to your Doctrine metadata driver.
 
-Then you can configure the ACLManager:
+Creating the ACL manager is simple:
 
 ```php
 $aclManager = new ACLManager($entityManager);
+```
 
-$evm = $entityManager->getEventManager();
+However, you must register some listener on the entity manager:
 
-// Configure which entity implements the SecurityIdentityInterface
-$rtel = new ResolveTargetEntityListener();
-$rtel->addResolveTargetEntity('MyCLabs\ACL\Model\SecurityIdentityInterface', 'My\Model\User', []);
-$evm->addEventListener(Events::loadClassMetadata, $rtel);
+```php
+$aclSetup = new \MyCLabs\ACL\EntityManagerSetup()
+    // Set which class implements the SecurityIdentityInterface (must be called once)
+    ->setSecurityIdentityClass('My\Model\User')
+    // Register role classes
+    ->registerRoleClass('My\Model\ArticleEditorRole', 'articleEditor');
 
-// Register the roles
-$metadataLoader = new MetadataLoader();
-$metadataLoader->registerRoleClass('My\Model\ArticleEditorRole', 'articleEditor');
-$evm->addEventListener(Events::loadClassMetadata, $metadataLoader);
-
-// Register the listener that looks for new resources
-$aclManagerLocator = function () use ($aclManager) {
-    return $aclManager;
+// To avoid instantiating the ACL manager uselessly (and avoid a circular dependency),
+// we must use a "locator" callback
+$aclManagerLocator = function () {
+    return $container->get('MyCLabs\ACL\ACLManager');
 };
-$evm->addEventSubscriber(new EntityManagerListener($aclManagerLocator));
+
+// Apply the configuration to the entity manager
+$aclSetup->setUpEntityManager($entityManager, $aclManagerLocator);
 ```
 
 ## Authorization cascading
@@ -366,10 +365,11 @@ class Actions extends BaseActions
 ```
 
 Here we added a "publish" action to restrict who can publish articles.
+
 Now we need to configure MyCLabs\ACL to use this class instead of the base class:
 
 ```php
-$metadataLoader->registerActionsClass('My\Model\Actions');
+$aclSetup->setActionsClass('My\Model\Actions');
 ```
 
 ## Performances
