@@ -5,6 +5,8 @@ namespace MyCLabs\ACL;
 use Doctrine\ORM\Event\LoadClassMetadataEventArgs;
 use Doctrine\ORM\Mapping\ClassMetadata;
 use Doctrine\ORM\Mapping\ClassMetadataFactory;
+use MyCLabs\ACL\Model\Actions;
+use MyCLabs\ACL\Model\Role;
 
 /**
  * Loads metadata relative to ACL in Doctrine.
@@ -29,17 +31,33 @@ class MetadataLoader
      *
      * @param string $class
      * @param string $shortName
+     *
+     * @throws \InvalidArgumentException The given class doesn't extend MyCLabs\ACL\Model\Role
      */
     public function registerRoleClass($class, $shortName)
     {
+        if (! $class instanceof Role) {
+            throw new \InvalidArgumentException('The given class doesn\'t extend MyCLabs\ACL\Model\Role');
+        }
+
         $this->roles[$shortName] = $class;
     }
 
     /**
+     * Registers an alternative "Actions" class to use in the authorization entity.
+     *
+     * This allows to write your own actions.
+     *
      * @param string $class
+     *
+     * @throws \InvalidArgumentException The given class doesn't extend MyCLabs\ACL\Model\Actions
      */
     public function setActionsClass($class)
     {
+        if (! $class instanceof Actions) {
+            throw new \InvalidArgumentException('The given class doesn\'t extend MyCLabs\ACL\Model\Actions');
+        }
+
         $this->actionsClass = $class;
     }
 

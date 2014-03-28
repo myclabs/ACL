@@ -173,11 +173,11 @@ $aclManager = new ACLManager($entityManager);
 However, you must register some listener on the entity manager:
 
 ```php
-$aclSetup = new \MyCLabs\ACL\EntityManagerSetup()
-    // Set which class implements the SecurityIdentityInterface (must be called once)
-    ->setSecurityIdentityClass('My\Model\User')
-    // Register role classes
-    ->registerRoleClass('My\Model\ArticleEditorRole', 'articleEditor');
+$aclSetup = new \MyCLabs\ACL\EntityManagerSetup();
+// Set which class implements the SecurityIdentityInterface (must be called once)
+$aclSetup->setSecurityIdentityClass('My\Model\User')
+// Register role classes
+$aclSetup->registerRoleClass('My\Model\ArticleEditorRole', 'articleEditor');
 
 // To avoid instantiating the ACL manager uselessly (and avoid a circular dependency),
 // we must use a "locator" callback

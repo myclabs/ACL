@@ -5,8 +5,6 @@ namespace MyCLabs\ACL;
 use Doctrine\ORM\EntityManager;
 use Doctrine\ORM\Events;
 use Doctrine\ORM\Tools\ResolveTargetEntityListener;
-use MyCLabs\ACL\Model\Actions;
-use MyCLabs\ACL\Model\Role;
 use MyCLabs\ACL\Model\SecurityIdentityInterface;
 
 /**
@@ -79,10 +77,6 @@ class EntityManagerSetup
      */
     public function registerRoleClass($class, $shortName)
     {
-        if (! $class instanceof Role) {
-            throw new \InvalidArgumentException('The given class doesn\'t extend MyCLabs\ACL\Model\Role');
-        }
-
         $this->metadataLoader->registerRoleClass($class, $shortName);
     }
 
@@ -97,10 +91,6 @@ class EntityManagerSetup
      */
     public function setActionsClass($class)
     {
-        if (! $class instanceof Actions) {
-            throw new \InvalidArgumentException('The given class doesn\'t extend MyCLabs\ACL\Model\Actions');
-        }
-
         $this->metadataLoader->setActionsClass($class);
     }
 }
