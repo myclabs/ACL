@@ -3,7 +3,7 @@
         "This file locks the dependencies of your project to a known state",
         "Read more about it at http://getcomposer.org/doc/01-basic-usage.md#composer-lock-the-lock-file"
     ],
-    "hash": "7cad3e15db4f4c12c7b0b8ad33ca6aa2",
+    "hash": "54c39acd8b9391674b041e22cbd5999a",
     "packages": [
         {
             "name": "doctrine/annotations",
@@ -487,12 +487,12 @@
             "source": {
                 "type": "git",
                 "url": "https://github.com/doctrine/doctrine2.git",
-                "reference": "f197a9c9f140a06f399fc05d7149220d04eb3a56"
+                "reference": "8f688509c83f2176d0c3bb01f024ddf021d36c93"
             },
             "dist": {
                 "type": "zip",
-                "url": "https://api.github.com/repos/doctrine/doctrine2/zipball/f197a9c9f140a06f399fc05d7149220d04eb3a56",
-                "reference": "f197a9c9f140a06f399fc05d7149220d04eb3a56",
+                "url": "https://api.github.com/repos/doctrine/doctrine2/zipball/8f688509c83f2176d0c3bb01f024ddf021d36c93",
+                "reference": "8f688509c83f2176d0c3bb01f024ddf021d36c93",
                 "shasum": ""
             },
             "require": {
@@ -556,7 +556,7 @@
                 "database",
                 "orm"
             ],
-            "time": "2014-03-07 03:38:26"
+            "time": "2014-03-28 13:05:20"
         },
         {
             "name": "symfony/console",

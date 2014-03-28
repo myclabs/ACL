@@ -27,11 +27,6 @@ class ACLManager
     private $entityManager;
 
     /**
-     * @var AuthorizationRepository
-     */
-    private $authorizationRepository;
-
-    /**
      * @var CascadeStrategy
      */
     private $cascadeStrategy;
@@ -43,7 +38,6 @@ class ACLManager
     public function __construct(EntityManager $entityManager, CascadeStrategy $cascadeStrategy = null)
     {
         $this->entityManager = $entityManager;
-        $this->authorizationRepository = $entityManager->getRepository('MyCLabs\ACL\Model\Authorization');
 
         $this->cascadeStrategy = $cascadeStrategy ?: new SimpleCascadeStrategy($entityManager);
     }
@@ -60,7 +54,8 @@ class ACLManager
      */
     public function isAllowed(SecurityIdentityInterface $identity, $action, ResourceInterface $resource)
     {
-        $repo = $this->authorizationRepository;
+        /** @var AuthorizationRepository $repo */
+        $repo = $this->entityManager->getRepository('MyCLabs\ACL\Model\Authorization');
 
         if ($resource instanceof EntityResource) {
             return $repo->isAllowedOnEntity($identity, $action, $resource);
@@ -93,7 +88,10 @@ class ACLManager
             $authorizations = [ $authorization ];
         }
 
-        $this->authorizationRepository->insertBulk($authorizations);
+        /** @var AuthorizationRepository $repository */
+        $repository = $this->entityManager->getRepository('MyCLabs\ACL\Model\Authorization');
+
+        $repository->insertBulk($authorizations);
     }
 
     /**
@@ -143,7 +141,10 @@ class ACLManager
     {
         $cascadedAuthorizations = $this->cascadeStrategy->processNewResource($resource);
 
-        $this->authorizationRepository->insertBulk($cascadedAuthorizations);
+        /** @var AuthorizationRepository $repository */
+        $repository = $this->entityManager->getRepository('MyCLabs\ACL\Model\Authorization');
+
+        $repository->insertBulk($cascadedAuthorizations);
     }
 
     /**

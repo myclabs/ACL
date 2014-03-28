@@ -23,11 +23,6 @@ class SimpleCascadeStrategy implements CascadeStrategy
     private $entityManager;
 
     /**
-     * @var AuthorizationRepository
-     */
-    private $authorizationRepository;
-
-    /**
      * @var ResourceGraphTraverser[]
      */
     private $resourceGraphTraversers = [];
@@ -35,7 +30,6 @@ class SimpleCascadeStrategy implements CascadeStrategy
     public function __construct(EntityManager $entityManager)
     {
         $this->entityManager = $entityManager;
-        $this->authorizationRepository = $entityManager->getRepository('MyCLabs\ACL\Model\Authorization');
     }
 
     /**
@@ -69,6 +63,9 @@ class SimpleCascadeStrategy implements CascadeStrategy
      */
     public function processNewResource(ResourceInterface $resource)
     {
+        /** @var AuthorizationRepository $repository */
+        $repository = $this->entityManager->getRepository('MyCLabs\ACL\Model\Authorization');
+
         // Find parent resources
         $parentResources = [];
         if ($resource instanceof CascadingResource) {
@@ -86,7 +83,7 @@ class SimpleCascadeStrategy implements CascadeStrategy
         foreach ($parentResources as $parentResource) {
             $authorizationsToCascade = array_merge(
                 $authorizationsToCascade,
-                $this->authorizationRepository->findCascadableAuthorizationsForResource($parentResource)
+                $repository->findCascadableAuthorizationsForResource($parentResource)
             );
         }
 

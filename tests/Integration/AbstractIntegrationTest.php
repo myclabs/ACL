@@ -34,7 +34,12 @@ abstract class AbstractIntegrationTest extends \PHPUnit_Framework_TestCase
 
         $setup = new ACLSetup();
         $setup->setSecurityIdentityClass('Tests\MyCLabs\ACL\Integration\Model\User');
+
         $setup->registerRoleClass('Tests\MyCLabs\ACL\Integration\Model\ArticleEditorRole', 'articleEditor');
+        $setup->registerRoleClass('Tests\MyCLabs\ACL\Integration\Model\AllArticlesEditorRole', 'allArticlesEditor');
+        $setup->registerRoleClass('Tests\MyCLabs\ACL\Integration\Model\ArticlePublisherRole', 'articlePublisher');
+        $setup->registerRoleClass('Tests\MyCLabs\ACL\Integration\Model\CategoryManagerRole', 'categoryManager');
+
         $setup->setActionsClass('Tests\MyCLabs\ACL\Integration\Model\Actions');
 
         // Create the entity manager

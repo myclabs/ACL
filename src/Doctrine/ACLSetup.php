@@ -60,7 +60,7 @@ class ACLSetup
      */
     public function setSecurityIdentityClass($class)
     {
-        if (! $class instanceof SecurityIdentityInterface) {
+        if (! is_subclass_of($class, 'MyCLabs\ACL\Model\SecurityIdentityInterface')) {
             throw new \InvalidArgumentException('The given class doesn\'t implement SecurityIdentityInterface');
         }
 
