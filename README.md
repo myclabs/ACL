@@ -190,7 +190,7 @@ $aclManagerLocator = function () use ($aclManager) {
 $evm->addEventSubscriber(new EntityManagerListener($aclManagerLocator));
 ```
 
-## Authorization cascade
+## Authorization cascading
 
 There are 2 ways to cascade authorizations:
 
@@ -268,7 +268,7 @@ Have a look below for an alternative solution.
 
 ### ResourceGraphTraverser
 
-The `` is an object you write that must return the parent and sub-resources of a resource.
+The `ResourceGraphTraverser` is an object you write that must return the parent and sub-resources of a resource.
 
 As explained, it must return **all** the sub/parent resources, which avoids MyCLabs\ACL
 recursively looking for sub/parent resources.
