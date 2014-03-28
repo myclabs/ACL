@@ -58,7 +58,7 @@ class QueryFilterTest extends AbstractIntegrationTest
 
         $qb = $this->em->createQueryBuilder();
         $qb->select('a')->from('Tests\MyCLabs\ACL\Integration\Model\Article', 'a');
-        QueryBuilderHelper::joinACL($qb, 'Tests\MyCLabs\ACL\Integration\Model\Article', 'a', $user, Actions::VIEW);
+        QueryBuilderHelper::joinACL($qb, $user, Actions::VIEW);
         $articles = $qb->getQuery()->getResult();
 
         $this->assertCount(1, $articles);

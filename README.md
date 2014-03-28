@@ -42,7 +42,7 @@ You can also filter your queries to get only the entities the user has access to
 $qb = $entityManager->createQueryBuilder();
 $qb->select('article')->from('Model\Article', 'article');
 
-QueryBuilderHelper::joinACL($qb, 'Model\Article', 'article', $user, Actions::EDIT);
+QueryBuilderHelper::joinACL($qb, $user, Actions::EDIT);
 
 // This query will return only the articles the user can edit
 $articles = $qb->getQuery()->getResult();
