@@ -97,16 +97,15 @@ class AuthorizationRepository extends EntityRepository
             ));
         }
 
-        $dql = "SELECT count(entity)
-                FROM $entityClass entity
-                JOIN MyCLabs\\ACL\\Model\\Authorization authorization WITH entity.id = authorization.entityId
-                WHERE entity = :entity
+        $dql = "SELECT count(authorization)
+                FROM MyCLabs\\ACL\\Model\\Authorization authorization
+                WHERE authorization.entityId = :entityId
                     AND authorization.entityClass = :entityClass
                     AND authorization.securityIdentity = :securityIdentity
                     AND authorization.actions.$action = true";
 
         $query = $this->_em->createQuery($dql);
-        $query->setParameter('entity', $entity);
+        $query->setParameter('entityId', $entity->getId());
         $query->setParameter('entityClass', $entityClass);
         $query->setParameter('securityIdentity', $identity);
 
