@@ -5,7 +5,7 @@ namespace MyCLabs\ACL\Doctrine;
 use Doctrine\Common\EventSubscriber;
 use Doctrine\ORM\Event\OnFlushEventArgs;
 use Doctrine\ORM\Events;
-use MyCLabs\ACL\ACLManager;
+use MyCLabs\ACL\ACL;
 use MyCLabs\ACL\Model\EntityResource;
 
 /**
@@ -18,12 +18,12 @@ class EntityResourcesListener implements EventSubscriber
     /**
      * @var callable
      */
-    private $aclManagerLocator;
+    private $aclLocator;
 
     /**
-     * @var ACLManager|null
+     * @var ACL|null
      */
-    private $aclManager;
+    private $acl;
 
     /**
      * @var EntityResource[]
@@ -31,15 +31,15 @@ class EntityResourcesListener implements EventSubscriber
     private $newResources = [];
 
     /**
-     * Because of a circular dependency, we can't require to inject directly the ACL manager.
-     * You need to inject a "locator", i.e. a callable that returns the ACL manager,
-     * so that the ACL manager can be fetched lazily.
+     * Because of a circular dependency, we can't require to inject directly the ACL.
+     * You need to inject a "locator", i.e. a callable that returns the ACL,
+     * so that the ACL can be fetched lazily.
      *
-     * @param callable $aclManagerLocator Callable that returns the ACL manager.
+     * @param callable $aclLocator Callable that returns the ACL.
      */
-    public function __construct(callable $aclManagerLocator)
+    public function __construct(callable $aclLocator)
     {
-        $this->aclManagerLocator = $aclManagerLocator;
+        $this->aclLocator = $aclLocator;
     }
 
     public function getSubscribedEvents()
@@ -65,23 +65,23 @@ class EntityResourcesListener implements EventSubscriber
 
     public function postFlush()
     {
-        $aclManager = $this->getACLManager();
+        $acl = $this->getACL();
 
         foreach ($this->newResources as $resource) {
-            $aclManager->processNewResource($resource);
+            $acl->processNewResource($resource);
         }
 
         $this->newResources = [];
     }
 
-    private function getACLManager()
+    private function getACL()
     {
-        if ($this->aclManager === null) {
-            // Resolve the ACL manager
-            $locator = $this->aclManagerLocator;
-            $this->aclManager = $locator();
+        if ($this->acl === null) {
+            // Resolve the ACL
+            $locator = $this->aclLocator;
+            $this->acl = $locator();
         }
 
-        return $this->aclManager;
+        return $this->acl;
     }
 }

@@ -3,7 +3,7 @@
 namespace Tests\MyCLabs\ACL\Unit\Repository\Model;
 
 use Doctrine\ORM\Mapping as ORM;
-use MyCLabs\ACL\ACLManager;
+use MyCLabs\ACL\ACL;
 use MyCLabs\ACL\Model\Actions;
 use MyCLabs\ACL\Model\Role;
 
@@ -25,8 +25,8 @@ class FileOwnerRole extends Role
         parent::__construct($identity);
     }
 
-    public function createAuthorizations(ACLManager $aclManager)
+    public function createAuthorizations(ACL $acl)
     {
-        $aclManager->allow($this, new Actions([Actions::VIEW, Actions::EDIT]), $this->file);
+        $acl->allow($this, new Actions([Actions::VIEW, Actions::EDIT]), $this->file);
     }
 }

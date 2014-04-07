@@ -25,7 +25,7 @@ class QueryFilterTest extends AbstractIntegrationTest
 
         $this->em->flush();
 
-        $this->aclManager->grant($user, new ArticleEditorRole($user, $article2));
+        $this->acl->grant($user, new ArticleEditorRole($user, $article2));
 
         $query = $this->em->createQuery(
             'SELECT a FROM Tests\MyCLabs\ACL\Integration\Model\Article a
@@ -54,7 +54,7 @@ class QueryFilterTest extends AbstractIntegrationTest
 
         $this->em->flush();
 
-        $this->aclManager->grant($user, new ArticleEditorRole($user, $article2));
+        $this->acl->grant($user, new ArticleEditorRole($user, $article2));
 
         $qb = $this->em->createQueryBuilder();
         $qb->select('a')->from('Tests\MyCLabs\ACL\Integration\Model\Article', 'a');

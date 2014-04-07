@@ -6,7 +6,7 @@ use Doctrine\Common\Cache\ArrayCache;
 use Doctrine\ORM\EntityManager;
 use Doctrine\ORM\Tools\SchemaTool;
 use Doctrine\ORM\Tools\Setup;
-use MyCLabs\ACL\ACLManager;
+use MyCLabs\ACL\ACL;
 use MyCLabs\ACL\Doctrine\ACLSetup;
 
 abstract class AbstractIntegrationTest extends \PHPUnit_Framework_TestCase
@@ -17,9 +17,9 @@ abstract class AbstractIntegrationTest extends \PHPUnit_Framework_TestCase
     protected $em;
 
     /**
-     * @var ACLManager
+     * @var ACL
      */
-    protected $aclManager;
+    protected $acl;
 
     public function setUp()
     {
@@ -46,10 +46,10 @@ abstract class AbstractIntegrationTest extends \PHPUnit_Framework_TestCase
         $config = Setup::createAnnotationMetadataConfiguration($paths, true, null, new ArrayCache(), false);
         $this->em = EntityManager::create($dbParams, $config);
 
-        $this->aclManager = new ACLManager($this->em);
+        $this->acl = new ACL($this->em);
 
         $setup->setUpEntityManager($this->em, function () {
-            return $this->aclManager;
+            return $this->acl;
         });
 
         // Create the DB

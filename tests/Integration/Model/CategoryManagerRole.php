@@ -3,7 +3,7 @@
 namespace Tests\MyCLabs\ACL\Integration\Model;
 
 use Doctrine\ORM\Mapping as ORM;
-use MyCLabs\ACL\ACLManager;
+use MyCLabs\ACL\ACL;
 use MyCLabs\ACL\Model\Role;
 
 /**
@@ -24,8 +24,8 @@ class CategoryManagerRole extends Role
         parent::__construct($identity);
     }
 
-    public function createAuthorizations(ACLManager $aclManager)
+    public function createAuthorizations(ACL $acl)
     {
-        $aclManager->allow($this, new Actions([Actions::VIEW]), $this->category);
+        $acl->allow($this, new Actions([Actions::VIEW]), $this->category);
     }
 }

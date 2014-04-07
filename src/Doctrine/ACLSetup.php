@@ -29,7 +29,7 @@ class ACLSetup
         $this->metadataLoader = new ACLMetadataLoader();
     }
 
-    public function setUpEntityManager(EntityManager $entityManager, callable $aclManagerLocator)
+    public function setUpEntityManager(EntityManager $entityManager, callable $aclLocator)
     {
         if ($this->securityIdentityClass === null) {
             throw new \RuntimeException(
@@ -48,7 +48,7 @@ class ACLSetup
         $evm->addEventListener(Events::loadClassMetadata, $this->metadataLoader);
 
         // Register the listener that looks for new resources
-        $evm->addEventSubscriber(new EntityResourcesListener($aclManagerLocator));
+        $evm->addEventSubscriber(new EntityResourcesListener($aclLocator));
     }
 
     /**

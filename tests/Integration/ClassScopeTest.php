@@ -30,21 +30,21 @@ class ClassScopeTest extends AbstractIntegrationTest
 
         $this->em->flush();
 
-        $this->aclManager->grant($user, new AllArticlesEditorRole($user));
+        $this->acl->grant($user, new AllArticlesEditorRole($user));
 
         // Test on the resource class
         $classResource = new ClassResource('Tests\MyCLabs\ACL\Integration\Model\Article');
-        $this->assertTrue($this->aclManager->isAllowed($user, Actions::VIEW, $classResource));
-        $this->assertTrue($this->aclManager->isAllowed($user, Actions::EDIT, $classResource));
-        $this->assertFalse($this->aclManager->isAllowed($user, Actions::DELETE, $classResource));
+        $this->assertTrue($this->acl->isAllowed($user, Actions::VIEW, $classResource));
+        $this->assertTrue($this->acl->isAllowed($user, Actions::EDIT, $classResource));
+        $this->assertFalse($this->acl->isAllowed($user, Actions::DELETE, $classResource));
 
         // Test on entities
-        $this->assertTrue($this->aclManager->isAllowed($user, Actions::VIEW, $article1));
-        $this->assertTrue($this->aclManager->isAllowed($user, Actions::EDIT, $article1));
-        $this->assertFalse($this->aclManager->isAllowed($user, Actions::DELETE, $article1));
-        $this->assertTrue($this->aclManager->isAllowed($user, Actions::VIEW, $article2));
-        $this->assertTrue($this->aclManager->isAllowed($user, Actions::EDIT, $article2));
-        $this->assertFalse($this->aclManager->isAllowed($user, Actions::DELETE, $article2));
+        $this->assertTrue($this->acl->isAllowed($user, Actions::VIEW, $article1));
+        $this->assertTrue($this->acl->isAllowed($user, Actions::EDIT, $article1));
+        $this->assertFalse($this->acl->isAllowed($user, Actions::DELETE, $article1));
+        $this->assertTrue($this->acl->isAllowed($user, Actions::VIEW, $article2));
+        $this->assertTrue($this->acl->isAllowed($user, Actions::EDIT, $article2));
+        $this->assertFalse($this->acl->isAllowed($user, Actions::DELETE, $article2));
     }
 
     /**
@@ -60,7 +60,7 @@ class ClassScopeTest extends AbstractIntegrationTest
 
         $this->em->flush();
 
-        $this->aclManager->grant($user, new AllArticlesEditorRole($user));
+        $this->acl->grant($user, new AllArticlesEditorRole($user));
 
         // Add a new resource after the role was given
         $article2 = new Article();
@@ -69,16 +69,16 @@ class ClassScopeTest extends AbstractIntegrationTest
 
         // Test on the resource class
         $classResource = new ClassResource('Tests\MyCLabs\ACL\Integration\Model\Article');
-        $this->assertTrue($this->aclManager->isAllowed($user, Actions::VIEW, $classResource));
-        $this->assertTrue($this->aclManager->isAllowed($user, Actions::EDIT, $classResource));
-        $this->assertFalse($this->aclManager->isAllowed($user, Actions::DELETE, $classResource));
+        $this->assertTrue($this->acl->isAllowed($user, Actions::VIEW, $classResource));
+        $this->assertTrue($this->acl->isAllowed($user, Actions::EDIT, $classResource));
+        $this->assertFalse($this->acl->isAllowed($user, Actions::DELETE, $classResource));
 
         // Test on entities
-        $this->assertTrue($this->aclManager->isAllowed($user, Actions::VIEW, $article1));
-        $this->assertTrue($this->aclManager->isAllowed($user, Actions::EDIT, $article1));
-        $this->assertFalse($this->aclManager->isAllowed($user, Actions::DELETE, $article1));
-        $this->assertTrue($this->aclManager->isAllowed($user, Actions::VIEW, $article2));
-        $this->assertTrue($this->aclManager->isAllowed($user, Actions::EDIT, $article2));
-        $this->assertFalse($this->aclManager->isAllowed($user, Actions::DELETE, $article2));
+        $this->assertTrue($this->acl->isAllowed($user, Actions::VIEW, $article1));
+        $this->assertTrue($this->acl->isAllowed($user, Actions::EDIT, $article1));
+        $this->assertFalse($this->acl->isAllowed($user, Actions::DELETE, $article1));
+        $this->assertTrue($this->acl->isAllowed($user, Actions::VIEW, $article2));
+        $this->assertTrue($this->acl->isAllowed($user, Actions::EDIT, $article2));
+        $this->assertFalse($this->acl->isAllowed($user, Actions::DELETE, $article2));
     }
 }

@@ -21,19 +21,19 @@ There are 2 kinds of resources:
 You give permissions to a user by adding it a role:
 
 ```php
-$aclManager->grant($user, new ArticleEditorRole($user, $article));
+$acl->grant($user, new ArticleEditorRole($user, $article));
 ```
 
 You remove permissions to a user by removing the role:
 
 ```php
-$aclManager->unGrant($user, $role);
+$acl->unGrant($user, $role);
 ```
 
 Test permissions:
 
 ```php
-$aclManager->isAllowed($user, Actions::EDIT, $article);
+$acl->isAllowed($user, Actions::EDIT, $article);
 ```
 
 You can also filter your queries to get only the entities the user has access to:
@@ -129,9 +129,9 @@ class ArticleEditorRole extends Role
         parent::__construct($user);
     }
 
-    public function createAuthorizations(ACLManager $aclManager)
+    public function createAuthorizations(ACL $acl)
     {
-        $aclManager->allow(
+        $acl->allow(
             $this,
             new Actions([Actions::VIEW, Actions::EDIT]),
             $this->article
@@ -142,7 +142,7 @@ class ArticleEditorRole extends Role
 
 The authorizations given by the role are created in the `createAuthorizations()` method.
 
-For creating an authorization, you need to call `$aclManager->allow()` with:
+For creating an authorization, you need to call `$acl->allow()` with:
 
 - the role (which will also provide the user/security identity that is being given access)
 - the actions that are included in the authorization
@@ -153,7 +153,7 @@ give access to all entities of that type:
 
 ```php
 // This will allow the users having the role to be able to view ALL the articles
-$aclManager->allow(
+$acl->allow(
     $this,
     new Actions([Actions::VIEW]),
     new ClassResource('My\Model\Article')
@@ -164,10 +164,10 @@ $aclManager->allow(
 
 You first need to register the annotation mapping to your Doctrine metadata driver.
 
-Creating the ACL manager is simple:
+Creating the ACL is simple:
 
 ```php
-$aclManager = new ACLManager($entityManager);
+$acl = new ACL($entityManager);
 ```
 
 However, you must register some listener on the entity manager:
@@ -179,14 +179,14 @@ $aclSetup->setSecurityIdentityClass('My\Model\User')
 // Register role classes
 $aclSetup->registerRoleClass('My\Model\ArticleEditorRole', 'articleEditor');
 
-// To avoid instantiating the ACL manager uselessly (and avoid a circular dependency),
+// To avoid instantiating the ACL uselessly (and avoid a circular dependency),
 // we must use a "locator" callback
-$aclManagerLocator = function () {
-    return $container->get('MyCLabs\ACL\ACLManager');
+$aclLocator = function () {
+    return $container->get('MyCLabs\ACL\ACL');
 };
 
 // Apply the configuration to the entity manager
-$aclSetup->setUpEntityManager($entityManager, $aclManagerLocator);
+$aclSetup->setUpEntityManager($entityManager, $aclLocator);
 ```
 
 ## Authorization cascading
@@ -312,7 +312,7 @@ $cascadeStrategy->setResourceGraphTraverser(
     $c->get(FolderResourceGraphTraverser::class)
 );
 
-$aclManager = new ACLManager($em, $cascadeStrategy);
+$acl = new ACL($em, $cascadeStrategy);
 ```
 
 ## Custom actions

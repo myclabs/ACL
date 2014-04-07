@@ -19,7 +19,7 @@ use MyCLabs\ACL\Repository\AuthorizationRepository;
  *
  * @author Matthieu Napoli <matthieu@mnapoli.fr>
  */
-class ACLManager
+class ACL
 {
     /**
      * @var EntityManager

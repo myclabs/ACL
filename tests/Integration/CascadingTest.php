@@ -31,19 +31,19 @@ class CascadingTest extends AbstractIntegrationTest
 
         $this->em->flush();
 
-        $this->aclManager->grant($user, new CategoryManagerRole($user, $category1));
+        $this->acl->grant($user, new CategoryManagerRole($user, $category1));
 
         // Direct authorization
-        $this->assertTrue($this->aclManager->isAllowed($user, Actions::VIEW, $category1));
-        $this->assertFalse($this->aclManager->isAllowed($user, Actions::EDIT, $category1));
+        $this->assertTrue($this->acl->isAllowed($user, Actions::VIEW, $category1));
+        $this->assertFalse($this->acl->isAllowed($user, Actions::EDIT, $category1));
 
         // Cascaded authorization
-        $this->assertTrue($this->aclManager->isAllowed($user, Actions::VIEW, $category2));
-        $this->assertFalse($this->aclManager->isAllowed($user, Actions::EDIT, $category2));
+        $this->assertTrue($this->acl->isAllowed($user, Actions::VIEW, $category2));
+        $this->assertFalse($this->acl->isAllowed($user, Actions::EDIT, $category2));
 
         // Should also cascade recursively, on sub-resources of sub-resources
-        $this->assertTrue($this->aclManager->isAllowed($user, Actions::VIEW, $category3));
-        $this->assertFalse($this->aclManager->isAllowed($user, Actions::EDIT, $category3));
+        $this->assertTrue($this->acl->isAllowed($user, Actions::VIEW, $category3));
+        $this->assertFalse($this->acl->isAllowed($user, Actions::EDIT, $category3));
     }
 
     /**
@@ -59,24 +59,24 @@ class CascadingTest extends AbstractIntegrationTest
 
         $this->em->flush();
 
-        $this->aclManager->grant($user, new CategoryManagerRole($user, $category1));
+        $this->acl->grant($user, new CategoryManagerRole($user, $category1));
 
         // Direct authorization
-        $this->assertTrue($this->aclManager->isAllowed($user, Actions::VIEW, $category1));
-        $this->assertFalse($this->aclManager->isAllowed($user, Actions::EDIT, $category1));
+        $this->assertTrue($this->acl->isAllowed($user, Actions::VIEW, $category1));
+        $this->assertFalse($this->acl->isAllowed($user, Actions::EDIT, $category1));
 
         // Cascaded authorization
         $category2 = new Category($category1);
         $this->em->persist($category2);
         $this->em->flush();
-        $this->assertTrue($this->aclManager->isAllowed($user, Actions::VIEW, $category2));
-        $this->assertFalse($this->aclManager->isAllowed($user, Actions::EDIT, $category2));
+        $this->assertTrue($this->acl->isAllowed($user, Actions::VIEW, $category2));
+        $this->assertFalse($this->acl->isAllowed($user, Actions::EDIT, $category2));
 
         // Should also cascade recursively, on sub-resources of sub-resources
         $category3 = new Category($category2);
         $this->em->persist($category3);
         $this->em->flush();
-        $this->assertTrue($this->aclManager->isAllowed($user, Actions::VIEW, $category3));
-        $this->assertFalse($this->aclManager->isAllowed($user, Actions::EDIT, $category3));
+        $this->assertTrue($this->acl->isAllowed($user, Actions::VIEW, $category3));
+        $this->assertFalse($this->acl->isAllowed($user, Actions::EDIT, $category3));
     }
 }

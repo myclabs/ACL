@@ -3,7 +3,7 @@
 namespace Tests\MyCLabs\ACL\Integration\Model;
 
 use Doctrine\ORM\Mapping as ORM;
-use MyCLabs\ACL\ACLManager;
+use MyCLabs\ACL\ACL;
 use MyCLabs\ACL\Model\ClassResource;
 use MyCLabs\ACL\Model\Role;
 
@@ -12,9 +12,9 @@ use MyCLabs\ACL\Model\Role;
  */
 class AllArticlesEditorRole extends Role
 {
-    public function createAuthorizations(ACLManager $aclManager)
+    public function createAuthorizations(ACL $acl)
     {
-        $aclManager->allow(
+        $acl->allow(
             $this,
             new Actions([Actions::VIEW, Actions::EDIT]),
             new ClassResource('Tests\MyCLabs\ACL\Integration\Model\Article')
