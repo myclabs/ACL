@@ -2,6 +2,10 @@ body {
     font-size: 18px;
 }
 
+section {
+    margin-bottom: 50px;
+}
+
 h1, h2, h3, h4 {
     color: #df691a;
 }
@@ -10,8 +14,8 @@ h3 {
 }
 
 code {
-    font-size: 80%;
-    padding: 3px 4px;
+    font-size: 85%;
+    padding: 5px 4px 1px;
     margin: 0 4px;
     border-radius: 2px;
 }
@@ -35,4 +39,14 @@ li {
     font-weight: 300;
     margin-left: 10px;
     color: white;
+}
+
+@media (min-width: 768px) {
+    #sidebar {
+        position:fixed;
+    }
+}
+
+.page-header {
+    margin-top: 0;
 }
