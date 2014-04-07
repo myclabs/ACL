@@ -32,12 +32,12 @@
                     </p>
 
                     <ul class="nav nav-pills nav-stacked">
-                        <li class="active">
+                        <li class="">
                             <a href="http://myclabs.github.io/ACL/">
                                 Introduction
                             </a>
                         </li>
-                        <li class="">
+                        <li class="active">
                             <a href="http://myclabs.github.io/ACL/doc/setup.html">
                                 Setup
                             </a>
@@ -74,53 +74,49 @@
                 </nav>
 
                 <section class="col-sm-offset-3 col-lg-offset-2 col-sm-9 col-lg-10">
-                    <p><a href="https://travis-ci.org/myclabs/ACL"><img alt="Build Status" src="https://travis-ci.org/myclabs/ACL.png?branch=master" /></a> <a href="https://coveralls.io/r/myclabs/ACL"><img alt="Coverage Status" src="https://coveralls.io/repos/myclabs/ACL/badge.png" /></a> <a href="https://scrutinizer-ci.com/g/myclabs/ACL/"><img alt="Scrutinizer Code Quality" src="https://scrutinizer-ci.com/g/myclabs/ACL/badges/quality-score.png?s=2997ec4cb570c1cfef520d541daac853527d173e" /></a> <a href="https://packagist.org/packages/myclabs/acl"><img alt="Latest Stable Version" src="https://poser.pugx.org/myclabs/acl/v/stable.png" /></a> <a href="https://packagist.org/packages/myclabs/acl"><img alt="Total Downloads" src="https://poser.pugx.org/myclabs/acl/downloads.png" /></a> <a href="https://packagist.org/packages/myclabs/acl"><img alt="License" src="https://poser.pugx.org/myclabs/acl/license.png" /></a></p>
-<p>MyCLabs ACL is a library that helps managing permissions on resources.</p>
-<p>Vocabulary:</p>
-<ul>
-<li><strong>Security identity</strong>: the entity which will be granted some access (this is generally the user)</li>
-<li><strong>Resource</strong>: a <em>thing</em> to which we want to control the access</li>
-<li><strong>Authorization</strong>: allows a security identity (user) to do something on a resource</li>
-<li><strong>Role</strong>: a role gives authorizations to a user (e.g. an administrator, an article editor, a project owner, …)</li>
-</ul>
-<p>There are 2 kinds of resources:</p>
-<ul>
-<li>an entity (example: article #123)</li>
-<li>all entities of a given type (example: all articles), which is represented by the classname of the entity</li>
-</ul>
-<h2>Overview</h2>
-<p>You give permissions to a user by adding it a role:</p>
-<pre><code class="language-php">$acl-&gt;grant($user, new ArticleEditorRole($user, $article));</code></pre>
-<p>You remove permissions to a user by removing the role:</p>
-<pre><code class="language-php">$acl-&gt;unGrant($user, $role);</code></pre>
-<p>Test permissions:</p>
-<pre><code class="language-php">$acl-&gt;isAllowed($user, Actions::EDIT, $article);</code></pre>
-<p>You can also filter your queries to get only the entities the user has access to:</p>
-<pre><code class="language-php">$qb = $entityManager-&gt;createQueryBuilder();
-$qb-&gt;select('article')-&gt;from('Model\Article', 'article');
+                    <h1>Setup</h1>
+<h2>Installation</h2>
+<p>Install the library with Composer:</p>
+<pre><code class="language-json">{
+    "require": {
+        "myclabs/acl": "*"
+    }
+}</code></pre>
+<h2>Configuration</h2>
+<p>You first need to register the annotation mapping to your Doctrine metadata driver.
+Here is for example how you would do it with the most basic Doctrine configuration:</p>
+<pre><code class="language-php">$paths = [
+    // Your model classes
+    __DIR__ . '/../src/My/Model',
 
-ACLQueryHelper::joinACL($qb, $user, Actions::EDIT);
+    // MyCLabs ACL model classes (adjust the directory)
+    __DIR__ . '/../vendor/myclabs/acl/src/Model',
+];
 
-// This query will return only the articles the user can edit
-$articles = $qb-&gt;getQuery()-&gt;getResult();</code></pre>
-<h3>Features</h3>
-<ul>
-<li>stored in database (you don't need to handle persistence yourself)</li>
-<li>extremely optimized:
-<ul>
-<li>filters queries at database level (you don't load entities the user can't access)</li>
-<li>joins with only 1 extra table</li>
-</ul>
-</li>
-<li>authorization cascading/inheritance</li>
-<li>authorizations are rebuildable: you can change what an "ArticleEditor" can do afterwards and just rebuild the ACL</li>
-<li>supports your custom actions on top of standard actions like "view", "edit", "delete", …</li>
-</ul>
-<h3>Limitations</h3>
-<ul>
-<li>because of Doctrine limitations you need to flush your resources before giving or testing authorizations</li>
-<li>backed up by the database: testing <code>isAllowed</code> means one call to the database</li>
-</ul>
+// Doctrine configuration
+$config = Setup::createAnnotationMetadataConfiguration($paths);
+$em = EntityManager::create($dbParams, $config);</code></pre>
+<p>Creating the ACL object is simple:</p>
+<pre><code class="language-php">$acl = new ACL($entityManager);</code></pre>
+<p>However, you must separately register some listeners on the entity manager.
+The <code>ACLSetup</code> class is here to help you:</p>
+<pre><code class="language-php">$aclSetup = new \MyCLabs\ACL\Doctrine\ACLSetup();
+// Set which class implements the SecurityIdentityInterface (must be called once)
+$aclSetup-&gt;setSecurityIdentityClass('My\Model\User')
+// Register role classes
+$aclSetup-&gt;registerRoleClass('My\Model\ArticleEditorRole', 'articleEditor');
+
+// To avoid instantiating the ACL uselessly (and avoid a circular dependency),
+// we must use a "locator" callback
+$aclLocator = function () {
+    // If you don't use a container, just return the $acl variable
+    return $container-&gt;get('MyCLabs\ACL\ACL');
+};
+
+// Apply the configuration to the entity manager
+$aclSetup-&gt;setUpEntityManager($entityManager, $aclLocator);</code></pre>
+<p>These listeners handle different things, like registering your role and user classes, and registering
+a listener that will act when new resources/entities are created (to cascade authorizations).</p>
                 </section>
 
             </div>

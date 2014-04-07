@@ -1,0 +1,195 @@
+<!DOCTYPE html>
+<html lang="en">
+    <head>
+        <meta charset="utf-8">
+        <meta name="viewport" content="width=device-width, initial-scale=1">
+
+        <title>MyCLabs\ACL</title>
+
+        <link rel="stylesheet" href="http://myclabs.github.io/ACL/css/bootstrap.min.css">
+        <link rel="stylesheet" href="http://myclabs.github.io/ACL/css/highlight.github.css">
+        <link rel="stylesheet" href="http://myclabs.github.io/ACL/css/main.css">
+
+        <link rel="shortcut icon" href="favicon.ico" type="image/x-icon">
+    </head>
+    <body>
+        <header class="navbar navbar-default">
+            <a class="navbar-brand" href="http://myclabs.github.io/ACL/">
+                MyCLabs\ACL
+                <small class="hidden-xs hidden-sm">
+                    Powerful and efficient access control library for your PHP application.
+                </small>
+            </a>
+        </header>
+
+        <div class="container-fluid">
+            <div class="row">
+
+                <nav id="sidebar" class="col-sm-3 col-lg-2" role="navigation">
+
+                    <p class="text-muted">
+                        Main documentation
+                    </p>
+
+                    <ul class="nav nav-pills nav-stacked">
+                        <li class="">
+                            <a href="http://myclabs.github.io/ACL/">
+                                Introduction
+                            </a>
+                        </li>
+                        <li class="">
+                            <a href="http://myclabs.github.io/ACL/doc/setup.html">
+                                Setup
+                            </a>
+                        </li>
+                        <li class="">
+                            <a href="http://myclabs.github.io/ACL/doc/usage.html">
+                                Usage
+                            </a>
+                        </li>
+                    </ul>
+
+                    <p class="text-muted">
+                        Advanced topics
+                    </p>
+
+                    <ul class="nav nav-pills nav-stacked">
+                        <li class="">
+                            <a href="http://myclabs.github.io/ACL/doc/actions.html">
+                                Actions
+                            </a>
+                        </li>
+                        <li class="active">
+                            <a href="http://myclabs.github.io/ACL/doc/cascading.html">
+                                Authorization cascading
+                            </a>
+                        </li>
+                        <li class="">
+                            <a href="http://myclabs.github.io/ACL/doc/performances.html">
+                                Performances
+                            </a>
+                        </li>
+                    </ul>
+
+                </nav>
+
+                <section class="col-sm-offset-3 col-lg-offset-2 col-sm-9 col-lg-10">
+                    <h1>Authorization cascading</h1>
+<p>There are 2 ways to cascade authorizations:</p>
+<ul>
+<li>via a hierarchy of resource: parent resources cascade their authorizations to sub-resources</li>
+<li>via a custom cascading strategy (if you have exotic needs)</li>
+</ul>
+<p>The first solution is supported out of the box. Example: allowing a user to access a folder and all its sub-folders.</p>
+<p>You have 2 solutions to define the hierarchical structure:</p>
+<ul>
+<li>implementing the <code>CascadingResource</code> interface</li>
+<li>writing a <code>ResourceGraphTraverser</code></li>
+</ul>
+<h2>CascadingResource</h2>
+<p>This is a very simple solution, yet a bit limited, and it crowds your entity a bit.</p>
+<p>Example:</p>
+<pre><code class="language-php">class Category implements EntityResource, CascadingResource
+{
+    /**
+     * @var Category[] Sub-categories
+     **/
+    private $children;
+
+    /**
+     * @var Category|null Parent category
+     **/
+    private $parent;
+
+    // ...
+
+    public function getParentResources(EntityManager $entityManager)
+    {
+        $parents = [ new ClassResource(get_class()) ];
+
+        if ($this-&gt;parent !== null) {
+            $parents[] = $this-&gt;parent;
+        }
+
+        return $parents;
+    }
+
+    public function getSubResources(EntityManager $entityManager)
+    {
+        return $this-&gt;children-&gt;toArray();
+    }
+}</code></pre>
+<p>Note: if you want to give authorizations on the class-resource "All categories" (<code>new ClassResource('Category')</code>)
+don't forget to return it in <code>getParentResources()</code> (as shown above). Else you can ignore it.</p>
+<p>Just so you know, <code>ClassResource</code> implements the <code>CascadingResource</code> interface:</p>
+<pre><code class="language-php">final class ClassResource implements ResourceInterface, CascadingResource
+{
+    // ...
+
+    public function getSubResources(EntityManager $entityManager)
+    {
+        $repository = $entityManager-&gt;getRepository($this-&gt;class);
+
+        return $repository-&gt;findAll();
+    }
+}</code></pre>
+<p><strong>Important</strong>: with <code>CascadingResource</code>, MyCLabs\ACL will assume each resource only returns its direct
+children/parent resources. So they will be traversed recursively, which sometimes can be inefficient.
+Have a look below for an alternative solution.</p>
+<h2>ResourceGraphTraverser</h2>
+<p>The <code>ResourceGraphTraverser</code> is an object you write that must return the parent and sub-resources of a resource.</p>
+<p>As explained, it must return <strong>all</strong> the sub/parent resources, which avoids MyCLabs\ACL
+recursively looking for sub/parent resources.</p>
+<p>Example:</p>
+<pre><code class="language-php">class FolderResourceGraphTraverser implements ResourceGraphTraverser
+{
+    public function getAllParentResources(ResourceInterface $resource)
+    {
+        if (! $resource instanceof Folder) {
+            throw new \RuntimeException;
+        }
+
+        $parents = $resource-&gt;getAllParentFoldersRecursively();
+        $parents[] = new ClassResource(Folder::class);
+
+        return $parents;
+    }
+
+    public function getAllSubResources(ResourceInterface $resource)
+    {
+        if (! $resource instanceof Folder) {
+            throw new \RuntimeException;
+        }
+
+        return array_merge(
+            $resource-&gt;getAllSubFoldersRecursively(),
+            $resource-&gt;getAllFiles()
+        );
+    }
+}</code></pre>
+<p>To register it:</p>
+<pre><code class="language-php">$cascadeStrategy = new SimpleCascadeStrategy($entityManager);
+$cascadeStrategy-&gt;setResourceGraphTraverser(
+    Folder::class,
+    $c-&gt;get(FolderResourceGraphTraverser::class)
+);
+
+$acl = new ACL($em, $cascadeStrategy);</code></pre>
+                </section>
+
+            </div>
+        </div>
+
+        <script src="//code.jquery.com/jquery-1.11.0.min.js"></script>
+        <script src="//netdna.bootstrapcdn.com/bootstrap/3.1.1/js/bootstrap.min.js"></script>
+        <script src="http://yandex.st/highlightjs/7.5/highlight.min.js"></script>
+
+        <script>
+            $(function() {
+                $("section>h1").wrap('<div class="page-header" />');
+                $("section>p:first-child").addClass('lead');
+                hljs.initHighlightingOnLoad();
+            });
+        </script>
+    </body>
+</html>
