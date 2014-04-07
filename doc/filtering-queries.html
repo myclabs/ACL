@@ -48,7 +48,7 @@
                                     Usage
                                 </a>
                             </li>
-                            <li class="">
+                            <li class="active">
                                 <a href="http://myclabs.github.io/ACL/doc/filtering-queries.html">
                                     Filtering queries
                                 </a>
@@ -60,7 +60,7 @@
                         </p>
 
                         <ul class="nav nav-pills nav-stacked">
-                            <li class="active">
+                            <li class="">
                                 <a href="http://myclabs.github.io/ACL/doc/actions.html">
                                     Actions
                                 </a>
@@ -80,92 +80,38 @@
                     </nav>
 
                     <section class="col-sm-offset-3 col-lg-offset-2 col-sm-9 col-lg-10">
-                        <h1>Actions</h1>
-<p>As you have seen in the examples, you can allow and test several actions on a resource.</p>
-<ul>
-<li><code>$acl-&gt;allow($role, $actions, $resource)</code></li>
-</ul>
-<p>When allowing access, you can allow the user to do several actions like so:</p>
-<pre><code class="language-php">$actions = new Actions();
-$actions-&gt;view = true;
-$actions-&gt;edit = true;</code></pre>
-<p>Here is a shortcut to achieve the same result:</p>
-<pre><code class="language-php">$actions = new Actions([
-    Actions::VIEW,
-    Actions::EDIT,
-]);
+                        <h1>Filtering queries</h1>
+<p>Filtering queries is pretty straightforward thanks to the simple architecture behind all this:
+there is a single <code>ACL_Authorization</code> table mapped to the <code>Authorization</code> Doctrine entity.</p>
+<p>Filtering in a SQL query would then look like this:</p>
+<pre><code class="language-sql">SELECT article.* FROM Blog_Article article
+INNER JOIN ACL_Authorization authorization
+    ON authorization.entity_id = article.id
+    AND authorization.entity_class = 'Blog\\Article'
+WHERE authorization.securityIdentity_id = :userId
+    AND actions_edit = true</code></pre>
+<h2>Doctrine queries</h2>
+<p>Of course what is really interesting is to filter in our <strong>Doctrine queries</strong>, and for this the
+<code>ACLQueryHelper</code> makes it very simple:</p>
+<pre><code class="language-php">$qb = $entityManager-&gt;createQueryBuilder();
 
-echo $actions-&gt;view; // true
-echo $actions-&gt;delete; // false</code></pre>
-<ul>
-<li><code>$acl-&gt;isAllowed($user, $action, $resource)</code></li>
-</ul>
-<p>When testing access, you can only test for one action:</p>
-<pre><code class="language-php">$acl-&gt;isAllowed($user, Actions::EDIT, $resource);</code></pre>
-<p>That is the same as this, but using constant is obviously preferred:</p>
-<pre><code class="language-php">$acl-&gt;isAllowed($user, 'edit', $resource);</code></pre>
-<h2>Default actions</h2>
-<p>Here is the list of all actions natively supported:</p>
-<pre><code class="language-php">class Actions
-{
-    const VIEW = 'view';
-    const CREATE = 'create';
-    const EDIT = 'edit';
-    const DELETE = 'delete';
-    const UNDELETE = 'undelete';
-    const ALLOW = 'allow';
+$qb-&gt;select('article')
+   -&gt;from('Blog\Article', 'article');
 
-    public $view = false;
-    public $create = false;
-    public $edit = false;
-    public $delete = false;
-    public $undelete = false;
-    public $allow = false;
+ACLQueryHelper::joinACL($qb, $user, Actions::EDIT);
 
-    // ....
-}</code></pre>
-<p>You don't have to use them all if you don't need it.</p>
-<p>FYI, <code>ALLOW</code> means "the user is allowed to allow other users on this resource", i.e. it's the action
-of managing access on the resource. This is usually what an administrator does: he can configure the
-accesses on the resources he administrates.</p>
-<h2>Custom actions</h2>
-<p>You can add your own actions by overriding the <code>Actions</code> class:</p>
-<pre><code class="language-php">namespace My\Model;
-
-use Doctrine\ORM\Mapping as ORM;
-use MyCLabs\ACL\Model\Actions as BaseActions;
-
-/**
- * @ORM\Embeddable
- */
-class Actions extends BaseActions
-{
-    const PUBLISH = 'publish';
-
-    /**
-     * @ORM\Column(type = "boolean")
-     */
-    public $publish = false;
-
-    /**
-     * {@inheritdoc}
-     */
-    public static function all()
-    {
-        return new static([
-            static::VIEW,
-            static::CREATE,
-            static::EDIT,
-            static::DELETE,
-            static::UNDELETE,
-            static::ALLOW,
-            static::PUBLISH,
-        ]);
-    }
-}</code></pre>
-<p>Here we added a "publish" action to restrict who can publish articles.</p>
-<p>Now we need to configure MyCLabs\ACL to use this class instead of the base class:</p>
-<pre><code class="language-php">$aclSetup-&gt;setActionsClass('My\Model\Actions');</code></pre>
+// This query will return only the articles the user can edit
+$articles = $qb-&gt;getQuery()-&gt;getResult();</code></pre>
+<p>This will generate the following DQL query:</p>
+<pre><code class="language-sql">SELECT article FROM Blog\Article article
+INNER JOIN MyCLabs\ACL\Model\Authorization authorization
+    WITH authorization.entityId = article.id
+WHERE authorization.entityClass = 'Blog\\Article'
+    AND authorization.securityIdentity = :user
+    AND authorization.actions.edit = true</code></pre>
+<p>You can of course combine <code>ACLQueryHelper::joinACL()</code> with additional filtering on the query builder.
+Unless you are writing some weird queries, the filtering should work as expected since it's a simple
+JOIN and WHERE.</p>
                     </section>
 
                 </div>

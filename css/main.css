@@ -2,6 +2,10 @@ body {
     font-size: 18px;
 }
 
+main {
+    margin-top: 90px;
+}
+
 section {
     margin-bottom: 50px;
 }
@@ -15,7 +19,7 @@ h3 {
 
 code {
     font-size: 85%;
-    padding: 5px 4px 1px;
+    padding: 4px 4px 1px;
     margin: 0 4px;
     border-radius: 2px;
 }
@@ -24,6 +28,9 @@ li {
     margin-bottom: 3px;
 }
 
+header.navbar {
+    opacity: 0.9;
+}
 .navbar .navbar-brand {
     font-size: 28px;
     height: auto;

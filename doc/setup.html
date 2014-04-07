@@ -13,7 +13,7 @@
         <link rel="shortcut icon" href="favicon.ico" type="image/x-icon">
     </head>
     <body>
-        <header class="navbar navbar-default">
+        <header class="navbar navbar-default navbar-fixed-top">
             <a class="navbar-brand" href="http://myclabs.github.io/ACL/">
                 MyCLabs\ACL
                 <small class="hidden-xs hidden-sm">
@@ -22,59 +22,65 @@
             </a>
         </header>
 
-        <div class="container-fluid">
-            <div class="row">
+        <main>
+            <div class="container-fluid">
+                <div class="row">
 
-                <nav id="sidebar" class="col-sm-3 col-lg-2" role="navigation">
+                    <nav id="sidebar" class="col-sm-3 col-lg-2" role="navigation">
 
-                    <p class="text-muted">
-                        Main documentation
-                    </p>
+                        <p class="text-muted">
+                            Main documentation
+                        </p>
 
-                    <ul class="nav nav-pills nav-stacked">
-                        <li class="">
-                            <a href="http://myclabs.github.io/ACL/">
-                                Introduction
-                            </a>
-                        </li>
-                        <li class="active">
-                            <a href="http://myclabs.github.io/ACL/doc/setup.html">
-                                Setup
-                            </a>
-                        </li>
-                        <li class="">
-                            <a href="http://myclabs.github.io/ACL/doc/usage.html">
-                                Usage
-                            </a>
-                        </li>
-                    </ul>
+                        <ul class="nav nav-pills nav-stacked">
+                            <li class="">
+                                <a href="http://myclabs.github.io/ACL/">
+                                    Introduction
+                                </a>
+                            </li>
+                            <li class="active">
+                                <a href="http://myclabs.github.io/ACL/doc/setup.html">
+                                    Setup
+                                </a>
+                            </li>
+                            <li class="">
+                                <a href="http://myclabs.github.io/ACL/doc/usage.html">
+                                    Usage
+                                </a>
+                            </li>
+                            <li class="">
+                                <a href="http://myclabs.github.io/ACL/doc/filtering-queries.html">
+                                    Filtering queries
+                                </a>
+                            </li>
+                        </ul>
 
-                    <p class="text-muted">
-                        Advanced topics
-                    </p>
+                        <p class="text-muted">
+                            Advanced topics
+                        </p>
 
-                    <ul class="nav nav-pills nav-stacked">
-                        <li class="">
-                            <a href="http://myclabs.github.io/ACL/doc/actions.html">
-                                Actions
-                            </a>
-                        </li>
-                        <li class="">
-                            <a href="http://myclabs.github.io/ACL/doc/cascading.html">
-                                Authorization cascading
-                            </a>
-                        </li>
-                        <li class="">
-                            <a href="http://myclabs.github.io/ACL/doc/performances.html">
-                                Performances
-                            </a>
-                        </li>
-                    </ul>
+                        <ul class="nav nav-pills nav-stacked">
+                            <li class="">
+                                <a href="http://myclabs.github.io/ACL/doc/actions.html">
+                                    Actions
+                                </a>
+                            </li>
+                            <li class="">
+                                <a href="http://myclabs.github.io/ACL/doc/cascading.html">
+                                    Authorization cascading
+                                </a>
+                            </li>
+                            <li class="">
+                                <a href="http://myclabs.github.io/ACL/doc/performances.html">
+                                    Performances
+                                </a>
+                            </li>
+                        </ul>
 
-                </nav>
+                    </nav>
 
-                <section class="col-sm-offset-3 col-lg-offset-2 col-sm-9 col-lg-10">
-                    <h1>Setup</h1>
+                    <section class="col-sm-offset-3 col-lg-offset-2 col-sm-9 col-lg-10">
+                        <h1>Setup</h1>
 <h2>Installation</h2>
 <p>Install the library with Composer:</p>
 <pre><code class="language-json">{
@@ -117,10 +123,11 @@ $aclLocator = function () {
 $aclSetup-&gt;setUpEntityManager($entityManager, $aclLocator);</code></pre>
 <p>These listeners handle different things, like registering your role and user classes, and registering
 a listener that will act when new resources/entities are created (to cascade authorizations).</p>
-                </section>
+                    </section>
 
+                </div>
             </div>
-        </div>
+        </main>
 
         <script src="//code.jquery.com/jquery-1.11.0.min.js"></script>
         <script src="//netdna.bootstrapcdn.com/bootstrap/3.1.1/js/bootstrap.min.js"></script>
