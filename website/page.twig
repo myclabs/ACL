@@ -13,7 +13,7 @@
         <link rel="shortcut icon" href="favicon.ico" type="image/x-icon">
     </head>
     <body>
-        <header class="navbar navbar-default">
+        <header class="navbar navbar-default navbar-fixed-top">
             <a class="navbar-brand" href="{{ baseUrl }}/">
                 MyCLabs\ACL
                 <small class="hidden-xs hidden-sm">
@@ -22,68 +22,70 @@
             </a>
         </header>
 
-        <div class="container-fluid">
-            <div class="row">
+        <main>
+            <div class="container-fluid">
+                <div class="row">
 
-                <nav id="sidebar" class="col-sm-3 col-lg-2" role="navigation">
+                    <nav id="sidebar" class="col-sm-3 col-lg-2" role="navigation">
 
-                    <p class="text-muted">
-                        Main documentation
-                    </p>
+                        <p class="text-muted">
+                            Main documentation
+                        </p>
 
-                    <ul class="nav nav-pills nav-stacked">
-                        <li class="{{ menu == 'introduction' ? 'active' }}">
-                            <a href="{{ baseUrl }}/">
-                                Introduction
-                            </a>
-                        </li>
-                        <li class="{{ menu == 'setup' ? 'active' }}">
-                            <a href="{{ baseUrl }}/doc/setup.html">
-                                Setup
-                            </a>
-                        </li>
-                        <li class="{{ menu == 'usage' ? 'active' }}">
-                            <a href="{{ baseUrl }}/doc/usage.html">
-                                Usage
-                            </a>
-                        </li>
-                        <li class="{{ menu == 'filtering' ? 'active' }}">
-                            <a href="{{ baseUrl }}/doc/filtering-queries.html">
-                                Filtering queries
-                            </a>
-                        </li>
-                    </ul>
+                        <ul class="nav nav-pills nav-stacked">
+                            <li class="{{ menu == 'introduction' ? 'active' }}">
+                                <a href="{{ baseUrl }}/">
+                                    Introduction
+                                </a>
+                            </li>
+                            <li class="{{ menu == 'setup' ? 'active' }}">
+                                <a href="{{ baseUrl }}/doc/setup.html">
+                                    Setup
+                                </a>
+                            </li>
+                            <li class="{{ menu == 'usage' ? 'active' }}">
+                                <a href="{{ baseUrl }}/doc/usage.html">
+                                    Usage
+                                </a>
+                            </li>
+                            <li class="{{ menu == 'filtering' ? 'active' }}">
+                                <a href="{{ baseUrl }}/doc/filtering-queries.html">
+                                    Filtering queries
+                                </a>
+                            </li>
+                        </ul>
 
-                    <p class="text-muted">
-                        Advanced topics
-                    </p>
+                        <p class="text-muted">
+                            Advanced topics
+                        </p>
 
-                    <ul class="nav nav-pills nav-stacked">
-                        <li class="{{ menu == 'actions' ? 'active' }}">
-                            <a href="{{ baseUrl }}/doc/actions.html">
-                                Actions
-                            </a>
-                        </li>
-                        <li class="{{ menu == 'cascading' ? 'active' }}">
-                            <a href="{{ baseUrl }}/doc/cascading.html">
-                                Authorization cascading
-                            </a>
-                        </li>
-                        <li class="{{ menu == 'performances' ? 'active' }}">
-                            <a href="{{ baseUrl }}/doc/performances.html">
-                                Performances
-                            </a>
-                        </li>
-                    </ul>
+                        <ul class="nav nav-pills nav-stacked">
+                            <li class="{{ menu == 'actions' ? 'active' }}">
+                                <a href="{{ baseUrl }}/doc/actions.html">
+                                    Actions
+                                </a>
+                            </li>
+                            <li class="{{ menu == 'cascading' ? 'active' }}">
+                                <a href="{{ baseUrl }}/doc/cascading.html">
+                                    Authorization cascading
+                                </a>
+                            </li>
+                            <li class="{{ menu == 'performances' ? 'active' }}">
+                                <a href="{{ baseUrl }}/doc/performances.html">
+                                    Performances
+                                </a>
+                            </li>
+                        </ul>
 
-                </nav>
+                    </nav>
 
-                <section class="col-sm-offset-3 col-lg-offset-2 col-sm-9 col-lg-10">
-                    {{ content|raw }}
-                </section>
+                    <section class="col-sm-offset-3 col-lg-offset-2 col-sm-9 col-lg-10">
+                        {{ content|raw }}
+                    </section>
 
+                </div>
             </div>
-        </div>
+        </main>
 
         <script src="//code.jquery.com/jquery-1.11.0.min.js"></script>
         <script src="//netdna.bootstrapcdn.com/bootstrap/3.1.1/js/bootstrap.min.js"></script>

@@ -2,6 +2,10 @@ body {
     font-size: 18px;
 }
 
+main {
+    margin-top: 90px;
+}
+
 section {
     margin-bottom: 50px;
 }
@@ -24,6 +28,9 @@ li {
     margin-bottom: 3px;
 }
 
+header.navbar {
+    opacity: 0.9;
+}
 .navbar .navbar-brand {
     font-size: 28px;
     height: auto;
