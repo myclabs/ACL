@@ -50,6 +50,7 @@ $articles = $qb->getQuery()->getResult();
 
 ### Features
 
+- stored in database (you don't need to handle persistence yourself)
 - extremely optimized:
   - filters queries at database level (you don't load entities the user can't access)
   - joins with only 1 extra table
@@ -159,6 +160,72 @@ $acl->allow(
     new ClassResource('My\Model\Article')
 );
 ```
+
+### Actions
+
+As you have seen in the previous examples, you can allow and test several actions on a resource.
+
+- `allow`
+
+When allowing access, you can allow the user to do several actions like so:
+
+```php
+$actions = new Actions();
+$actions->view = true;
+$actions->edit = true;
+
+$acl->allow($role, $actions, $resource);
+```
+
+The way shown in the examples above is a shortcut, sometimes more practical:
+
+```php
+$actions = new Actions([
+    Actions::VIEW,
+    Actions::EDIT,
+]);
+
+echo $actions->view; // true
+echo $actions->delete; // false
+```
+
+- `isAllowed`
+
+When testing access, you can only test for one action:
+
+```php
+$acl->isAllowed($user, Actions::EDIT, $resource);
+```
+
+Here is the list of all actions natively supported:
+
+```php
+class Actions
+{
+    const VIEW = 'view';
+    const CREATE = 'create';
+    const EDIT = 'edit';
+    const DELETE = 'delete';
+    const UNDELETE = 'undelete';
+    const ALLOW = 'allow';
+
+    public $view = false;
+    public $create = false;
+    public $edit = false;
+    public $delete = false;
+    public $undelete = false;
+    public $allow = false;
+
+    // ....
+}
+```
+
+You don't have to use them all if you don't need it.
+
+FYI, `ALLOW` means "the user is allowed to allow other users on this resource", i.e. it's the action
+of managing access on the resource. This is usually what an administrator does: he can configure the
+accesses on the resources he administrates.
+
 
 ## Setup
 
