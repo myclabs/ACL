@@ -1,0 +1,38 @@
+body {
+    font-size: 18px;
+}
+
+h1, h2, h3, h4 {
+    color: #df691a;
+}
+h3 {
+    font-size: 23px;
+}
+
+code {
+    font-size: 80%;
+    padding: 3px 4px;
+    margin: 0 4px;
+    border-radius: 2px;
+}
+
+li {
+    margin-bottom: 3px;
+}
+
+.navbar .navbar-brand {
+    font-size: 28px;
+    height: auto;
+    line-height: 50px;
+    margin-left: 20px;
+    color: #df691a;
+}
+.navbar a.navbar-brand:hover {
+    color: #df691a;
+}
+.navbar .navbar-brand small {
+    font-size: 18px;
+    font-weight: 300;
+    margin-left: 10px;
+    color: white;
+}

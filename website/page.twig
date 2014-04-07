@@ -1,0 +1,55 @@
+<!DOCTYPE html>
+<html lang="en">
+    <head>
+        <meta charset="utf-8">
+        <meta name="viewport" content="width=device-width, initial-scale=1">
+
+        <title>MyCLabs\ACL</title>
+
+        <link rel="stylesheet" href="{{ baseUrl }}/css/bootstrap.min.css">
+        <link rel="stylesheet" href="{{ baseUrl }}/css/highlight.github.css">
+        <link rel="stylesheet" href="{{ baseUrl }}/css/main.css">
+    </head>
+    <body>
+        <header class="navbar navbar-default">
+            <a class="navbar-brand" href="{{ baseUrl }}/">
+                MyCLabs\ACL
+                <small>Powerful and efficient access control.</small>
+            </a>
+        </header>
+
+        <div class="container-fluid">
+            <div class="row">
+                <nav class="col-sm-3 col-lg-2">
+                    <ul class="nav nav-pills nav-stacked">
+                        <li class="{{ menu == 'introduction' ? 'active' }}">
+                            <a href="{{ baseUrl }}/">
+                                Introduction
+                            </a>
+                        </li>
+                        <li class="{{ menu == 'actions' ? 'active' }}">
+                            <a href="{{ baseUrl }}/doc/actions">
+                                Actions
+                            </a>
+                        </li>
+                    </ul>
+                </nav>
+                <section class="col-sm-9 col-lg-10">
+                    {{ content|raw }}
+                </section>
+            </div>
+        </div>
+
+        <script src="//code.jquery.com/jquery-1.11.0.min.js"></script>
+        <script src="//netdna.bootstrapcdn.com/bootstrap/3.1.1/js/bootstrap.min.js"></script>
+        <script src="http://yandex.st/highlightjs/7.5/highlight.min.js"></script>
+
+        <script>
+            $(function() {
+                $("section>h1").wrap('<div class="page-header" />');
+                $("section>p:first-child").addClass('lead');
+                hljs.initHighlightingOnLoad();
+            });
+        </script>
+    </body>
+</html>
