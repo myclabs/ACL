@@ -95,8 +95,13 @@
 <li>all entities of a given type (example: all articles), which is represented by the classname of the entity</li>
 </ul>
 <h2>Overview</h2>
+<p>We hate being lost and confused, so everything you have to do with ACL is done on the ACL service.
+You can start by creating it:</p>
+<pre><code class="language-php">// full configuration shown in the documentation
+$acl = new ACL($entityManager);</code></pre>
 <p>You give permissions to a user by adding it a role:</p>
 <pre><code class="language-php">$acl-&gt;grant($user, new ArticleEditorRole($user, $article));</code></pre>
+<p>Roles are classes that you write and which define the permissions a user has on a resource.</p>
 <p>You remove permissions to a user by removing the role:</p>
 <pre><code class="language-php">$acl-&gt;unGrant($user, $role);</code></pre>
 <p>Test permissions:</p>
