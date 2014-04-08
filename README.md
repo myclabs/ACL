@@ -20,11 +20,21 @@ There are 2 kinds of resources:
 
 ## Overview
 
+We hate being lost and confused, so everything you have to do with ACL is done on the ACL service.
+You can start by creating it:
+
+```php
+// full configuration shown in the documentation
+$acl = new ACL($entityManager);
+```
+
 You give permissions to a user by adding it a role:
 
 ```php
 $acl->grant($user, new ArticleEditorRole($user, $article));
 ```
+
+Roles are classes that you write and which define the permissions a user has on a resource.
 
 You remove permissions to a user by removing the role:
 
