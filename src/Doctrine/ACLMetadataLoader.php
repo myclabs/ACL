@@ -37,7 +37,7 @@ class ACLMetadataLoader
     public function registerRoleClass($class, $shortName)
     {
         if (! is_subclass_of($class, 'MyCLabs\ACL\Model\Role')) {
-            throw new \InvalidArgumentException('The given class doesn\'t extend MyCLabs\ACL\Model\Role');
+            throw new \InvalidArgumentException(sprintf('%s doesn\'t extend MyCLabs\ACL\Model\Role', $class));
         }
 
         $this->roles[$shortName] = $class;

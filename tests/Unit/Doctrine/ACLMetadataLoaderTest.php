@@ -19,7 +19,7 @@ class ACLMetadataLoaderTest extends \PHPUnit_Framework_TestCase
 
     /**
      * @expectedException \InvalidArgumentException
-     * @expectedExceptionMessage The given class doesn't extend MyCLabs\ACL\Model\Role
+     * @expectedExceptionMessage foo doesn't extend MyCLabs\ACL\Model\Role
      */
     public function testRegisterInvalidRoleClass()
     {
