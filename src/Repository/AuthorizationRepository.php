@@ -52,11 +52,11 @@ class AuthorizationRepository extends EntityRepository
                 'parentAuthorization_id' => $parent ? $parent->getId() : null,
                 'entity_class'           => $authorization->getEntityClass(),
                 'entity_id'              => $authorization->getEntityId(),
-                'cascadable'             => $authorization->isCascadable(),
+                'cascadable'             => (int) $authorization->isCascadable(),
             ];
 
             foreach ($authorization->getActions()->toArray() as $action => $value) {
-                $data['actions_' . $action] = $value;
+                $data['actions_' . $action] = (int) $value;
             }
 
             $connection->insert($tableName, $data);
