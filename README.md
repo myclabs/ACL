@@ -4,7 +4,22 @@ menu: introduction
 
 [![Build Status](https://travis-ci.org/myclabs/ACL.png?branch=master)](https://travis-ci.org/myclabs/ACL) [![Coverage Status](https://coveralls.io/repos/myclabs/ACL/badge.png)](https://coveralls.io/r/myclabs/ACL) [![Scrutinizer Code Quality](https://scrutinizer-ci.com/g/myclabs/ACL/badges/quality-score.png?s=2997ec4cb570c1cfef520d541daac853527d173e)](https://scrutinizer-ci.com/g/myclabs/ACL/) [![Latest Stable Version](https://poser.pugx.org/myclabs/acl/v/stable.png)](https://packagist.org/packages/myclabs/acl) [![Total Downloads](https://poser.pugx.org/myclabs/acl/downloads.png)](https://packagist.org/packages/myclabs/acl) [![License](https://poser.pugx.org/myclabs/acl/license.png)](https://packagist.org/packages/myclabs/acl)
 
-MyCLabs ACL is a library that helps managing permissions on resources.
+**MyCLabs ACL is a library that helps managing permissions on your model.**
+
+It is different from other ACL libraries in that it focuses on controlling access to your model classes
+(Doctrine entities). As such, you access control model follows your real model, which makes it possible
+to have access in cascade easily (e.g. if you can access a category, you can also access all
+the sub-categories it contains).
+
+It is also optimized as much as possible: authorizations are stored in database in a way to
+allow very efficient filtering at the SQL level through Doctrine queries
+(you can load only the objects a user can access). No other ACL system that we know of allows this.
+
+Requirements:
+
+- PHP 5.4
+- Use Doctrine as the ORM for your model
+- Doctrine 2.5 (currently in beta)
 
 Vocabulary:
 
@@ -66,6 +81,7 @@ $articles = $qb->getQuery()->getResult();
 - extremely optimized:
   - filters queries at database level (you don't load entities the user can't access)
   - joins with only 1 extra table
+  - bypasses Doctrine's ORM to insert authorizations in database (fast and efficient)
 - authorization cascading/inheritance
 - authorizations are rebuildable: you can change what an "ArticleEditor" can do afterwards and just rebuild the ACL
 - supports your custom actions on top of standard actions like "view", "edit", "delete", …
