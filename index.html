@@ -89,7 +89,20 @@
 
                     <section class="col-sm-offset-3 col-lg-offset-2 col-sm-9 col-lg-10">
                         <p><a href="https://travis-ci.org/myclabs/ACL"><img alt="Build Status" src="https://travis-ci.org/myclabs/ACL.png?branch=master" /></a> <a href="https://coveralls.io/r/myclabs/ACL"><img alt="Coverage Status" src="https://coveralls.io/repos/myclabs/ACL/badge.png" /></a> <a href="https://scrutinizer-ci.com/g/myclabs/ACL/"><img alt="Scrutinizer Code Quality" src="https://scrutinizer-ci.com/g/myclabs/ACL/badges/quality-score.png?s=2997ec4cb570c1cfef520d541daac853527d173e" /></a> <a href="https://packagist.org/packages/myclabs/acl"><img alt="Latest Stable Version" src="https://poser.pugx.org/myclabs/acl/v/stable.png" /></a> <a href="https://packagist.org/packages/myclabs/acl"><img alt="Total Downloads" src="https://poser.pugx.org/myclabs/acl/downloads.png" /></a> <a href="https://packagist.org/packages/myclabs/acl"><img alt="License" src="https://poser.pugx.org/myclabs/acl/license.png" /></a></p>
-<p>MyCLabs ACL is a library that helps managing permissions on resources.</p>
+<p><strong>MyCLabs ACL is a library that helps managing permissions on your model.</strong></p>
+<p>It is different from other ACL libraries in that it focuses on controlling access to your model classes
+(Doctrine entities). As such, you access control model follows your real model, which makes it possible
+to have access in cascade easily (e.g. if you can access a category, you can also access all
+the sub-categories it contains).</p>
+<p>It is also optimized as much as possible: authorizations are stored in database in a way to
+allow very efficient filtering at the SQL level through Doctrine queries
+(you can load only the objects a user can access). No other ACL system that we know of allows this.</p>
+<p>Requirements:</p>
+<ul>
+<li>PHP 5.4</li>
+<li>Use Doctrine as the ORM for your model</li>
+<li>Doctrine 2.5 (currently in beta)</li>
+</ul>
 <p>Vocabulary:</p>
 <ul>
 <li><strong>Security identity</strong>: the entity which will be granted some access (this is generally the user)</li>
@@ -129,6 +142,7 @@ $articles = $qb-&gt;getQuery()-&gt;getResult();</code></pre>
 <ul>
 <li>filters queries at database level (you don't load entities the user can't access)</li>
 <li>joins with only 1 extra table</li>
+<li>bypasses Doctrine's ORM to insert authorizations in database (fast and efficient)</li>
 </ul>
 </li>
 <li>authorization cascading/inheritance</li>
