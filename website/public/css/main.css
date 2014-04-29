@@ -17,13 +17,6 @@ h3 {
     font-size: 23px;
 }
 
-code {
-    font-size: 85%;
-    padding: 4px 4px 1px;
-    margin: 0 4px;
-    border-radius: 2px;
-}
-
 li {
     margin-bottom: 3px;
 }
@@ -80,5 +73,15 @@ pre {
 }
 pre code {
     border: none;
+    background-color: #1D2B3A;
+}
+
+code {
+    font-size: 85%;
+    padding: 4px 4px 1px;
+    margin: 0 4px;
+    border-radius: 3px;
+    color: #c5c8c6;
+    border: solid 1px #3D5166;
     background-color: #1D2B3A;
 }
