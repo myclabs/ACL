@@ -66,6 +66,11 @@ header.navbar {
     margin-top: 0;
 }
 
+#sidebar .github-star {
+    margin-top: 20px;
+    margin-left: 50px;
+}
+
 pre {
     padding: 0;
     border-color: #3D5166;
