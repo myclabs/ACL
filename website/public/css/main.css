@@ -1,5 +1,5 @@
 body {
-    font-size: 18px;
+    font-size: 19px;
 }
 
 main {
@@ -53,7 +53,27 @@ header.navbar {
         position:fixed;
     }
 }
+@media (max-width: 960px) {
+    body {
+        font-size: 17px;
+    }
+    pre {
+        font-size: 12px;
+    }
+}
 
 .page-header {
     margin-top: 0;
+}
+
+pre {
+    padding: 0;
+    border-color: #3D5166;
+    background-color: #1D2B3A;
+    border-radius: 4px;
+    margin: 15px;
+}
+pre code {
+    border: none;
+    background-color: #1D2B3A;
 }
