@@ -82,6 +82,7 @@ $articles = $qb->getQuery()->getResult();
   - filters queries at database level (you don't load entities the user can't access)
   - joins with only 1 extra table
   - bypasses Doctrine's ORM to insert authorizations in database (fast and efficient)
+  - cascade delete at database level
 - authorization cascading/inheritance
 - authorizations are rebuildable: you can change what an "ArticleEditor" can do afterwards and just rebuild the ACL
 - supports your custom actions on top of standard actions like "view", "edit", "delete", …
