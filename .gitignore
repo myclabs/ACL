@@ -1,2 +1,3 @@
-vendor/*
+.couscous/
+vendor/
 composer.phar
