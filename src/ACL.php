@@ -121,13 +121,22 @@ class ACL
      * @param SecurityIdentityInterface $identity
      * @param Role                      $role
      */
-    public function unGrant(SecurityIdentityInterface $identity, Role $role)
+    public function revoke(SecurityIdentityInterface $identity, Role $role)
     {
         $identity->removeRole($role);
         $this->entityManager->remove($role);
 
         // Authorizations are deleted in cascade in database
         $this->entityManager->flush($role);
+    }
+
+    /**
+     * @deprecated Deprecated in favor of revoke(). Will be removed in next major version.
+     * @see revoke()
+     */
+    public function unGrant(SecurityIdentityInterface $identity, Role $role)
+    {
+        $this->revoke($identity, $role);
     }
 
     /**

@@ -54,7 +54,7 @@ Roles are classes that you write and which define the permissions a user has on 
 You remove permissions to a user by removing the role:
 
 ```php
-$acl->unGrant($user, $role);
+$acl->revoke($user, $role);
 ```
 
 Test permissions:
