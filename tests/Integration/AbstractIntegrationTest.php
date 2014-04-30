@@ -52,6 +52,9 @@ abstract class AbstractIntegrationTest extends \PHPUnit_Framework_TestCase
             return $this->acl;
         });
 
+        // Necessary so that SQLite supports CASCADE DELETE
+        $this->em->getConnection()->executeQuery('PRAGMA foreign_keys = ON');
+
         // Create the DB
         $tool = new SchemaTool($this->em);
         $tool->createSchema($this->em->getMetadataFactory()->getAllMetadata());
