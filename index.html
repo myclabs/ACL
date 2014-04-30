@@ -143,6 +143,7 @@ $articles = $qb-&gt;getQuery()-&gt;getResult();</code></pre>
 <li>filters queries at database level (you don't load entities the user can't access)</li>
 <li>joins with only 1 extra table</li>
 <li>bypasses Doctrine's ORM to insert authorizations in database (fast and efficient)</li>
+<li>cascade delete at database level</li>
 </ul>
 </li>
 <li>authorization cascading/inheritance</li>
