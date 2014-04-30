@@ -64,3 +64,19 @@ $aclSetup->setUpEntityManager($entityManager, $aclLocator);
 
 These listeners handle different things, like registering your role and user classes, and registering
 a listener that will act when new resources/entities are created (to cascade authorizations).
+
+
+## Cascade delete
+
+To be as efficient as possible, MyCLabs\ACL uses `ON DELETE CASCADE` at database level.
+
+For example, when a role is removed, all of its authorizations will be deleted in cascade by MySQL/SQLite/…
+That allows to bypass using Doctrine's "cascade remove" which loads all the entities in memory (there could
+be thousands of authorizations).
+
+However this means **your database must support CASCADE operations**. MySQL and PostgreSQL support it,
+but SQLite usually [needs a configuration step](http://www.sqlite.org/foreignkeys.html#fk_enable):
+
+```php
+$entityManager->getConnection()->executeQuery('PRAGMA foreign_keys = ON');
+```
