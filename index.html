@@ -124,7 +124,7 @@ $acl = new ACL($entityManager);</code></pre>
 <pre><code class="language-php">$acl-&gt;grant($user, new ArticleEditorRole($user, $article));</code></pre>
 <p>Roles are classes that you write and which define the permissions a user has on a resource.</p>
 <p>You remove permissions to a user by removing the role:</p>
-<pre><code class="language-php">$acl-&gt;unGrant($user, $role);</code></pre>
+<pre><code class="language-php">$acl-&gt;revoke($user, $role);</code></pre>
 <p>Test permissions:</p>
 <pre><code class="language-php">$acl-&gt;isAllowed($user, Actions::EDIT, $article);</code></pre>
 <p>You can also filter your queries to get only the entities the user has access to:</p>

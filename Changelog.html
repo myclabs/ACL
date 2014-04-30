@@ -41,7 +41,7 @@
                                     Introduction
                                 </a>
                             </li>
-                            <li class="active">
+                            <li class="">
                                 <a href="http://myclabs.github.io/ACL/doc/setup.html">
                                     Setup
                                 </a>
@@ -88,57 +88,13 @@
                     </nav>
 
                     <section class="col-sm-offset-3 col-lg-offset-2 col-sm-9 col-lg-10">
-                        <h1>Setup</h1>
-<h2>Installation</h2>
-<p>Install the library with Composer:</p>
-<pre><code class="language-json">{
-    "require": {
-        "myclabs/acl": "*"
-    }
-}</code></pre>
-<h2>Configuration</h2>
-<p>You first need to register the annotation mapping to your Doctrine metadata driver.
-Here is for example how you would do it with the most basic Doctrine configuration:</p>
-<pre><code class="language-php">$paths = [
-    // Your model classes
-    __DIR__ . '/../src/My/Model',
-
-    // MyCLabs ACL model classes (adjust the directory)
-    __DIR__ . '/../vendor/myclabs/acl/src/Model',
-];
-
-// Doctrine configuration
-$config = Setup::createAnnotationMetadataConfiguration($paths);
-$em = EntityManager::create($dbParams, $config);</code></pre>
-<p>Creating the ACL object is simple:</p>
-<pre><code class="language-php">$acl = new ACL($entityManager);</code></pre>
-<p>However, you must separately register some listeners on the entity manager.
-The <code>ACLSetup</code> class is here to help you:</p>
-<pre><code class="language-php">$aclSetup = new \MyCLabs\ACL\Doctrine\ACLSetup();
-// Set which class implements the SecurityIdentityInterface (must be called once)
-$aclSetup-&gt;setSecurityIdentityClass('My\Model\User')
-// Register role classes
-$aclSetup-&gt;registerRoleClass('My\Model\ArticleEditorRole', 'articleEditor');
-
-// To avoid instantiating the ACL uselessly (and avoid a circular dependency),
-// we must use a "locator" callback
-$aclLocator = function () {
-    // If you don't use a container, just return the $acl variable
-    return $container-&gt;get('MyCLabs\ACL\ACL');
-};
-
-// Apply the configuration to the entity manager
-$aclSetup-&gt;setUpEntityManager($entityManager, $aclLocator);</code></pre>
-<p>These listeners handle different things, like registering your role and user classes, and registering
-a listener that will act when new resources/entities are created (to cascade authorizations).</p>
-<h2>Cascade delete</h2>
-<p>To be as efficient as possible, MyCLabs\ACL uses <code>ON DELETE CASCADE</code> at database level.</p>
-<p>For example, when a role is removed, all of its authorizations will be deleted in cascade by MySQL/SQLite/…
-That allows to bypass using Doctrine's "cascade remove" which loads all the entities in memory (there could
-be thousands of authorizations).</p>
-<p>However this means <strong>your database must support CASCADE operations</strong>. MySQL and PostgreSQL support it,
-but SQLite usually <a href="http://www.sqlite.org/foreignkeys.html#fk_enable">needs a configuration step</a>:</p>
-<pre><code class="language-php">$entityManager-&gt;getConnection()-&gt;executeQuery('PRAGMA foreign_keys = ON');</code></pre>
+                        <h1>Change log</h1>
+<h2>1.1.0</h2>
+<ul>
+<li><code>ACL::unGrant()</code> is deprecated in favor of the new <code>ACL::revoke()</code> method. <code>unGrant()</code> will be removed eventually.</li>
+</ul>
+<h2>1.0.0</h2>
+<p>First stable release.</p>
                     </section>
 
                 </div>
