@@ -3,6 +3,8 @@
 namespace Tests\MyCLabs\ACL\Integration;
 
 use Doctrine\Common\Cache\ArrayCache;
+use Doctrine\DBAL\Connection;
+use Doctrine\DBAL\DriverManager;
 use Doctrine\DBAL\Schema\Schema;
 use Doctrine\ORM\EntityManager;
 use Doctrine\ORM\Tools\SchemaTool;
@@ -24,12 +26,16 @@ abstract class AbstractIntegrationTest extends \PHPUnit_Framework_TestCase
 
     public function setUp()
     {
+        $dbParams = $this->getDBParams();
+
+        // Create the DB
+        $this->dropAndCreateDB(DriverManager::getConnection($dbParams));
+
         // Create the entity manager
         $paths = [
             __DIR__ . '/../../src/Model',
             __DIR__ . '/Model',
         ];
-        $dbParams = $this->getDBParams();
         $config = Setup::createAnnotationMetadataConfiguration($paths, true, null, new ArrayCache(), false);
         $this->em = EntityManager::create($dbParams, $config);
 
@@ -40,8 +46,9 @@ abstract class AbstractIntegrationTest extends \PHPUnit_Framework_TestCase
             return $this->acl;
         });
 
-        // Create the DB
-        $this->buildSchema();
+        // Create the schema
+        $tool = new SchemaTool($this->em);
+        $tool->createSchema($this->em->getMetadataFactory()->getAllMetadata());
 
         // Necessary so that SQLite supports CASCADE DELETE
         if ($dbParams['driver'] == 'pdo_sqlite') {
@@ -91,10 +98,8 @@ abstract class AbstractIntegrationTest extends \PHPUnit_Framework_TestCase
         return $dbParams;
     }
 
-    private function buildSchema()
+    private function dropAndCreateDB(Connection $connection)
     {
-        $connection = $this->em->getConnection();
-
         // Drop and recreate the database
         if ($connection->getDatabasePlatform()->supportsCreateDropDatabase()) {
             $dbname = $connection->getDatabase();
@@ -114,9 +119,5 @@ abstract class AbstractIntegrationTest extends \PHPUnit_Framework_TestCase
                 $connection->exec($stmt);
             }
         }
-
-        // Create the tables and all
-        $tool = new SchemaTool($this->em);
-        $tool->createSchema($this->em->getMetadataFactory()->getAllMetadata());
     }
 }
