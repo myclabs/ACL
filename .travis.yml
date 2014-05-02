@@ -14,6 +14,7 @@ env:
 matrix:
   allow_failures:
     - env: DB=pgsql
+    - php: hhvm
   exclude:
     - php: hhvm
       env: DB=pgsql # driver currently unsupported by HHVM
