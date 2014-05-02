@@ -1,0 +1,15 @@
+<?xml version="1.0" encoding="utf-8"?>
+<phpunit bootstrap="../../vendor/autoload.php">
+    <php>
+        <var name="db_type" value="pdo_mysql" />
+        <var name="db_username" value="travis" />
+        <var name="db_password" value="" />
+        <var name="db_name" value="acl_tests" />
+    </php>
+
+    <testsuites>
+        <testsuite name="Test suite">
+            <directory>tests</directory>
+        </testsuite>
+    </testsuites>
+</phpunit>

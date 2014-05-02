@@ -27,10 +27,7 @@ abstract class AbstractIntegrationTest extends \PHPUnit_Framework_TestCase
             __DIR__ . '/../../src/Model',
             __DIR__ . '/Model',
         ];
-        $dbParams = [
-            'driver' => 'pdo_sqlite',
-            'memory' => true,
-        ];
+        $dbParams = $this->getDBParams();
 
         $setup = new ACLSetup();
         $setup->setSecurityIdentityClass('Tests\MyCLabs\ACL\Integration\Model\User');
@@ -53,10 +50,35 @@ abstract class AbstractIntegrationTest extends \PHPUnit_Framework_TestCase
         });
 
         // Necessary so that SQLite supports CASCADE DELETE
-        $this->em->getConnection()->executeQuery('PRAGMA foreign_keys = ON');
+        if ($dbParams['driver'] == 'pdo_sqlite') {
+            $this->em->getConnection()->executeQuery('PRAGMA foreign_keys = ON');
+        }
 
         // Create the DB
         $tool = new SchemaTool($this->em);
         $tool->createSchema($this->em->getMetadataFactory()->getAllMetadata());
+    }
+
+    private function getDBParams()
+    {
+        $dbParams = [
+            'driver' => 'pdo_sqlite',
+            'memory' => true,
+        ];
+
+        if (isset($GLOBALS['db_type'])) {
+            $dbParams['driver'] = $GLOBALS['db_type'];
+        }
+        if (isset($GLOBALS['db_username'])) {
+            $dbParams['user'] = $GLOBALS['db_username'];
+        }
+        if (isset($GLOBALS['db_password'])) {
+            $dbParams['password'] = $GLOBALS['db_password'];
+        }
+        if (isset($GLOBALS['db_name'])) {
+            $dbParams['dbname'] = $GLOBALS['db_name'];
+        }
+
+        return $dbParams;
     }
 }
