@@ -108,29 +108,33 @@ Here is for example how you would do it with the most basic Doctrine configurati
 ];
 
 // Doctrine configuration
-$config = Setup::createAnnotationMetadataConfiguration($paths);
+$config = Setup::createConfiguration($isDevMode);
+// Myclabs/ACL uses namespaces annotations
+$config-&gt;setMetadataDriverImpl($config-&gt;newDefaultAnnotationDriver($paths, false));
 $em = EntityManager::create($dbParams, $config);</code></pre>
 <p>Creating the ACL object is simple:</p>
 <pre><code class="language-php">$acl = new ACL($entityManager);</code></pre>
-<p>However, you must separately register some listeners on the entity manager.
+<p>Note that you'll need to define a SecurityIdentity class, usually a user class
+(you can see an example in the <a href="usage.html">Usage section</a>).</p>
+<p>Then, you must separately register some listeners on the entity manager.
 The <code>ACLSetup</code> class is here to help you:</p>
 <pre><code class="language-php">$aclSetup = new \MyCLabs\ACL\Doctrine\ACLSetup();
 // Set which class implements the SecurityIdentityInterface (must be called once)
-$aclSetup-&gt;setSecurityIdentityClass('My\Model\User')
+$aclSetup-&gt;setSecurityIdentityClass('My\Model\User');
 // Register role classes
 $aclSetup-&gt;registerRoleClass('My\Model\ArticleEditorRole', 'articleEditor');
 
-// To avoid instantiating the ACL uselessly (and avoid a circular dependency),
-// we must use a "locator" callback
-$aclLocator = function () {
-    // If you don't use a container, just return the $acl variable
+// Apply the configuration to the entity manager
+$aclSetup-&gt;setUpEntityManager($entityManager, function () use ($acl) { return $acl; });</code></pre>
+<p>These listeners handle different things, like registering your role and user classes, and registering
+a listener that will act when new resources/entities are created (to cascade authorizations).</p>
+<h2>Using a container</h2>
+<p>You can also use a container to avoid instantiating the ACL uselessly (and avoid a circular dependency):</p>
+<pre><code class="language-php">$aclLocator = function () {
     return $container-&gt;get('MyCLabs\ACL\ACL');
 };
 
-// Apply the configuration to the entity manager
 $aclSetup-&gt;setUpEntityManager($entityManager, $aclLocator);</code></pre>
-<p>These listeners handle different things, like registering your role and user classes, and registering
-a listener that will act when new resources/entities are created (to cascade authorizations).</p>
 <h2>Cascade delete</h2>
 <p>To be as efficient as possible, MyCLabs\ACL uses <code>ON DELETE CASCADE</code> at database level.</p>
 <p>For example, when a role is removed, all of its authorizations will be deleted in cascade by MySQL/SQLite/…

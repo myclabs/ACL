@@ -170,12 +170,12 @@ might want to have an abstract <code>BaseArticleRole</code> that you can referen
 <p>The role gives the authorizations.</p>
 <p>To create a new role, extend the <code>MyCLabs\ACL\Model\Role</code> abstract class:</p>
 <pre><code class="language-php">/**
- * @Entity(readOnly=true)
+ * @ORM\Entity(readOnly=true)
  */
 class ArticleEditorRole extends Role
 {
     /**
-     * @ManyToOne(targetEntity="Article", inversedBy="roles")
+     * @ORM\ManyToOne(targetEntity="Article", inversedBy="roles")
      */
     protected $article;
 
@@ -205,7 +205,7 @@ class ArticleEditorRole extends Role
 <p>The resource can be either an entity instance (as shown above) or an entity classname, which will
 give access to all entities of that type:</p>
 <pre><code class="language-php">/**
- * @Entity(readOnly=true)
+ * @ORM\Entity(readOnly=true)
  */
 class AdministratorRole extends Role
 {

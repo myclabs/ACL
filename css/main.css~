@@ -65,7 +65,7 @@ header.navbar {
 }
 
 #sidebar .text-muted {
-    color: #859AAF;
+  color: #667C92;
 }
 
 pre {
