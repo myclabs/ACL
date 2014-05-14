@@ -31,7 +31,9 @@ $paths = [
 ];
 
 // Doctrine configuration
-$config = Setup::createAnnotationMetadataConfiguration($paths);
+$config = Setup::createConfiguration($isDevMode);
+// Myclabs/ACL uses namespaces annotations
+$config->setMetadataDriverImpl($config->newDefaultAnnotationDriver($paths, false));
 $em = EntityManager::create($dbParams, $config);
 ```
 
@@ -41,30 +43,37 @@ Creating the ACL object is simple:
 $acl = new ACL($entityManager);
 ```
 
-However, you must separately register some listeners on the entity manager.
+Note that you'll need to define a SecurityIdentity class, usually a user class
+(you can see an example in the [Usage section](usage.md)).
+
+Then, you must separately register some listeners on the entity manager.
 The `ACLSetup` class is here to help you:
 
 ```php
 $aclSetup = new \MyCLabs\ACL\Doctrine\ACLSetup();
 // Set which class implements the SecurityIdentityInterface (must be called once)
-$aclSetup->setSecurityIdentityClass('My\Model\User')
+$aclSetup->setSecurityIdentityClass('My\Model\User');
 // Register role classes
 $aclSetup->registerRoleClass('My\Model\ArticleEditorRole', 'articleEditor');
 
-// To avoid instantiating the ACL uselessly (and avoid a circular dependency),
-// we must use a "locator" callback
-$aclLocator = function () {
-    // If you don't use a container, just return the $acl variable
-    return $container->get('MyCLabs\ACL\ACL');
-};
-
 // Apply the configuration to the entity manager
-$aclSetup->setUpEntityManager($entityManager, $aclLocator);
+$aclSetup->setUpEntityManager($entityManager, function () use ($acl) { return $acl; });
 ```
 
 These listeners handle different things, like registering your role and user classes, and registering
 a listener that will act when new resources/entities are created (to cascade authorizations).
 
+## Using a container
+
+You can also use a container to avoid instantiating the ACL uselessly (and avoid a circular dependency):
+
+```php
+$aclLocator = function () {
+    return $container->get('MyCLabs\ACL\ACL');
+};
+
+$aclSetup->setUpEntityManager($entityManager, $aclLocator);
+```
 
 ## Cascade delete
 

@@ -112,12 +112,12 @@ To create a new role, extend the `MyCLabs\ACL\Model\Role` abstract class:
 
 ```php
 /**
- * @Entity(readOnly=true)
+ * @ORM\Entity(readOnly=true)
  */
 class ArticleEditorRole extends Role
 {
     /**
-     * @ManyToOne(targetEntity="Article", inversedBy="roles")
+     * @ORM\ManyToOne(targetEntity="Article", inversedBy="roles")
      */
     protected $article;
 
@@ -152,7 +152,7 @@ give access to all entities of that type:
 
 ```php
 /**
- * @Entity(readOnly=true)
+ * @ORM\Entity(readOnly=true)
  */
 class AdministratorRole extends Role
 {

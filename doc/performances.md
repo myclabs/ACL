@@ -12,8 +12,8 @@ You shouldn't call `isAllowed()` a lot, if you do try instead to filter your que
 this is much more efficient. However, if you do, you might want to cache the results of those calls in order
 to avoid doing too many queries.
 
-MyCLabs\ACL doesn't ship with a cache for now because there are some problems associated to it, mainly
-cache invalidation when ACLs changes. However this can change, you are free to file an issue for this.
+MyCLabs\ACL doesn't ship with a cache for now mainly because of cache invalidation when ACLs changes.
+However this can change, you are free to add an issue about it.
 
 Be aware that using a cache for this is not mandatory. If your application doesn't handle a lot of traffic
 the ACL system will work just fine (the isAllowed query is very simple and optimized).

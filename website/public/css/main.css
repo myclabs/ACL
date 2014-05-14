@@ -64,6 +64,10 @@ header.navbar {
     margin-left: 50px;
 }
 
+#sidebar .text-muted {
+    color: #859AAF;
+}
+
 pre {
     padding: 0;
     border-color: #3D5166;
