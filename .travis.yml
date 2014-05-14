@@ -15,6 +15,7 @@ matrix:
   allow_failures:
     - env: DB=pgsql
     - php: hhvm
+      env: DB=sqlite
   exclude:
     - php: hhvm
       env: DB=pgsql # driver currently unsupported by HHVM
