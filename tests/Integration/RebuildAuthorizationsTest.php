@@ -23,7 +23,7 @@ class RebuildAuthorizationTest extends AbstractIntegrationTest
         $this->em->persist($user);
         $this->em->flush();
 
-        $this->acl->grant($user, new ArticleEditorRole($user, $article2));
+        $this->acl->grant($user, 'articleEditor', $article2);
 
         $this->em->clear();
 

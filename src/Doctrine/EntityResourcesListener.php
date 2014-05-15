@@ -3,6 +3,7 @@
 namespace MyCLabs\ACL\Doctrine;
 
 use Doctrine\Common\EventSubscriber;
+use Doctrine\ORM\Event\LifecycleEventArgs;
 use Doctrine\ORM\Event\OnFlushEventArgs;
 use Doctrine\ORM\Events;
 use MyCLabs\ACL\ACL;
@@ -47,6 +48,7 @@ class EntityResourcesListener implements EventSubscriber
         return [
             Events::onFlush,
             Events::postFlush,
+            Events::postRemove
         ];
     }
 
@@ -72,6 +74,20 @@ class EntityResourcesListener implements EventSubscriber
         }
 
         $this->newResources = [];
+    }
+
+    public function postRemove(LifecycleEventArgs $eventArgs)
+    {
+        $entity = $eventArgs->getEntity();
+        $em = $eventArgs->getEntityManager();
+
+        $roleRepo = $em->getRepository('MyCLabs\ACL\Model\Role');
+
+        $roles = $roleRepo->findBy(['resourceId' => $entity->getId()]);
+
+        foreach ($roles as $role) {
+            $em->remove($role);
+        }
     }
 
     private function getACL()

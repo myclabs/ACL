@@ -10,6 +10,7 @@ use MyCLabs\ACL\ACL;
 use MyCLabs\ACL\Doctrine\ACLSetup;
 use MyCLabs\ACL\Model\Actions;
 use MyCLabs\ACL\Model\Authorization;
+use MyCLabs\ACL\Model\Role;
 use MyCLabs\ACL\Repository\AuthorizationRepository;
 use Tests\MyCLabs\ACL\Unit\Repository\Model\File;
 use Tests\MyCLabs\ACL\Unit\Repository\Model\FileOwnerRole;
@@ -43,13 +44,20 @@ class AuthorizationRepositoryTest extends \PHPUnit_Framework_TestCase
 
         $setup = new ACLSetup();
         $setup->setSecurityIdentityClass('Tests\MyCLabs\ACL\Unit\Repository\Model\User');
-        $setup->registerRoleClass('Tests\MyCLabs\ACL\Unit\Repository\Model\FileOwnerRole', 'fileOwner');
+        $roles = [
+            'fileOwner' => [
+                'resource' => 'Tests\MyCLabs\ACL\Unit\Repository\Model\File',
+                'actions' => new Actions([Actions::VIEW, Actions::EDIT])
+            ]
+        ];
 
         // Create the entity manager
         $config = Setup::createAnnotationMetadataConfiguration($paths, true, null, new ArrayCache(), false);
         $this->em = EntityManager::create($dbParams, $config);
 
         $this->acl = new ACL($this->em);
+
+        $setup->registerRoles($roles, $this->acl);
 
         $setup->setUpEntityManager($this->em, function () {
             return $this->acl;
@@ -66,7 +74,7 @@ class AuthorizationRepositoryTest extends \PHPUnit_Framework_TestCase
         $this->em->persist($user);
         $resource = new File();
         $this->em->persist($resource);
-        $role = new FileOwnerRole($user, $resource);
+        $role = new Role($user, 'fileOwner', $resource);
         $this->em->persist($role);
 
         $this->em->flush();

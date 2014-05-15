@@ -21,17 +21,6 @@ class Article implements EntityResource, CascadingResource
      */
     protected $id;
 
-    /**
-     * @var ArticleEditorRole[]|Collection
-     * @ORM\OneToMany(targetEntity="ArticleEditorRole", mappedBy="article", cascade={"remove"})
-     */
-    protected $roles;
-
-    public function __construct()
-    {
-        $this->roles = new ArrayCollection();
-    }
-
     public function getId()
     {
         return $this->id;

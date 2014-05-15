@@ -11,13 +11,10 @@ use MyCLabs\ACL\ACL;
  * Role.
  *
  * @ORM\Entity
- * @ORM\InheritanceType("JOINED")
- * @ORM\DiscriminatorColumn(name="type", type="string")
  * @ORM\Table(name="ACL_Role")
  *
- * @author Matthieu Napoli <matthieu@mnapoli.fr>
  */
-abstract class Role
+class Role
 {
     /**
      * @var int
@@ -38,17 +35,41 @@ abstract class Role
      */
     protected $authorizations;
 
-    public function __construct(SecurityIdentityInterface $identity)
+    /**
+     * @ORM\Column(type="integer", nullable=true)
+     **/
+    protected $resourceId;
+
+    /**
+     * @var string
+     * @ORM\Column(type="string")
+     */
+    protected $name;
+
+    public function __construct(SecurityIdentityInterface $identity, $name, ResourceInterface $resource)
     {
         $this->authorizations = new ArrayCollection();
         $this->securityIdentity = $identity;
+        if ($resource instanceof EntityResource) {
+            $this->resourceId = $resource->getId();
+        }
+        $this->name = $name;
     }
 
     /**
      * @param ACL $acl
+     * @param $actions
+     * @param $resource
      * @return Authorization[]
      */
-    abstract public function createAuthorizations(ACL $acl);
+    public function createAuthorizations(ACL $acl, $actions, $resource)
+    {
+        $acl->allow(
+            $this,
+            $actions,
+            $resource
+        );
+    }
 
     /**
      * @return int
@@ -64,5 +85,21 @@ abstract class Role
     public function getSecurityIdentity()
     {
         return $this->securityIdentity;
+    }
+
+    /**
+     * @return string
+     */
+    public function getName()
+    {
+        return $this->name;
+    }
+
+    /**
+     * @return mixed
+     */
+    public function getResourceId()
+    {
+        return $this->resourceId;
     }
 }

@@ -88,10 +88,10 @@ class Authorization
     /**
      * Creates an authorization on a resource.
      *
-     * @param Role              $role
-     * @param Actions           $actions
+     * @param role $role
+     * @param Actions $actions
      * @param ResourceInterface $resource
-     * @param bool              $cascade  Should this authorization cascade?
+     * @param bool $cascade Should this authorization cascade?
      * @throws \RuntimeException
      * @return static
      */

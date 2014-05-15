@@ -24,7 +24,7 @@ class CustomActionsTest extends AbstractIntegrationTest
 
         $this->em->flush();
 
-        $this->acl->grant($user, new ArticlePublisherRole($user, $article2));
+        $this->acl->grant($user, 'articlePublisher', $article2);
 
         $this->assertFalse($this->acl->isAllowed($user, Actions::VIEW, $article1));
         $this->assertFalse($this->acl->isAllowed($user, Actions::PUBLISH, $article1));

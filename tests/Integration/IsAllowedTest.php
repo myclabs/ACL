@@ -24,7 +24,7 @@ class IsAllowedTest extends AbstractIntegrationTest
 
         $this->em->flush();
 
-        $this->acl->grant($user, new ArticleEditorRole($user, $article2));
+        $this->acl->grant($user, 'articleEditor', $article2);
 
         $this->assertFalse($this->acl->isAllowed($user, Actions::VIEW, $article1));
         $this->assertFalse($this->acl->isAllowed($user, Actions::EDIT, $article1));

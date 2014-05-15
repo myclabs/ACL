@@ -11,6 +11,8 @@ use Doctrine\ORM\Tools\SchemaTool;
 use Doctrine\ORM\Tools\Setup;
 use MyCLabs\ACL\ACL;
 use MyCLabs\ACL\Doctrine\ACLSetup;
+use MyCLabs\ACL\Model\ClassResource;
+use Tests\MyCLabs\ACL\Integration\Model\Actions;
 
 abstract class AbstractIntegrationTest extends \PHPUnit_Framework_TestCase
 {
@@ -61,10 +63,26 @@ abstract class AbstractIntegrationTest extends \PHPUnit_Framework_TestCase
         $setup = new ACLSetup();
         $setup->setSecurityIdentityClass('Tests\MyCLabs\ACL\Integration\Model\User');
 
-        $setup->registerRoleClass('Tests\MyCLabs\ACL\Integration\Model\ArticleEditorRole', 'articleEditor');
-        $setup->registerRoleClass('Tests\MyCLabs\ACL\Integration\Model\AllArticlesEditorRole', 'allArticlesEditor');
-        $setup->registerRoleClass('Tests\MyCLabs\ACL\Integration\Model\ArticlePublisherRole', 'articlePublisher');
-        $setup->registerRoleClass('Tests\MyCLabs\ACL\Integration\Model\CategoryManagerRole', 'categoryManager');
+        $roles = [
+            'articleEditor' => [
+                'resource' => 'Tests\MyCLabs\ACL\Integration\Model\Article',
+                'actions' => new Actions([Actions::VIEW, Actions::EDIT])
+            ],
+            'allArticlesEditor' => [
+                'resource' => new ClassResource('Tests\MyCLabs\ACL\Integration\Model\Article'),
+                'actions' => new Actions([Actions::VIEW, Actions::EDIT])
+            ],
+            'articlePublisher' => [
+                'resource' => 'Tests\MyCLabs\ACL\Integration\Model\Article',
+                'actions' => new Actions([Actions::VIEW, Actions::PUBLISH])
+            ],
+            'categoryManager' => [
+                'resource' => 'Tests\MyCLabs\ACL\Integration\Model\Category',
+                'actions' => new Actions([Actions::VIEW])
+            ]
+        ];
+
+        $setup->registerRoles($roles, $this->acl);
 
         $setup->setActionsClass('Tests\MyCLabs\ACL\Integration\Model\Actions');
 
