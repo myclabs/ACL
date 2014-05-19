@@ -207,6 +207,7 @@ class ACL
      * @param string $roleName
      * @param Model\ResourceInterface $resource
      * @throws \InvalidArgumentException
+     * @throws AlreadyExistsException
      */
     public function grant(SecurityIdentityInterface $identity, $roleName, ResourceInterface $resource = null)
     {
@@ -227,6 +228,9 @@ class ACL
         if ($this->roles[$roleName]['resource'] instanceof ClassResource) {
             $resource = $this->roles[$roleName]['resource'];
         }
+        if ($this->roleExists($identity, $roleName, $resource)) {
+            throw new AlreadyExistsException('The role already exists for the specified user and the specified resource');
+        }
         $role = new Role($identity, $roleName, $resource);
 
         $identity->addRole($role);
@@ -235,6 +239,37 @@ class ACL
         $this->entityManager->flush($role);
 
         $this->allow($role, $this->roles[$roleName]['actions'], $resource);
+    }
+
+    /**
+     * Test if a role already exists
+     *
+     * @param SecurityIdentityInterface $identity
+     * @param $roleName
+     * @param ResourceInterface $resource
+     * @return bool
+     */
+    protected function roleExists(SecurityIdentityInterface $identity, $roleName, ResourceInterface $resource = null)
+    {
+        if ($resource instanceof ClassResource) {
+            $role = $this->entityManager
+                ->getRepository('Myclabs\ACL\Model\Role')
+                ->findOneBy([
+                    'securityIdentity' => $identity->getId(),
+                    'name' => $roleName
+                ]);
+        }
+        else {
+            $role = $this->entityManager
+                ->getRepository('Myclabs\ACL\Model\Role')
+                ->findOneBy([
+                    'securityIdentity' => $identity->getId(),
+                    'name' => $roleName,
+                    'resourceId' => $resource->getId()
+                ]);
+        }
+
+        return isset($role);
     }
 
     public function setRoles($roles)

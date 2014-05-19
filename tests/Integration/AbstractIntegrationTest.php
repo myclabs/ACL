@@ -79,6 +79,10 @@ abstract class AbstractIntegrationTest extends \PHPUnit_Framework_TestCase
             'categoryManager' => [
                 'resource' => 'Tests\MyCLabs\ACL\Integration\Model\Category',
                 'actions' => new Actions([Actions::VIEW])
+            ],
+            'articleEditorCopy' => [
+                'resource' => 'Tests\MyCLabs\ACL\Integration\Model\Article',
+                'actions' => new Actions([Actions::VIEW, Actions::EDIT])
             ]
         ];
 
