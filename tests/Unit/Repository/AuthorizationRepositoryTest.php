@@ -13,7 +13,6 @@ use MyCLabs\ACL\Model\Authorization;
 use MyCLabs\ACL\Model\Role;
 use MyCLabs\ACL\Repository\AuthorizationRepository;
 use Tests\MyCLabs\ACL\Unit\Repository\Model\File;
-use Tests\MyCLabs\ACL\Unit\Repository\Model\FileOwnerRole;
 use Tests\MyCLabs\ACL\Unit\Repository\Model\User;
 
 /**
