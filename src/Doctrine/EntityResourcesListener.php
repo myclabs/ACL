@@ -78,15 +78,17 @@ class EntityResourcesListener implements EventSubscriber
 
     public function postRemove(LifecycleEventArgs $eventArgs)
     {
-        $entity = $eventArgs->getEntity();
-        $em = $eventArgs->getEntityManager();
+        if ($eventArgs->getEntity() instanceof EntityResource) {
+            $entity = $eventArgs->getEntity();
+            $em = $eventArgs->getEntityManager();
 
-        $roleRepo = $em->getRepository('MyCLabs\ACL\Model\Role');
+            $roleRepo = $em->getRepository('MyCLabs\ACL\Model\Role');
 
-        $roles = $roleRepo->findBy(['resourceId' => $entity->getId()]);
+            $roles = $roleRepo->findBy(['resourceId' => $entity->getId()]);
 
-        foreach ($roles as $role) {
-            $em->remove($role);
+            foreach ($roles as $role) {
+                $em->remove($role);
+            }
         }
     }
 

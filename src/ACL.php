@@ -171,13 +171,13 @@ class ACL
                 $roleName
             ));
         }
-        if (null === $resource && !($this->roles[$roleName]['resource'] instanceof ClassResource)) {
-            throw new \InvalidArgumentException('The resource is null and the role\'s resource is not a ClassResource');
-        }
-        if (!($this->roles[$roleName]['resource'] instanceof ClassResource)
-            && $this->roles[$roleName]['resource'] != ClassUtils::getClass($resource)
-        ) {
-            throw new \InvalidArgumentException('The given resource class doesn\'t match the role resource class');
+        if (!($this->roles[$roleName]['resource'] instanceof ClassResource)) {
+            if (null === $resource) {
+                throw new \InvalidArgumentException('The resource is null and the role\'s resource is not a ClassResource');
+            }
+            if ($this->roles[$roleName]['resource'] != ClassUtils::getClass($resource)) {
+                throw new \InvalidArgumentException('The given resource class doesn\'t match the role resource class');
+            }
         }
     }
 
@@ -219,10 +219,15 @@ class ACL
             /** @var Role $role */
             $actions = $this->roles[$role->getName()]['actions'];
             $resourceClass = $this->roles[$role->getName()]['resource'];
-            $resourceRepo = $this->entityManager->getRepository($resourceClass);
-            $resource = $resourceRepo->find($role->getResourceId());
-            $this->allow($role, $actions, $resource);
-            //$role->createAuthorizations($this);
+            if ($resourceClass instanceof ClassResource) {
+                $this->allow($role, $actions, $resourceClass);
+            }
+            else {
+                $resourceRepo = $this->entityManager->getRepository($resourceClass);
+                /** @var EntityResource $resource */
+                $resource = $resourceRepo->find($role->getResourceId());
+                $this->allow($role, $actions, $resource);
+            }
         }
         $this->entityManager->flush();
         $this->entityManager->clear();
@@ -244,6 +249,7 @@ class ACL
             return $roleRepo->findOneBy([ 'securityIdentity' => $identity->getId(), 'name' => $roleName ]);
         }
         else {
+            /** @var EntityResource $resource */
             return $roleRepo->findOneBy([
                 'securityIdentity' => $identity->getId(),
                 'resourceId' => $resource->getId(),
