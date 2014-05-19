@@ -46,15 +46,18 @@ $acl = new ACL($entityManager);
 Note that you'll need to define a SecurityIdentity class, usually a user class
 (you can see an example in the [Usage section](usage.md)).
 
-Then, you must separately register some listeners on the entity manager.
+Then, you must separately register some listeners on the entity manager and your roles.
 The `ACLSetup` class is here to help you:
 
 ```php
 $aclSetup = new \MyCLabs\ACL\Doctrine\ACLSetup();
 // Set which class implements the SecurityIdentityInterface (must be called once)
 $aclSetup->setSecurityIdentityClass('My\Model\User');
-// Register role classes
-$aclSetup->registerRoleClass('My\Model\ArticleEditorRole', 'articleEditor');
+// Register roles
+$aclSetup->registerRoles([ 'ArticleEditorRole' => [
+                                'resource' => 'My\Model\Article',
+                                'actions' => new Actions([ Actions::Edit ]) ]
+                         ]);
 
 // Apply the configuration to the entity manager
 $aclSetup->setUpEntityManager($entityManager, function () use ($acl) { return $acl; });

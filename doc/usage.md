@@ -108,64 +108,34 @@ might want to have an abstract `BaseArticleRole` that you can reference in your 
 
 The role gives the authorizations.
 
-To create a new role, extend the `MyCLabs\ACL\Model\Role` abstract class:
+They are declared in an array and must be registered with the ACLSetup class:
 
 ```php
-/**
- * @ORM\Entity(readOnly=true)
- */
-class ArticleEditorRole extends Role
-{
-    /**
-     * @ORM\ManyToOne(targetEntity="Article", inversedBy="roles")
-     */
-    protected $article;
+$roles = [];
+$roles = ['articleEditor'] = [
+    'resource' => 'My\Model\Article',
+    'actions' => new Actions([Actions::VIEW, Actions::EDIT])
+];
 
-    public function __construct(User $user, Article $article)
-    {
-        $this->article = $article;
-
-        parent::__construct($user);
-    }
-
-    public function createAuthorizations(ACL $acl)
-    {
-        $acl->allow(
-            $this,
-            new Actions([ Actions::VIEW, Actions::EDIT ]),
-            $this->article
-        );
-    }
-}
+$aclSetup->registerRoles($roles);
 ```
 
 The authorizations given by the role are created in the `createAuthorizations()` method.
 
-For creating an authorization, you need to call `$acl->allow()` with:
+For each role you need to specify:
 
-- *the role* (the role contains the user)
-- *the actions* that are included in the authorization
+- *the role name*
 - *the resource* (here the article)
+- *the actions* that can be performed on the resource
 
-The resource can be either an entity instance (as shown above) or an entity classname, which will
+The resource can be either a class name (as shown above) or an class resource, which will
 give access to all entities of that type:
 
 ```php
-/**
- * @ORM\Entity(readOnly=true)
- */
-class AdministratorRole extends Role
-{
-    public function createAuthorizations(ACL $acl)
-    {
-        // Administrators are able to do everything on ALL the articles
-        $acl->allow(
-            $this,
-            Actions::all(),
-            new ClassResource('My\Model\Article')
-        );
-    }
-}
+$roles = ['allArticlesEditor'] = [
+    'resource' => new ClassResource('Tests\MyCLabs\ACL\Integration\Model\Article'),
+    'actions' => new Actions([Actions::VIEW, Actions::EDIT])
+];
 ```
 
 Authorizations that are granted on class resources (i.e. *all entities of that class*) are cascaded
@@ -176,32 +146,41 @@ Another common use case for class resources are object creation. For example, yo
 to be able to create new articles. You can do this in the `ArticleEditorRole`:
 
 ```php
-        $acl->allow(
-            $this,
-            new Actions([ Actions::CREATE ]),
-            new ClassResource('My\Model\Article')
-        );
+$roles = ['articleCreator'] = [
+    'resource' => new ClassResource('My\Model\Article'),
+    'actions' => new Actions([Actions::CREATE])
+];
 ```
 
 
-### 4. Grant roles to users
+### 4. Grant/revoke roles to users
 
 Now that everything is defined, we can grant users some roles very simply:
 
 ```php
-$acl->grant($user, new ArticleEditorRole($user, $article));
+// On a single resource
+$acl->grant($user, 'ArticleEditor', $article);
+// On a class resource
+$acl->grant($user, 'AllArticlesEditor');
 ```
 
 Here, the ACL will add the role to the user and use the role to automatically generate and persist the
 related authorizations.
 
+To revoke a role to an user, use the revoke method:
+```php
+// For a single resource
+$acl->revoke($user, 'ArticleEditor', $article);
+// For a class resource
+$acl->revoke($user, 'AllArticlesEditor');
+```
 
 ## Check access
 
 Now that accesses are defined, we can test the authorizations:
 
 ```php
-$acl->grant($user, new ArticleEditorRole($user, $article));
+$acl->grant($user, 'ArticleEditor', $article);
 
 echo $acl->isAllowed($user, Actions::VIEW, $article);   // true
 echo $acl->isAllowed($user, Actions::EDIT, $article);   // true

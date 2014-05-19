@@ -46,7 +46,7 @@ $acl = new ACL($entityManager);
 You give permissions to a user by adding it a role:
 
 ```php
-$acl->grant($user, new ArticleEditorRole($user, $article));
+$acl->grant($user, 'ArticleEditorRole', $article);
 ```
 
 Roles are classes that you write and which define the permissions a user has on a resource.
@@ -54,7 +54,7 @@ Roles are classes that you write and which define the permissions a user has on 
 You remove permissions to a user by removing the role:
 
 ```php
-$acl->revoke($user, $role);
+$acl->revoke($user, 'ArticleEditorRole', $article);
 ```
 
 Test permissions:
