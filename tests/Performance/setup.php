@@ -49,14 +49,14 @@ if ($dbParams['driver'] == 'pdo_sqlite') {
 
 
 $users = [];
-for ($i = 0; $i < 10; $i++) {
+for ($i = 0; $i < 20; $i++) {
     $users[$i] = new User();
     $em->persist($users[$i]);
 }
 
 $categories = [];
 $articles = [];
-for ($i = 0; $i < 10; $i++) {
+for ($i = 0; $i < 20; $i++) {
     $category = new Category();
     $em->persist($category);
     $categories[$i] = $category;
