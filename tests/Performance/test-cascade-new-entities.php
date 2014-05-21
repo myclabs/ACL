@@ -22,7 +22,7 @@ $em->flush();
 // Add roles on those categories
 foreach ($users as $user) {
     foreach ($newCategories as $newCategory) {
-        $acl->grant($user, new CategoryManagerRole($user, $category));
+        $acl->grant($user, new CategoryManagerRole($user, $newCategory));
     }
 }
 
