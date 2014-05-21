@@ -7,7 +7,11 @@
     "type": "library",
     "autoload": {
         "psr-4": {
-            "MyCLabs\\ACL\\": "src/",
+            "MyCLabs\\ACL\\": "src/"
+        }
+    },
+    "autoload-dev": {
+        "psr-4": {
             "Tests\\MyCLabs\\ACL\\": "tests/"
         }
     },
