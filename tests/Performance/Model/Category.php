@@ -22,12 +22,6 @@ class Category implements EntityResource, CascadingResource
     protected $id;
 
     /**
-     * @var CategoryManagerRole[]|Collection
-     * @ORM\OneToMany(targetEntity="CategoryManagerRole", mappedBy="category")
-     */
-    protected $roles;
-
-    /**
      * @var Category[]
      * @ORM\OneToMany(targetEntity="Category", mappedBy="parent")
      **/

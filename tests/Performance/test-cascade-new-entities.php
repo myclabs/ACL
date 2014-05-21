@@ -5,7 +5,6 @@
 
 use Tests\MyCLabs\ACL\Performance\Model\Article;
 use Tests\MyCLabs\ACL\Performance\Model\Category;
-use Tests\MyCLabs\ACL\Performance\Model\CategoryManagerRole;
 
 require_once __DIR__ . '/setup.php';
 
@@ -22,7 +21,7 @@ $em->flush();
 // Add roles on those categories
 foreach ($users as $user) {
     foreach ($newCategories as $newCategory) {
-        $acl->grant($user, new CategoryManagerRole($user, $category));
+        $acl->grant($user, 'CategoryManager', $newCategory);
     }
 }
 

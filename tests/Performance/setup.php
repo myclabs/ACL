@@ -9,6 +9,8 @@ use Doctrine\ORM\Tools\SchemaTool;
 use Doctrine\ORM\Tools\Setup;
 use MyCLabs\ACL\ACL;
 use MyCLabs\ACL\Doctrine\ACLSetup;
+use MyCLabs\ACL\Model\Actions;
+use MyCLabs\ACL\Model\ClassResource;
 use Tests\MyCLabs\ACL\Performance\Model\Article;
 use Tests\MyCLabs\ACL\Performance\Model\Category;
 use Tests\MyCLabs\ACL\Performance\Model\User;
@@ -30,11 +32,25 @@ $em = EntityManager::create($dbParams, $config);
 // Create the ACL object
 $acl = new ACL($em);
 
+$roles = [
+    'ArticleEditor' => [
+        'resource' => 'Tests\MyCLabs\ACL\Performance\Model\Article',
+        'actions' => new Actions([Actions::VIEW, Actions::EDIT])
+    ],
+    'AllArticlesEditor' => [
+        'resource' => new ClassResource('Tests\MyCLabs\ACL\Performance\Model\Article'),
+        'actions' => new Actions([Actions::VIEW, Actions::EDIT])
+    ],
+    'CategoryManager' => [
+        'resource' => 'Tests\MyCLabs\ACL\Performance\Model\Category',
+        'actions' => new Actions([Actions::VIEW])
+    ]
+];
+
 $setup = new ACLSetup();
 $setup->setSecurityIdentityClass('Tests\MyCLabs\ACL\Performance\Model\User');
-$setup->registerRoleClass('Tests\MyCLabs\ACL\Performance\Model\ArticleEditorRole', 'articleEditor');
-$setup->registerRoleClass('Tests\MyCLabs\ACL\Performance\Model\AllArticlesEditorRole', 'allArticlesEditor');
-$setup->registerRoleClass('Tests\MyCLabs\ACL\Performance\Model\CategoryManagerRole', 'categoryManager');
+$setup->registerRoles($roles, $acl);
+
 $setup->setUpEntityManager($em, function () use ($acl) {
     return $acl;
 });

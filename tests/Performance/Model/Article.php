@@ -22,12 +22,6 @@ class Article implements EntityResource, CascadingResource
     protected $id;
 
     /**
-     * @var ArticleEditorRole[]|Collection
-     * @ORM\OneToMany(targetEntity="ArticleEditorRole", mappedBy="article", cascade={"remove"})
-     */
-    protected $roles;
-
-    /**
      * @var Category
      * @ORM\ManyToOne(targetEntity="Category", inversedBy="articles")
      **/
