@@ -85,4 +85,15 @@ class AuthorizationTest extends \PHPUnit_Framework_TestCase
         $this->assertTrue($childAuthorization->isCascadable());
         $this->assertFalse($childAuthorization->isRoot());
     }
+
+    /**
+     * @expectedException RuntimeException
+     */
+    public function testCreateAuthorizationWithInvalidResourceClass()
+    {
+        $role = $this->getMock('MyCLabs\ACL\Model\Role', [], [], '', false);
+        $resource = $this->getMock('MyCLabs\ACL\Model\ResourceInterface');
+
+        Authorization::create($role, Actions::all(), $resource);
+    }
 }
