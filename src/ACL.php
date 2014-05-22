@@ -262,4 +262,22 @@ class ACL
     {
         $this->roles = $roles;
     }
+
+    /**
+     * @param Model\EntityResource $entity
+     * @return array
+     */
+    public function getRoleNamesForResource(EntityResource $entity) {
+        $roleNames = [];
+        $className = ClassUtils::getClass($entity);
+
+        foreach ($this->roles as $roleName => $role) {
+            if (array_key_exists('resource', $role)
+                && $role['resource'] == $className
+            ) {
+                    $roleNames[] = $roleName;
+            }
+        }
+        return $roleNames;
+    }
 }
