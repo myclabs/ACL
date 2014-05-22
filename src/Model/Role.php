@@ -57,21 +57,6 @@ class Role
     }
 
     /**
-     * @param ACL $acl
-     * @param $actions
-     * @param $resource
-     * @return Authorization[]
-     */
-    public function createAuthorizations(ACL $acl, $actions, $resource)
-    {
-        $acl->allow(
-            $this,
-            $actions,
-            $resource
-        );
-    }
-
-    /**
      * @return int
      */
     public function getId()
