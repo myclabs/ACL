@@ -1,5 +1,5 @@
 ---
-menu: usage
+currentMenu: usage
 ---
 
 # Usage

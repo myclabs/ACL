@@ -1,5 +1,5 @@
 ---
-menu: filtering
+currentMenu: filtering
 ---
 
 # Filtering queries

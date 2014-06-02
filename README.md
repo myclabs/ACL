@@ -1,10 +1,15 @@
 ---
-menu: introduction
+currentMenu: introduction
 ---
 
-[![Build Status](https://travis-ci.org/myclabs/ACL.png?branch=master)](https://travis-ci.org/myclabs/ACL) [![Coverage Status](https://coveralls.io/repos/myclabs/ACL/badge.png)](https://coveralls.io/r/myclabs/ACL) [![Scrutinizer Code Quality](https://scrutinizer-ci.com/g/myclabs/ACL/badges/quality-score.png?s=2997ec4cb570c1cfef520d541daac853527d173e)](https://scrutinizer-ci.com/g/myclabs/ACL/) [![Latest Stable Version](https://poser.pugx.org/myclabs/acl/v/stable.png)](https://packagist.org/packages/myclabs/acl) [![Total Downloads](https://poser.pugx.org/myclabs/acl/downloads.png)](https://packagist.org/packages/myclabs/acl) [![License](https://poser.pugx.org/myclabs/acl/license.png)](https://packagist.org/packages/myclabs/acl)
-
 **MyCLabs ACL is a library that helps managing permissions on your model.**
+
+[![Build Status](https://travis-ci.org/myclabs/ACL.png?branch=master)](https://travis-ci.org/myclabs/ACL)
+[![Coverage Status](https://coveralls.io/repos/myclabs/ACL/badge.png)](https://coveralls.io/r/myclabs/ACL)
+[![Scrutinizer Code Quality](https://scrutinizer-ci.com/g/myclabs/ACL/badges/quality-score.png?s=2997ec4cb570c1cfef520d541daac853527d173e)](https://scrutinizer-ci.com/g/myclabs/ACL/)
+[![Latest Stable Version](https://poser.pugx.org/myclabs/acl/v/stable.png)](https://packagist.org/packages/myclabs/acl)
+[![Total Downloads](https://poser.pugx.org/myclabs/acl/downloads.png)](https://packagist.org/packages/myclabs/acl)
+[![License](https://poser.pugx.org/myclabs/acl/license.png)](https://packagist.org/packages/myclabs/acl)
 
 It is different from other ACL libraries in that it focuses on controlling access to your model classes
 (Doctrine entities). As such, you access control model follows your real model, which makes it possible

@@ -1,1 +1,58 @@
-baseUrl: http://myclabs.github.io/ACL
+templateUrl: https://github.com/myclabs/couscous-template
+
+template:
+    # Base URL of the published website
+    baseUrl: http://myclabs.github.io/ACL
+
+    github:
+        user: myclabs
+        repo: ACL
+
+    title: MyCLabs\ACL
+    subTitle: Powerful and efficient access control library for your PHP application.
+
+    # The left menu bar
+    menu:
+        sections:
+            main:
+                name: Main documentation
+                items:
+                    introduction:
+                        text: Introduction
+                        relativeUrl:
+                    setup:
+                        text: Setup
+                        relativeUrl: doc/setup.html
+                    usage:
+                        text: Usage
+                        relativeUrl: doc/usage.html
+                    filtering:
+                        text: Filtering queries
+                        relativeUrl: doc/filtering-queries.html
+            advanced-topics:
+                name: Advanced topics
+                items:
+                    actions:
+                        text: Actions
+                        relativeUrl: doc/actions.html
+                    cascading:
+                        text: Authorization cascading
+                        relativeUrl: doc/cascading.html
+                    performances:
+                        text: Performances
+                        relativeUrl: doc/performances.html
+            other-projects:
+                name: Other MyCLabs projects
+                items:
+                    work:
+                        text: '<i class="fa fa-github"></i> MyCLabs\Work'
+                        absoluteUrl: http://myclabs.github.io/Work/
+                    deepcopy:
+                        text: '<i class="fa fa-github"></i> MyCLabs\DeepCopy'
+                        absoluteUrl: https://github.com/myclabs/DeepCopy
+                    phpenum:
+                        text: '<i class="fa fa-github"></i> php-enum'
+                        absoluteUrl: https://github.com/myclabs/php-enum
+                    jqueryconfirm:
+                        text: '<i class="fa fa-github"></i> jquery.confirm'
+                        absoluteUrl: http://myclabs.github.io/jquery.confirm/

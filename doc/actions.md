@@ -1,5 +1,5 @@
 ---
-menu: actions
+currentMenu: actions
 ---
 
 # Actions
