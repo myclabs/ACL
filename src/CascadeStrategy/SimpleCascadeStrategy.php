@@ -2,13 +2,13 @@
 
 namespace MyCLabs\ACL\CascadeStrategy;
 
-use Doctrine\Common\Util\ClassUtils;
 use Doctrine\ORM\EntityManager;
 use MyCLabs\ACL\Model\Authorization;
-use MyCLabs\ACL\Model\CascadingResource;
 use MyCLabs\ACL\Model\ResourceInterface;
 use MyCLabs\ACL\Repository\AuthorizationRepository;
+use MyCLabs\ACL\ResourceGraph\CascadingResourceGraphTraverser;
 use MyCLabs\ACL\ResourceGraph\ResourceGraphTraverser;
+use MyCLabs\ACL\ResourceGraph\ResourceGraphTraverserDispatcher;
 
 /**
  * Simple cascade: authorizations are cascaded from a resource to its sub-resources.
@@ -23,13 +23,20 @@ class SimpleCascadeStrategy implements CascadeStrategy
     private $entityManager;
 
     /**
-     * @var ResourceGraphTraverser[]
+     * @var ResourceGraphTraverserDispatcher
      */
-    private $resourceGraphTraversers = [];
+    private $resourceGraphTraverser;
 
     public function __construct(EntityManager $entityManager)
     {
         $this->entityManager = $entityManager;
+
+        $this->resourceGraphTraverser = new ResourceGraphTraverserDispatcher();
+        // Default traverser for CascadingResource
+        $this->resourceGraphTraverser->setResourceGraphTraverser(
+            'MyCLabs\ACL\Model\CascadingResource',
+            new CascadingResourceGraphTraverser($entityManager, $this->resourceGraphTraverser)
+        );
     }
 
     /**
@@ -37,17 +44,7 @@ class SimpleCascadeStrategy implements CascadeStrategy
      */
     public function cascadeAuthorization(Authorization $authorization, ResourceInterface $resource)
     {
-        // Find sub-resources
-        $subResources = [];
-        if ($resource instanceof CascadingResource) {
-            $subResources = $this->getAllSubResources($resource);
-        } else {
-            $traverser = $this->getResourceGraphTraverser(ClassUtils::getClass($resource));
-
-            if ($traverser) {
-                $subResources = $traverser->getAllSubResources($resource);
-            }
-        }
+        $subResources = $this->resourceGraphTraverser->getAllSubResources($resource);
 
         // Cascade authorizations
         $authorizations = [];
@@ -66,17 +63,7 @@ class SimpleCascadeStrategy implements CascadeStrategy
         /** @var AuthorizationRepository $repository */
         $repository = $this->entityManager->getRepository('MyCLabs\ACL\Model\Authorization');
 
-        // Find parent resources
-        $parentResources = [];
-        if ($resource instanceof CascadingResource) {
-            $parentResources = $this->getAllParentResources($resource);
-        } else {
-            $traverser = $this->getResourceGraphTraverser(ClassUtils::getClass($resource));
-
-            if ($traverser) {
-                $parentResources = $traverser->getAllParentResources($resource);
-            }
-        }
+        $parentResources = $this->resourceGraphTraverser->getAllParentResources($resource);
 
         // Find root authorizations on the parent resources
         $authorizationsToCascade = [];
@@ -98,75 +85,11 @@ class SimpleCascadeStrategy implements CascadeStrategy
     }
 
     /**
-     * Get all parent resources recursively.
-     * @param CascadingResource $resource
-     * @return ResourceInterface[]
-     */
-    private function getAllParentResources(CascadingResource $resource)
-    {
-        $parents = [];
-
-        foreach ($resource->getParentResources($this->entityManager) as $parentResource) {
-            $parents[] = $parentResource;
-            if ($parentResource instanceof CascadingResource) {
-                $parents = array_merge($parents, $this->getAllParentResources($parentResource));
-            }
-        }
-
-        return $this->unique($parents);
-    }
-
-    /**
-     * Get all sub-resources recursively.
-     * @param CascadingResource $resource
-     * @return ResourceInterface[]
-     */
-    private function getAllSubResources(CascadingResource $resource)
-    {
-        $subResources = [];
-
-        foreach ($resource->getSubResources($this->entityManager) as $subResource) {
-            $subResources[] = $subResource;
-            if ($subResource instanceof CascadingResource) {
-                $subResources = array_merge($subResources, $this->getAllSubResources($subResource));
-            }
-        }
-
-        return $this->unique($subResources);
-    }
-
-    private function unique(array $array)
-    {
-        $result  = [];
-
-        foreach ($array as $item) {
-            if (! in_array($item, $result, true)) {
-                $result[] = $item;
-            }
-        }
-
-        return $result;
-    }
-
-    /**
      * @param string                 $entityClass
      * @param ResourceGraphTraverser $resourceGraphTraverser
      */
     public function setResourceGraphTraverser($entityClass, $resourceGraphTraverser)
     {
-        $this->resourceGraphTraversers[$entityClass] = $resourceGraphTraverser;
-    }
-
-    /**
-     * @param string $entityClass
-     * @return ResourceGraphTraverser|null
-     */
-    private function getResourceGraphTraverser($entityClass)
-    {
-        if (isset($this->resourceGraphTraversers[$entityClass])) {
-            return $this->resourceGraphTraversers[$entityClass];
-        }
-
-        return null;
+        $this->resourceGraphTraverser->setResourceGraphTraverser($entityClass, $resourceGraphTraverser);
     }
 }

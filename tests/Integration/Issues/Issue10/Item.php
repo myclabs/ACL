@@ -2,13 +2,15 @@
 
 namespace Tests\MyCLabs\ACL\Integration\Issues\Issue10;
 
+use Doctrine\ORM\EntityManager;
 use Doctrine\ORM\Mapping as ORM;
+use MyCLabs\ACL\Model\CascadingResource;
 use MyCLabs\ACL\Model\EntityResource;
 
 /**
  * @ORM\Entity
  */
-class Item implements EntityResource
+class Item implements EntityResource, CascadingResource
 {
     /**
      * @ORM\Id @ORM\GeneratedValue
@@ -30,5 +32,15 @@ class Item implements EntityResource
     public function getId()
     {
         return $this->id;
+    }
+
+    public function getParentResources(EntityManager $entityManager)
+    {
+        return [ $this->project ];
+    }
+
+    public function getSubResources(EntityManager $entityManager)
+    {
+        return [];
     }
 }
