@@ -35,12 +35,13 @@ abstract class AbstractIntegrationTest extends \PHPUnit_Framework_TestCase
         $paths = [
             __DIR__ . '/../../src/Model',
             __DIR__ . '/Model',
+            __DIR__ . '/Issues/Issue10',
         ];
         $config = Setup::createAnnotationMetadataConfiguration($paths, true, null, new ArrayCache(), false);
         $this->em = EntityManager::create($dbParams, $config);
 
         // Create the ACL object
-        $this->acl = new ACL($this->em);
+        $this->acl = $this->createACL();
         $setup = $this->configureACL();
         $setup->setUpEntityManager($this->em, function () {
             return $this->acl;
@@ -56,6 +57,11 @@ abstract class AbstractIntegrationTest extends \PHPUnit_Framework_TestCase
         }
     }
 
+    protected function createACL()
+    {
+        return new ACL($this->em);
+    }
+
     private function configureACL()
     {
         $setup = new ACLSetup();
@@ -65,6 +71,8 @@ abstract class AbstractIntegrationTest extends \PHPUnit_Framework_TestCase
         $setup->registerRoleClass('Tests\MyCLabs\ACL\Integration\Model\AllArticlesEditorRole', 'allArticlesEditor');
         $setup->registerRoleClass('Tests\MyCLabs\ACL\Integration\Model\ArticlePublisherRole', 'articlePublisher');
         $setup->registerRoleClass('Tests\MyCLabs\ACL\Integration\Model\CategoryManagerRole', 'categoryManager');
+
+        $setup->registerRoleClass('Tests\MyCLabs\ACL\Integration\Issues\Issue10\AccountAdminRole', 'accountAdmin');
 
         $setup->setActionsClass('Tests\MyCLabs\ACL\Integration\Model\Actions');
 
