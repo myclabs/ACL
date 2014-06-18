@@ -161,16 +161,11 @@ class ACL
      */
     public function rebuildAuthorizations()
     {
-        $authorizationRepository = $this->entityManager->getRepository('MyCLabs\ACL\Model\Authorization');
         $roleRepository = $this->entityManager->getRepository('MyCLabs\ACL\Model\Role');
 
         // Clear
-        // TODO use DQL DELETE query
-        foreach ($authorizationRepository->findAll() as $authorization) {
-            $this->entityManager->remove($authorization);
-        }
-        $this->entityManager->flush();
-        $this->entityManager->clear();
+        $this->entityManager->createQuery('DELETE MyCLabs\ACL\Model\Authorization');
+        $this->entityManager->clear('MyCLabs\ACL\Model\Authorization');
 
         // Regenerate
         foreach ($roleRepository->findAll() as $role) {
