@@ -164,7 +164,7 @@ class ACL
         $roleRepository = $this->entityManager->getRepository('MyCLabs\ACL\Model\Role');
 
         // Clear
-        $this->entityManager->createQuery('DELETE MyCLabs\ACL\Model\Authorization');
+        $this->entityManager->createQuery('DELETE MyCLabs\ACL\Model\Authorization')->execute();
         $this->entityManager->clear('MyCLabs\ACL\Model\Authorization');
 
         // Regenerate
