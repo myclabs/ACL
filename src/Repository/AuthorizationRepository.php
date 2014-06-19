@@ -151,7 +151,7 @@ class AuthorizationRepository extends EntityRepository
         $qb->where('a.cascadable = true');
 
         // Root authorizations means no parent
-        $qb->where('a.parentAuthorization IS NULL');
+        $qb->andWhere('a.parentAuthorization IS NULL');
 
         if ($resource instanceof EntityResource) {
             $qb->andWhere('a.entityClass = :entityClass');
