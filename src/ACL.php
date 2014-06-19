@@ -157,6 +157,21 @@ class ACL
     }
 
     /**
+     * Process a resource that has been deleted.
+     *
+     * Called by the EntityResourcesListener.
+     *
+     * @param EntityResource $resource
+     */
+    public function processDeletedResource(EntityResource $resource)
+    {
+        /** @var AuthorizationRepository $repository */
+        $repository = $this->entityManager->getRepository('MyCLabs\ACL\Model\Authorization');
+
+        $repository->removeAuthorizationsForResource($resource);
+    }
+
+    /**
      * Clears and rebuilds all the authorizations from the roles.
      */
     public function rebuildAuthorizations()

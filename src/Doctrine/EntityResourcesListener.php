@@ -52,13 +52,21 @@ class EntityResourcesListener implements EventSubscriber
 
     public function onFlush(OnFlushEventArgs $args)
     {
+        $acl = $this->getACL();
         $uow = $args->getEntityManager()->getUnitOfWork();
 
-        // Remember new resources
+        // Remember new resources for after flush (we need them to have an ID)
         $this->newResources = [];
         foreach ($uow->getScheduledEntityInsertions() as $entity) {
             if ($entity instanceof EntityResource) {
                 $this->newResources[] = $entity;
+            }
+        }
+
+        // Process deleted resources
+        foreach ($uow->getScheduledEntityDeletions() as $entity) {
+            if ($entity instanceof EntityResource) {
+                $acl->processDeletedResource($entity);
             }
         }
     }

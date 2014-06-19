@@ -194,4 +194,41 @@ class AuthorizationRepositoryTest extends \PHPUnit_Framework_TestCase
         $this->assertTrue($repository->isAllowedOnEntityClass($user, Actions::VIEW, $class));
         $this->assertFalse($repository->isAllowedOnEntityClass($user, Actions::EDIT, $class));
     }
+
+    /**
+     * @depends testInsertBulk
+     */
+    public function testRemoveForResource()
+    {
+        $user = new User();
+        $this->em->persist($user);
+
+        $resource1 = new File();
+        $this->em->persist($resource1);
+        $role1 = new FileOwnerRole($user, $resource1);
+        $this->em->persist($role1);
+        $this->em->flush();
+
+        $resource2 = new File();
+        $this->em->persist($resource2);
+        $role2 = new FileOwnerRole($user, $resource2);
+        $this->em->persist($role2);
+        $this->em->flush();
+
+        $authorizations = [
+            Authorization::create($role1, new Actions([ Actions::VIEW ]), $resource1),
+            Authorization::create($role2, new Actions([ Actions::VIEW ]), $resource2),
+        ];
+
+        /** @var AuthorizationRepository $repository */
+        $repository = $this->em->getRepository('MyCLabs\ACL\Model\Authorization');
+        $repository->insertBulk($authorizations);
+
+        // We remove the authorizations for the resource 1
+        $repository->removeAuthorizationsForResource($resource1);
+        // We check that they were removed
+        $this->assertFalse($repository->isAllowedOnEntity($user, Actions::VIEW, $resource1));
+        // and that authorizations for the resource 2 weren't removed
+        $this->assertTrue($repository->isAllowedOnEntity($user, Actions::VIEW, $resource2));
+    }
 }
