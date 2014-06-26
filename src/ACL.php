@@ -210,7 +210,21 @@ class ACL
     {
         /** @var AuthorizationRepository $repository */
         $repository = $this->entityManager->getRepository('MyCLabs\ACL\Model\Authorization');
+        $roleRepo = $this->entityManager->getRepository('MyCLabs\ACL\Model\Role');
 
+        // Remove the roles for this resource
+        foreach ($this->getRolesForResource($resource) as $roleName) {
+            $roles = $roleRepo->findBy([
+                'resourceId' => $resource->getId(),
+                'name' => $roleName
+            ]);
+
+            foreach ($roles as $role) {
+                $this->entityManager->remove($role);
+            }
+        }
+
+        // Delete the authorizations for this resource
         $repository->removeAuthorizationsForResource($resource);
     }
 
@@ -276,15 +290,13 @@ class ACL
      * @param EntityResource $entity
      * @return array
      */
-    public function getRoleNamesForResource(EntityResource $entity)
+    public function getRolesForResource(EntityResource $entity)
     {
         $roleNames = [];
         $className = ClassUtils::getClass($entity);
 
         foreach ($this->roles as $roleName => $role) {
-            if (array_key_exists('resource', $role)
-                && $role['resource'] == $className
-            ) {
+            if (isset($role['resource']) && $role['resource'] === $className) {
                 $roleNames[] = $roleName;
             }
         }
