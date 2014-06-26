@@ -4,7 +4,6 @@ namespace Tests\MyCLabs\ACL\Integration;
 
 use Tests\MyCLabs\ACL\Integration\Model\Actions;
 use Tests\MyCLabs\ACL\Integration\Model\Article;
-use Tests\MyCLabs\ACL\Integration\Model\ArticlePublisherRole;
 use Tests\MyCLabs\ACL\Integration\Model\User;
 
 /**

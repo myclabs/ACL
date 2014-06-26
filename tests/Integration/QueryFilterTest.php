@@ -5,7 +5,6 @@ namespace Tests\MyCLabs\ACL\Integration;
 use MyCLabs\ACL\Model\Actions;
 use MyCLabs\ACL\Doctrine\ACLQueryHelper;
 use Tests\MyCLabs\ACL\Integration\Model\Article;
-use Tests\MyCLabs\ACL\Integration\Model\ArticleEditorRole;
 use Tests\MyCLabs\ACL\Integration\Model\User;
 
 /**

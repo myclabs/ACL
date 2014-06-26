@@ -3,7 +3,6 @@
 namespace Tests\MyCLabs\ACL\Integration\Issues\Issue10;
 
 use Doctrine\Common\Collections\ArrayCollection;
-use Doctrine\Common\Collections\Collection;
 use Doctrine\ORM\EntityManager;
 use Doctrine\ORM\Mapping as ORM;
 use MyCLabs\ACL\Model\CascadingResource;
@@ -19,12 +18,6 @@ class Account implements EntityResource, CascadingResource
      * @ORM\Column(type="integer")
      */
     protected $id;
-
-    /**
-     * @var AccountAdminRole[]|Collection
-     * @ORM\OneToMany(targetEntity="AccountAdminRole", mappedBy="account")
-     */
-    protected $roles;
 
     /**
      * @var Project[]

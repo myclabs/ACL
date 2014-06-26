@@ -7,7 +7,6 @@ use MyCLabs\ACL\CascadeStrategy\SimpleCascadeStrategy;
 use MyCLabs\ACL\Model\Actions;
 use Tests\MyCLabs\ACL\Integration\AbstractIntegrationTest;
 use Tests\MyCLabs\ACL\Integration\Issues\Issue10\Account;
-use Tests\MyCLabs\ACL\Integration\Issues\Issue10\AccountAdminRole;
 use Tests\MyCLabs\ACL\Integration\Issues\Issue10\Item;
 use Tests\MyCLabs\ACL\Integration\Issues\Issue10\Project;
 use Tests\MyCLabs\ACL\Integration\Issues\Issue10\ProjectGraphTraverser;
