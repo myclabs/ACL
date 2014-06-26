@@ -4,6 +4,7 @@ namespace MyCLabs\ACL;
 
 use Doctrine\Common\Util\ClassUtils;
 use Doctrine\ORM\EntityManager;
+use InvalidArgumentException;
 use MyCLabs\ACL\CascadeStrategy\CascadeStrategy;
 use MyCLabs\ACL\CascadeStrategy\SimpleCascadeStrategy;
 use MyCLabs\ACL\Model\Actions;
@@ -109,7 +110,7 @@ class ACL
      * @param SecurityIdentityInterface $identity
      * @param string $roleName
      * @param ResourceInterface $resource
-     * @throws \InvalidArgumentException
+     * @throws InvalidArgumentException
      * @throws AlreadyExistsException
      */
     public function grant(SecurityIdentityInterface $identity, $roleName, ResourceInterface $resource = null)
@@ -141,7 +142,7 @@ class ACL
      * @param SecurityIdentityInterface $identity
      * @param string $roleName
      * @param EntityResource $resource
-     * @throws \InvalidArgumentException
+     * @throws InvalidArgumentException
      */
     public function revoke(SecurityIdentityInterface $identity, $roleName, EntityResource $resource = null)
     {
@@ -161,22 +162,22 @@ class ACL
      *
      * @param $roleName
      * @param ResourceInterface $resource
-     * @throws \InvalidArgumentException
+     * @throws InvalidArgumentException
      */
     protected function checkGrantAndRevokeParameters($roleName, ResourceInterface $resource = null)
     {
         if (!array_key_exists($roleName, $this->roles)) {
-            throw new \InvalidArgumentException(sprintf(
-                'The role name %s doesn\'t exists in the roles list',
+            throw new InvalidArgumentException(sprintf(
+                "The role name %s doesn't exists in the roles list",
                 $roleName
             ));
         }
         if (!($this->roles[$roleName]['resource'] instanceof ClassResource)) {
             if (null === $resource) {
-                throw new \InvalidArgumentException('The resource is null and the role\'s resource is not a ClassResource');
+                throw new InvalidArgumentException("The resource is null and the role's resource is not a ClassResource");
             }
             if ($this->roles[$roleName]['resource'] != ClassUtils::getClass($resource)) {
-                throw new \InvalidArgumentException('The given resource class doesn\'t match the role resource class');
+                throw new InvalidArgumentException("The given resource class doesn't match the role resource class");
             }
         }
     }
@@ -231,8 +232,7 @@ class ACL
             $resourceClass = $this->roles[$role->getName()]['resource'];
             if ($resourceClass instanceof ClassResource) {
                 $this->allow($role, $actions, $resourceClass);
-            }
-            else {
+            } else {
                 $resourceRepo = $this->entityManager->getRepository($resourceClass);
                 /** @var EntityResource $resource */
                 $resource = $resourceRepo->find($role->getResourceId());
@@ -257,8 +257,7 @@ class ACL
         $roleRepo = $this->entityManager->getRepository('Myclabs\ACL\Model\Role');
         if ($this->roles[$roleName]['resource'] instanceof ClassResource) {
             return $roleRepo->findOneBy([ 'securityIdentity' => $identity->getId(), 'name' => $roleName ]);
-        }
-        else {
+        } else {
             /** @var EntityResource $resource */
             return $roleRepo->findOneBy([
                 'securityIdentity' => $identity->getId(),
@@ -274,10 +273,11 @@ class ACL
     }
 
     /**
-     * @param Model\EntityResource $entity
+     * @param EntityResource $entity
      * @return array
      */
-    public function getRoleNamesForResource(EntityResource $entity) {
+    public function getRoleNamesForResource(EntityResource $entity)
+    {
         $roleNames = [];
         $className = ClassUtils::getClass($entity);
 
@@ -285,7 +285,7 @@ class ACL
             if (array_key_exists('resource', $role)
                 && $role['resource'] == $className
             ) {
-                    $roleNames[] = $roleName;
+                $roleNames[] = $roleName;
             }
         }
         return $roleNames;
