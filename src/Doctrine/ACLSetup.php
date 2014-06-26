@@ -68,19 +68,6 @@ class ACLSetup
     }
 
     /**
-     * Dynamically register a role subclass in the discriminator map for the Doctrine mapping.
-     *
-     * @param string $class
-     * @param string $shortName
-     *
-     * @throws \InvalidArgumentException The given class doesn't extend MyCLabs\ACL\Model\Role
-     */
-    public function registerRoleClass($class, $shortName)
-    {
-        $this->metadataLoader->registerRoleClass($class, $shortName);
-    }
-
-    /**
      * Registers an alternative "Actions" class to use in the authorization entity.
      *
      * This allows to write your own actions.
@@ -94,7 +81,12 @@ class ACLSetup
         $this->metadataLoader->setActionsClass($class);
     }
 
-    public function registerRoles($roles, ACL $acl)
+    /**
+     * @todo Move to ACL
+     * @param array $roles
+     * @param ACL   $acl
+     */
+    public function registerRoles(array $roles, ACL $acl)
     {
         // send to metadataloader
         /** @var ACL $acl */

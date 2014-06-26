@@ -6,7 +6,6 @@ use Doctrine\ORM\Event\LoadClassMetadataEventArgs;
 use Doctrine\ORM\Mapping\ClassMetadata;
 use Doctrine\ORM\Mapping\ClassMetadataFactory;
 use MyCLabs\ACL\Model\Actions;
-use MyCLabs\ACL\Model\Role;
 
 /**
  * Loads metadata relative to ACL in Doctrine.
@@ -16,32 +15,9 @@ use MyCLabs\ACL\Model\Role;
 class ACLMetadataLoader
 {
     /**
-     * Discriminator map for roles.
-     * @var string[]
-     */
-    private $roles = [];
-
-    /**
      * @var string
      */
     private $actionsClass;
-
-    /**
-     * Dynamically register a role subclass in the discriminator map for the Doctrine mapping.
-     *
-     * @param string $class
-     * @param string $shortName
-     *
-     * @throws \InvalidArgumentException The given class doesn't extend MyCLabs\ACL\Model\Role
-     */
-    public function registerRoleClass($class, $shortName)
-    {
-        if (! is_subclass_of($class, 'MyCLabs\ACL\Model\Role')) {
-            throw new \InvalidArgumentException(sprintf('%s doesn\'t extend MyCLabs\ACL\Model\Role', $class));
-        }
-
-        $this->roles[$shortName] = $class;
-    }
 
     /**
      * Registers an alternative "Actions" class to use in the authorization entity.
@@ -68,10 +44,6 @@ class ACLMetadataLoader
     {
         /** @var ClassMetadata $metadata */
         $metadata = $eventArgs->getClassMetadata();
-
-        if ($metadata->getName() === 'MyCLabs\ACL\Model\Role') {
-            $metadata->setDiscriminatorMap($this->roles);
-        }
 
         if (($this->actionsClass !== null) && ($metadata->getName() === 'MyCLabs\ACL\Model\Authorization')) {
             $this->remapActions($metadata, $eventArgs->getEntityManager()->getMetadataFactory());
