@@ -10,7 +10,7 @@ use MyCLabs\ACL\ACL;
 use MyCLabs\ACL\Doctrine\ACLSetup;
 use MyCLabs\ACL\Model\Actions;
 use MyCLabs\ACL\Model\Authorization;
-use MyCLabs\ACL\Model\Role;
+use MyCLabs\ACL\Model\RoleEntry;
 use MyCLabs\ACL\Model\ClassResource;
 use MyCLabs\ACL\Repository\AuthorizationRepository;
 use Tests\MyCLabs\ACL\Unit\Repository\Model\File;
@@ -74,7 +74,7 @@ class AuthorizationRepositoryTest extends \PHPUnit_Framework_TestCase
         $this->em->persist($user);
         $resource = new File();
         $this->em->persist($resource);
-        $role = new Role($user, 'fileOwner', $resource);
+        $role = new RoleEntry($user, 'fileOwner', $resource);
         $this->em->persist($role);
         $this->em->flush();
 
@@ -113,7 +113,7 @@ class AuthorizationRepositoryTest extends \PHPUnit_Framework_TestCase
         $this->em->persist($user);
         $resource = new File();
         $this->em->persist($resource);
-        $role = new Role($user, 'owner', $resource);
+        $role = new RoleEntry($user, 'owner', $resource);
         $this->em->persist($role);
         $this->em->flush();
 
@@ -158,7 +158,7 @@ class AuthorizationRepositoryTest extends \PHPUnit_Framework_TestCase
         $this->em->persist($user);
         $resource = new File();
         $this->em->persist($resource);
-        $role = new Role($user, 'owner', $resource);
+        $role = new RoleEntry($user, 'owner', $resource);
         $this->em->persist($role);
         $this->em->flush();
 
@@ -183,7 +183,7 @@ class AuthorizationRepositoryTest extends \PHPUnit_Framework_TestCase
         $this->em->persist($user);
         $resource = new File();
         $this->em->persist($resource);
-        $role = new Role($user, 'owner', $resource);
+        $role = new RoleEntry($user, 'owner', $resource);
         $this->em->persist($role);
         $this->em->flush();
 
@@ -212,13 +212,13 @@ class AuthorizationRepositoryTest extends \PHPUnit_Framework_TestCase
 
         $resource1 = new File();
         $this->em->persist($resource1);
-        $role1 = new Role($user, 'owner', $resource1);
+        $role1 = new RoleEntry($user, 'owner', $resource1);
         $this->em->persist($role1);
         $this->em->flush();
 
         $resource2 = new File();
         $this->em->persist($resource2);
-        $role2 = new Role($user, 'owner', $resource2);
+        $role2 = new RoleEntry($user, 'owner', $resource2);
         $this->em->persist($role2);
         $this->em->flush();
 

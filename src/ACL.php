@@ -12,7 +12,7 @@ use MyCLabs\ACL\Model\Authorization;
 use MyCLabs\ACL\Model\ClassResource;
 use MyCLabs\ACL\Model\EntityResource;
 use MyCLabs\ACL\Model\ResourceInterface;
-use MyCLabs\ACL\Model\Role;
+use MyCLabs\ACL\Model\RoleEntry;
 use MyCLabs\ACL\Model\SecurityIdentityInterface;
 use MyCLabs\ACL\Repository\AuthorizationRepository;
 
@@ -78,12 +78,12 @@ class ACL
      *
      * This method should only be called in roles.
      *
-     * @param Role              $role
+     * @param RoleEntry              $role
      * @param Actions           $actions
      * @param ResourceInterface $resource
      * @param bool              $cascade  Should the authorization cascade to sub-resources?
      */
-    public function allow(Role $role, Actions $actions, ResourceInterface $resource, $cascade = true)
+    public function allow(RoleEntry $role, Actions $actions, ResourceInterface $resource, $cascade = true)
     {
         $authorization = Authorization::create($role, $actions, $resource, $cascade);
 
@@ -123,7 +123,7 @@ class ACL
         if (null !== $this->getRole($identity, $roleName, $resource)) {
             throw new AlreadyExistsException('The role already exists for the specified user and the specified resource');
         }
-        $role = new Role($identity, $roleName, $resource);
+        $role = new RoleEntry($identity, $roleName, $resource);
 
         $identity->addRole($role);
 
@@ -210,7 +210,7 @@ class ACL
     {
         /** @var AuthorizationRepository $repository */
         $repository = $this->entityManager->getRepository('MyCLabs\ACL\Model\Authorization');
-        $roleRepo = $this->entityManager->getRepository('MyCLabs\ACL\Model\Role');
+        $roleRepo = $this->entityManager->getRepository('MyCLabs\ACL\Model\RoleEntry');
 
         // Remove the roles for this resource
         foreach ($this->getRolesForResource($resource) as $roleName) {
@@ -233,7 +233,7 @@ class ACL
      */
     public function rebuildAuthorizations()
     {
-        $roleRepository = $this->entityManager->getRepository('MyCLabs\ACL\Model\Role');
+        $roleRepository = $this->entityManager->getRepository('MyCLabs\ACL\Model\RoleEntry');
 
         // Clear
         $this->entityManager->createQuery('DELETE MyCLabs\ACL\Model\Authorization')->execute();
@@ -241,7 +241,7 @@ class ACL
 
         // Regenerate
         foreach ($roleRepository->findAll() as $role) {
-            /** @var Role $role */
+            /** @var RoleEntry $role */
             $actions = $this->roles[$role->getName()]['actions'];
             $resourceClass = $this->roles[$role->getName()]['resource'];
             if ($resourceClass instanceof ClassResource) {
@@ -264,11 +264,11 @@ class ACL
      * @param SecurityIdentityInterface $identity
      * @param $roleName
      * @param ResourceInterface $resource
-     * @return Role
+     * @return RoleEntry
      */
     protected function getRole(SecurityIdentityInterface $identity, $roleName, ResourceInterface $resource = null)
     {
-        $roleRepo = $this->entityManager->getRepository('Myclabs\ACL\Model\Role');
+        $roleRepo = $this->entityManager->getRepository('Myclabs\ACL\Model\RoleEntry');
         if ($this->roles[$roleName]['resource'] instanceof ClassResource) {
             return $roleRepo->findOneBy([ 'securityIdentity' => $identity->getId(), 'name' => $roleName ]);
         } else {

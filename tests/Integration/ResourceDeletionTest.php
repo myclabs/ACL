@@ -39,7 +39,7 @@ class ResourceDeletionTest extends AbstractIntegrationTest
         $this->assertEquals(0, $query->getSingleScalarResult(), "The authorization wasn't deleted");
 
         // We check that the role is deleted too
-        $query = $this->em->createQuery('SELECT COUNT(r.id) FROM MyCLabs\ACL\Model\Role r');
+        $query = $this->em->createQuery('SELECT COUNT(r.id) FROM MyCLabs\ACL\Model\RoleEntry r');
         $this->assertEquals(0, $query->getSingleScalarResult(), "The role wasn't deleted");
     }
 
@@ -77,7 +77,7 @@ class ResourceDeletionTest extends AbstractIntegrationTest
         $this->assertEquals(1, $query->getSingleScalarResult(), "The child authorization wasn't deleted");
 
         // We check that the role is not deleted
-        $query = $this->em->createQuery('SELECT COUNT(r.id) FROM MyCLabs\ACL\Model\Role r');
+        $query = $this->em->createQuery('SELECT COUNT(r.id) FROM MyCLabs\ACL\Model\RoleEntry r');
         $this->assertEquals(1, $query->getSingleScalarResult());
 
         // We check that isAllowed still works with the parent resource (which wasn't deleted)

@@ -9,14 +9,14 @@ use Doctrine\Common\Collections\Collection;
  *
  * This trait needs a $roles attribute.
  *
- * @property Role[]|Collection $roles
+ * @property RoleEntry[]|Collection $roles
  *
  * @author Matthieu Napoli <matthieu@mnapoli.fr>
  */
 trait SecurityIdentityTrait
 {
     /**
-     * @return Role[]
+     * @return RoleEntry[]
      */
     public function getRoles()
     {
@@ -24,17 +24,17 @@ trait SecurityIdentityTrait
     }
 
     /**
-     * @param Role $role
+     * @param RoleEntry $role
      */
-    public function addRole(Role $role)
+    public function addRole(RoleEntry $role)
     {
         $this->roles[] = $role;
     }
 
     /**
-     * @param Role $role
+     * @param RoleEntry $role
      */
-    public function removeRole(Role $role)
+    public function removeRole(RoleEntry $role)
     {
         $this->roles->removeElement($role);
     }

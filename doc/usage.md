@@ -38,8 +38,8 @@ class User implements SecurityIdentityInterface
     protected $id;
 
     /**
-     * @var Role[]
-     * @ORM\OneToMany(targetEntity="MyCLabs\ACL\Model\Role", mappedBy="securityIdentity",
+     * @var RoleEntry[]
+     * @ORM\OneToMany(targetEntity="MyCLabs\ACL\Model\RoleEntry", mappedBy="securityIdentity",
      *     cascade={"persist", "remove"}, orphanRemoval=true)
      */
     protected $roles;

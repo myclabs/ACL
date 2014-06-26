@@ -15,17 +15,17 @@ interface SecurityIdentityInterface
     public function getId();
 
     /**
-     * @return Role[]
+     * @return RoleEntry[]
      */
     public function getRoles();
 
     /**
-     * @param Role $role
+     * @param RoleEntry $role
      */
-    public function addRole(Role $role);
+    public function addRole(RoleEntry $role);
 
     /**
-     * @param Role $role
+     * @param RoleEntry $role
      */
-    public function removeRole(Role $role);
+    public function removeRole(RoleEntry $role);
 }

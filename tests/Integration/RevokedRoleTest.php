@@ -29,14 +29,14 @@ class RevokedRoleTest extends AbstractIntegrationTest
         $this->assertFalse($this->acl->isAllowed($user, Actions::VIEW, $article2));
         $this->assertFalse($this->acl->isAllowed($user, Actions::EDIT, $article2));
 
-        // Role granted: access
+        // RoleEntry granted: access
         $this->acl->grant($user, 'articleEditor', $article2);
         $this->assertFalse($this->acl->isAllowed($user, Actions::VIEW, $article1));
         $this->assertFalse($this->acl->isAllowed($user, Actions::EDIT, $article1));
         $this->assertTrue($this->acl->isAllowed($user, Actions::VIEW, $article2));
         $this->assertTrue($this->acl->isAllowed($user, Actions::EDIT, $article2));
 
-        // Role revoked: no access
+        // RoleEntry revoked: no access
         $this->acl->revoke($user, 'articleEditor', $article2);
         $this->assertFalse($this->acl->isAllowed($user, Actions::VIEW, $article1));
         $this->assertFalse($this->acl->isAllowed($user, Actions::EDIT, $article1));

@@ -8,13 +8,13 @@ use Doctrine\ORM\Mapping as ORM;
 use MyCLabs\ACL\ACL;
 
 /**
- * Role.
+ * RoleEntry.
  *
  * @ORM\Entity
  * @ORM\Table(name="ACL_Role")
  *
  */
-class Role
+class RoleEntry
 {
     /**
      * @var int

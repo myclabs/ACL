@@ -28,10 +28,10 @@ class Authorization
     protected $id;
 
     /**
-     * Role that created the authorization.
+     * RoleEntry that created the authorization.
      *
-     * @var Role
-     * @ORM\ManyToOne(targetEntity="Role", inversedBy="authorizations")
+     * @var RoleEntry
+     * @ORM\ManyToOne(targetEntity="RoleEntry", inversedBy="authorizations")
      * @ORM\JoinColumn(name="role_id", nullable=false, onDelete="CASCADE")
      */
     protected $role;
@@ -88,14 +88,14 @@ class Authorization
     /**
      * Creates an authorization on a resource.
      *
-     * @param Role $role
+     * @param RoleEntry $role
      * @param Actions $actions
      * @param ResourceInterface $resource
      * @param bool $cascade Should this authorization cascade?
      * @throws \RuntimeException
      * @return static
      */
-    public static function create(Role $role, Actions $actions, ResourceInterface $resource, $cascade = true)
+    public static function create(RoleEntry $role, Actions $actions, ResourceInterface $resource, $cascade = true)
     {
         if ($resource instanceof EntityResource) {
             return new static($role, $actions, $cascade, ClassUtils::getClass($resource), $resource->getId());
@@ -107,14 +107,14 @@ class Authorization
     }
 
     /**
-     * @param Role    $role
+     * @param RoleEntry    $role
      * @param Actions $actions
      * @param bool    $cascade Should this authorization cascade?
      * @param string  $entityClass
      * @param int     $entityId
      */
     private function __construct(
-        Role $role,
+        RoleEntry $role,
         Actions $actions,
         $cascade,
         $entityClass,
@@ -202,7 +202,7 @@ class Authorization
     }
 
     /**
-     * @return Role
+     * @return RoleEntry
      */
     public function getRole()
     {

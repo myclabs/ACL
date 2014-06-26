@@ -14,7 +14,7 @@ class AuthorizationTest extends \PHPUnit_Framework_TestCase
     public function testCreateWithClassResource()
     {
         $user = $this->getMockForAbstractClass('MyCLabs\ACL\Model\SecurityIdentityInterface');
-        $role = $this->getMock('MyCLabs\ACL\Model\Role', [], [], '', false);
+        $role = $this->getMock('MyCLabs\ACL\Model\RoleEntry', [], [], '', false);
         $role->expects($this->once())
             ->method('getSecurityIdentity')
             ->will($this->returnValue($user));
@@ -37,7 +37,7 @@ class AuthorizationTest extends \PHPUnit_Framework_TestCase
     public function testCreateWithEntityResource()
     {
         $user = $this->getMockForAbstractClass('MyCLabs\ACL\Model\SecurityIdentityInterface');
-        $role = $this->getMock('MyCLabs\ACL\Model\Role', [], [], '', false);
+        $role = $this->getMock('MyCLabs\ACL\Model\RoleEntry', [], [], '', false);
         $role->expects($this->once())
             ->method('getSecurityIdentity')
             ->will($this->returnValue($user));
@@ -63,7 +63,7 @@ class AuthorizationTest extends \PHPUnit_Framework_TestCase
     public function testCreateChildAuthorization()
     {
         $user = $this->getMockForAbstractClass('MyCLabs\ACL\Model\SecurityIdentityInterface');
-        $role = $this->getMock('MyCLabs\ACL\Model\Role', [], [], '', false);
+        $role = $this->getMock('MyCLabs\ACL\Model\RoleEntry', [], [], '', false);
         $role->expects($this->any())
             ->method('getSecurityIdentity')
             ->will($this->returnValue($user));
@@ -91,7 +91,7 @@ class AuthorizationTest extends \PHPUnit_Framework_TestCase
      */
     public function testCreateAuthorizationWithInvalidResourceClass()
     {
-        $role = $this->getMock('MyCLabs\ACL\Model\Role', [], [], '', false);
+        $role = $this->getMock('MyCLabs\ACL\Model\RoleEntry', [], [], '', false);
         $resource = $this->getMock('MyCLabs\ACL\Model\ResourceInterface');
 
         Authorization::create($role, Actions::all(), $resource);

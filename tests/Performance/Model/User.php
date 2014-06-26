@@ -5,7 +5,7 @@ namespace Tests\MyCLabs\ACL\Performance\Model;
 use Doctrine\Common\Collections\ArrayCollection;
 use Doctrine\Common\Collections\Collection;
 use Doctrine\ORM\Mapping as ORM;
-use MyCLabs\ACL\Model\Role;
+use MyCLabs\ACL\Model\RoleEntry;
 use MyCLabs\ACL\Model\SecurityIdentityInterface;
 use MyCLabs\ACL\Model\SecurityIdentityTrait;
 
@@ -23,7 +23,7 @@ class User implements SecurityIdentityInterface
     protected $id;
 
     /**
-     * @var Role[]|Collection
+     * @var RoleEntry[]|Collection
      * @ORM\OneToMany(targetEntity="MyCLabs\ACL\Model\Role", mappedBy="securityIdentity",
      * cascade={"persist", "remove"}, orphanRemoval=true)
      */
