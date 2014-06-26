@@ -1,5 +1,5 @@
 ---
-menu: setup
+currentMenu: setup
 ---
 
 # Setup

@@ -1,5 +1,5 @@
 ---
-menu: cascading
+currentMenu: cascading
 ---
 
 # Authorization cascading

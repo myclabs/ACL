@@ -151,7 +151,7 @@ class AuthorizationRepository extends EntityRepository
         $qb->where('a.cascadable = true');
 
         // Root authorizations means no parent
-        $qb->where('a.parentAuthorization IS NULL');
+        $qb->andWhere('a.parentAuthorization IS NULL');
 
         if ($resource instanceof EntityResource) {
             $qb->andWhere('a.entityClass = :entityClass');
@@ -166,5 +166,39 @@ class AuthorizationRepository extends EntityRepository
         }
 
         return $qb->getQuery()->getResult();
+    }
+
+    /**
+     * Remove all the authorizations that apply to the given resource.
+     *
+     * @param ResourceInterface $resource
+     * @throws \RuntimeException If the resource is an entity, it must be persisted.
+     */
+    public function removeAuthorizationsForResource(ResourceInterface $resource)
+    {
+        $qb = $this->_em->createQueryBuilder();
+
+        $qb->delete($this->getEntityName(), 'a');
+
+        if ($resource instanceof EntityResource) {
+            if ($resource->getId() === null) {
+                throw new \RuntimeException(sprintf(
+                    'The entity resource %s must be persisted (id not null) to be able to remove the authorizations',
+                    ClassUtils::getClass($resource)
+                ));
+            }
+
+            $qb->andWhere('a.entityClass = :entityClass');
+            $qb->andWhere('a.entityId = :entityId');
+            $qb->setParameter('entityClass', ClassUtils::getClass($resource));
+            $qb->setParameter('entityId', $resource->getId());
+        }
+        if ($resource instanceof ClassResource) {
+            $qb->andWhere('a.entityClass = :entityClass');
+            $qb->andWhere('a.entityId IS NULL');
+            $qb->setParameter('entityClass', $resource->getClass());
+        }
+
+        $qb->getQuery()->execute();
     }
 }

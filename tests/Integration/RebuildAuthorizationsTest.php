@@ -27,12 +27,21 @@ class RebuildAuthorizationTest extends AbstractIntegrationTest
 
         $this->em->clear();
 
+        $qb = $this->em->createQueryBuilder();
+        $qb->select('count(authorization.id)');
+        $qb->from('MyCLabs\ACL\Model\Authorization', 'authorization');
+        $query = $qb->getQuery();
+
+        $initialCount = $query->getSingleScalarResult();
+
         $this->acl->rebuildAuthorizations();
 
         $this->assertFalse($this->acl->isAllowed($user, Actions::VIEW, $article1));
         $this->assertFalse($this->acl->isAllowed($user, Actions::EDIT, $article1));
         $this->assertTrue($this->acl->isAllowed($user, Actions::VIEW, $article2));
         $this->assertTrue($this->acl->isAllowed($user, Actions::EDIT, $article2));
+
+        $this->assertEquals($initialCount, $query->getSingleScalarResult());
     }
 
     public function testRebuildAuthorizationsWithClassResource()

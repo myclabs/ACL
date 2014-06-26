@@ -199,20 +199,30 @@ class ACL
     }
 
     /**
+     * Process a resource that has been deleted.
+     *
+     * Called by the EntityResourcesListener.
+     *
+     * @param EntityResource $resource
+     */
+    public function processDeletedResource(EntityResource $resource)
+    {
+        /** @var AuthorizationRepository $repository */
+        $repository = $this->entityManager->getRepository('MyCLabs\ACL\Model\Authorization');
+
+        $repository->removeAuthorizationsForResource($resource);
+    }
+
+    /**
      * Clears and rebuilds all the authorizations from the roles.
      */
     public function rebuildAuthorizations()
     {
-        $authorizationRepository = $this->entityManager->getRepository('MyCLabs\ACL\Model\Authorization');
         $roleRepository = $this->entityManager->getRepository('MyCLabs\ACL\Model\Role');
 
         // Clear
-        // TODO use DQL DELETE query
-        foreach ($authorizationRepository->findAll() as $authorization) {
-            $this->entityManager->remove($authorization);
-        }
-        $this->entityManager->flush();
-        $this->entityManager->clear();
+        $this->entityManager->createQuery('DELETE MyCLabs\ACL\Model\Authorization')->execute();
+        $this->entityManager->clear('MyCLabs\ACL\Model\Authorization');
 
         // Regenerate
         foreach ($roleRepository->findAll() as $role) {

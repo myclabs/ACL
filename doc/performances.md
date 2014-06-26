@@ -1,5 +1,5 @@
 ---
-menu: performances
+currentMenu: performances
 ---
 
 # Performances

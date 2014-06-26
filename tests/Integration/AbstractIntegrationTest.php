@@ -37,12 +37,13 @@ abstract class AbstractIntegrationTest extends \PHPUnit_Framework_TestCase
         $paths = [
             __DIR__ . '/../../src/Model',
             __DIR__ . '/Model',
+            __DIR__ . '/Issues/Issue10',
         ];
         $config = Setup::createAnnotationMetadataConfiguration($paths, true, null, new ArrayCache(), false);
         $this->em = EntityManager::create($dbParams, $config);
 
         // Create the ACL object
-        $this->acl = new ACL($this->em);
+        $this->acl = $this->createACL();
         $setup = $this->configureACL();
         $setup->setUpEntityManager($this->em, function () {
             return $this->acl;
@@ -56,6 +57,11 @@ abstract class AbstractIntegrationTest extends \PHPUnit_Framework_TestCase
         if ($dbParams['driver'] == 'pdo_sqlite') {
             $this->em->getConnection()->executeQuery('PRAGMA foreign_keys = ON');
         }
+    }
+
+    protected function createACL()
+    {
+        return new ACL($this->em);
     }
 
     private function configureACL()
@@ -87,6 +93,8 @@ abstract class AbstractIntegrationTest extends \PHPUnit_Framework_TestCase
         ];
 
         $setup->registerRoles($roles, $this->acl);
+
+        $setup->registerRoleClass('Tests\MyCLabs\ACL\Integration\Issues\Issue10\AccountAdminRole', 'accountAdmin');
 
         $setup->setActionsClass('Tests\MyCLabs\ACL\Integration\Model\Actions');
 
