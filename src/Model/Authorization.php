@@ -88,7 +88,7 @@ class Authorization
     /**
      * Creates an authorization on a resource.
      *
-     * @param role $role
+     * @param Role $role
      * @param Actions $actions
      * @param ResourceInterface $resource
      * @param bool $cascade Should this authorization cascade?

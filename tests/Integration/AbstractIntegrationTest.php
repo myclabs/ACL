@@ -89,12 +89,14 @@ abstract class AbstractIntegrationTest extends \PHPUnit_Framework_TestCase
             'articleEditorCopy' => [
                 'resource' => 'Tests\MyCLabs\ACL\Integration\Model\Article',
                 'actions' => new Actions([Actions::VIEW, Actions::EDIT])
+            ],
+            'accountAdmin' => [
+                'resource' => 'Tests\MyCLabs\ACL\Integration\Issues\Issue10\Account',
+                'actions' => Actions::all()
             ]
         ];
 
         $setup->registerRoles($roles, $this->acl);
-
-        $setup->registerRoleClass('Tests\MyCLabs\ACL\Integration\Issues\Issue10\AccountAdminRole', 'accountAdmin');
 
         $setup->setActionsClass('Tests\MyCLabs\ACL\Integration\Model\Actions');
 

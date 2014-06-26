@@ -48,7 +48,7 @@ class Issue10Test extends AbstractIntegrationTest
         $this->em->persist($user);
         $this->em->flush();
 
-        $this->acl->grant($user, new AccountAdminRole($user, $account));
+        $this->acl->grant($user, 'accountAdmin', $account);
 
         $this->assertTrue($this->acl->isAllowed($user, Actions::VIEW, $account));
         $this->assertTrue($this->acl->isAllowed($user, Actions::VIEW, $project));
@@ -70,7 +70,7 @@ class Issue10Test extends AbstractIntegrationTest
         $this->em->persist($user);
         $this->em->flush();
 
-        $this->acl->grant($user, new AccountAdminRole($user, $account));
+        $this->acl->grant($user, 'accountAdmin', $account);
 
         $this->assertTrue($this->acl->isAllowed($user, Actions::VIEW, $account));
 

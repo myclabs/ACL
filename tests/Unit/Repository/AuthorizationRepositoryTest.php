@@ -113,7 +113,7 @@ class AuthorizationRepositoryTest extends \PHPUnit_Framework_TestCase
         $this->em->persist($user);
         $resource = new File();
         $this->em->persist($resource);
-        $role = new FileOwnerRole($user, $resource);
+        $role = new Role($user, 'owner', $resource);
         $this->em->persist($role);
         $this->em->flush();
 
@@ -158,7 +158,7 @@ class AuthorizationRepositoryTest extends \PHPUnit_Framework_TestCase
         $this->em->persist($user);
         $resource = new File();
         $this->em->persist($resource);
-        $role = new FileOwnerRole($user, $resource);
+        $role = new Role($user, 'owner', $resource);
         $this->em->persist($role);
         $this->em->flush();
 
@@ -183,7 +183,7 @@ class AuthorizationRepositoryTest extends \PHPUnit_Framework_TestCase
         $this->em->persist($user);
         $resource = new File();
         $this->em->persist($resource);
-        $role = new FileOwnerRole($user, $resource);
+        $role = new Role($user, 'owner', $resource);
         $this->em->persist($role);
         $this->em->flush();
 
@@ -212,13 +212,13 @@ class AuthorizationRepositoryTest extends \PHPUnit_Framework_TestCase
 
         $resource1 = new File();
         $this->em->persist($resource1);
-        $role1 = new FileOwnerRole($user, $resource1);
+        $role1 = new Role($user, 'owner', $resource1);
         $this->em->persist($role1);
         $this->em->flush();
 
         $resource2 = new File();
         $this->em->persist($resource2);
-        $role2 = new FileOwnerRole($user, $resource2);
+        $role2 = new Role($user, 'owner', $resource2);
         $this->em->persist($role2);
         $this->em->flush();
 

@@ -4,9 +4,7 @@ namespace Tests\MyCLabs\ACL\Integration;
 
 use MyCLabs\ACL\Model\Actions;
 use Tests\MyCLabs\ACL\Integration\Model\Article;
-use Tests\MyCLabs\ACL\Integration\Model\ArticleEditorRole;
 use Tests\MyCLabs\ACL\Integration\Model\Category;
-use Tests\MyCLabs\ACL\Integration\Model\CategoryManagerRole;
 use Tests\MyCLabs\ACL\Integration\Model\User;
 
 /**
@@ -25,7 +23,7 @@ class ResourceDeletionTest extends AbstractIntegrationTest
         $this->em->flush();
 
         // The role will create 1 authorization
-        $this->acl->grant($user, new ArticleEditorRole($user, $resource));
+        $this->acl->grant($user, 'articleEditor', $resource);
         $this->assertTrue($this->acl->isAllowed($user, Actions::VIEW, $resource));
 
         // We need to reload the resource because the role hasn't been added automatically to
@@ -41,7 +39,7 @@ class ResourceDeletionTest extends AbstractIntegrationTest
         $this->assertEquals(0, $query->getSingleScalarResult(), "The authorization wasn't deleted");
 
         // We check that the role is deleted too
-        $query = $this->em->createQuery('SELECT COUNT(r.id) FROM Tests\MyCLabs\ACL\Integration\Model\ArticleEditorRole r');
+        $query = $this->em->createQuery('SELECT COUNT(r.id) FROM MyCLabs\ACL\Model\Role r');
         $this->assertEquals(0, $query->getSingleScalarResult(), "The role wasn't deleted");
     }
 
@@ -62,7 +60,7 @@ class ResourceDeletionTest extends AbstractIntegrationTest
         $this->em->flush();
 
         // We apply a role on the parent resource, authorizations will cascade to the sub-resource
-        $this->acl->grant($user, new CategoryManagerRole($user, $category));
+        $this->acl->grant($user, 'categoryManager', $category);
         $this->assertTrue($this->acl->isAllowed($user, Actions::VIEW, $category));
         $this->assertTrue($this->acl->isAllowed($user, Actions::VIEW, $subCategory));
 
@@ -79,7 +77,7 @@ class ResourceDeletionTest extends AbstractIntegrationTest
         $this->assertEquals(1, $query->getSingleScalarResult(), "The child authorization wasn't deleted");
 
         // We check that the role is not deleted
-        $query = $this->em->createQuery('SELECT COUNT(r.id) FROM Tests\MyCLabs\ACL\Integration\Model\CategoryManagerRole r');
+        $query = $this->em->createQuery('SELECT COUNT(r.id) FROM MyCLabs\ACL\Model\Role r');
         $this->assertEquals(1, $query->getSingleScalarResult());
 
         // We check that isAllowed still works with the parent resource (which wasn't deleted)
