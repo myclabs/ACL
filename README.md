@@ -48,31 +48,41 @@ You can start by creating it:
 $acl = new ACL($entityManager);
 ```
 
-You give permissions to a user by adding it a role:
+Let's define a role:
 
 ```php
-$acl->grant($user, 'ArticleEditorRole', $article);
+$acl->setRoles([
+    // An article editor will be allowed to VIEW and EDIT an article
+    'ArticleEditor' => [
+        'resourceType' => 'Acme\Model\Article',
+        'actions'      => [ Actions::VIEW, Actions::EDIT ],
+    ],
+]);
 ```
 
-Roles are classes that you write and which define the permissions a user has on a resource.
-
-You remove permissions to a user by removing the role:
+Now you can grant a user the role and the resource to which it applies:
 
 ```php
-$acl->revoke($user, 'ArticleEditorRole', $article);
+$acl->grant($user, 'ArticleEditor', $article);
 ```
 
 Test permissions:
 
 ```php
-$acl->isAllowed($user, Actions::EDIT, $article);
+echo $acl->isAllowed($user, Actions::EDIT, $article); // true
+```
+
+You remove permissions to a user by revoking the role:
+
+```php
+$acl->revoke($user, 'ArticleEditor', $article);
 ```
 
 You can also filter your queries to get only the entities the user has access to:
 
 ```php
 $qb = $entityManager->createQueryBuilder();
-$qb->select('article')->from('Model\Article', 'article');
+$qb->select('article')->from('Acme\Model\Article', 'article');
 
 ACLQueryHelper::joinACL($qb, $user, Actions::EDIT);
 
@@ -85,7 +95,7 @@ $articles = $qb->getQuery()->getResult();
 - stored in database (you don't need to handle persistence yourself)
 - extremely optimized:
   - filters queries at database level (you don't load entities the user can't access)
-  - joins with only 1 extra table
+  - joins with only 1 extra table only
   - bypasses Doctrine's ORM to insert authorizations in database (fast and efficient)
   - cascade delete at database level
 - authorization cascading/inheritance
@@ -95,4 +105,4 @@ $articles = $qb->getQuery()->getResult();
 ### Limitations
 
 - because of Doctrine limitations you need to flush your resources before giving or testing authorizations
-- backed up by the database: testing `isAllowed` means one call to the database
+- backed up by the database: testing `isAllowed` means one call to the database unless cached

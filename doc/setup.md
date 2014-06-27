@@ -18,8 +18,9 @@ Install the library with Composer:
 
 ## Configuration
 
-You first need to register the annotation mapping to your Doctrine metadata driver.
-Here is for example how you would do it with the most basic Doctrine configuration:
+You first need to add the mapping of `MyCLabs\ACL` classes to your Doctrine configuration.
+
+Here is for example how you would do it with the most basic Doctrine setup:
 
 ```php
 $paths = [
@@ -51,13 +52,17 @@ The `ACLSetup` class is here to help you:
 
 ```php
 $aclSetup = new \MyCLabs\ACL\Doctrine\ACLSetup();
+
 // Set which class implements the SecurityIdentityInterface (must be called once)
 $aclSetup->setSecurityIdentityClass('My\Model\User');
+
 // Register roles
-$aclSetup->registerRoles([ 'ArticleEditorRole' => [
-                                'resource' => 'My\Model\Article',
-                                'actions' => new Actions([ Actions::Edit ]) ]
-                         ]);
+$aclSetup->registerRoles([
+    'ArticleEditorRole' => [
+        'resourceType' => 'My\Model\Article',
+        'actions'      => [ Actions::Edit ],
+    ],
+]);
 
 // Apply the configuration to the entity manager
 $aclSetup->setUpEntityManager($entityManager, function () use ($acl) { return $acl; });
@@ -82,7 +87,7 @@ $aclSetup->setUpEntityManager($entityManager, $aclLocator);
 
 To be as efficient as possible, MyCLabs\ACL uses `ON DELETE CASCADE` at database level.
 
-For example, when a role is removed, all of its authorizations will be deleted in cascade by MySQL/SQLite/…
+For example, when a role is revoked, all of its authorizations will be deleted in cascade by MySQL/SQLite/…
 That allows to bypass using Doctrine's "cascade remove" which loads all the entities in memory (there could
 be thousands of authorizations).
 
