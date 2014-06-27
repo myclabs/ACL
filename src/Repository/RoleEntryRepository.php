@@ -18,6 +18,32 @@ use MyCLabs\ACL\Model\SecurityIdentityInterface;
 class RoleEntryRepository extends EntityRepository
 {
     /**
+     * Find the role entries of the given role that apply to the resource.
+     *
+     * @param string            $roleName
+     * @param ResourceInterface $resource
+     *
+     * @return RoleEntry[]
+     */
+    public function findByRoleAndResource($roleName, ResourceInterface $resource)
+    {
+        if ($resource instanceof EntityResource) {
+            return $this->findOneBy([
+                'roleName'         => $roleName,
+                'entityClass'      => ClassUtils::getClass($resource),
+                'entityId'         => $resource->getId(),
+            ]);
+        }
+
+        /** @var ClassResource $resource */
+        return $this->findBy([
+            'roleName'         => $roleName,
+            'entityClass'      => $resource->getClass(),
+            'entityId'         => null,
+        ]);
+    }
+
+    /**
      * Find a role entry.
      *
      * @param SecurityIdentityInterface $identity

@@ -77,32 +77,6 @@ class Article implements EntityResource
 }
 ```
 
-You can also optionally add an association to the roles that apply on this resource.
-Such association is very useful so that the roles (and their authorizations) are deleted in cascade
-when the resource is deleted:
-
-```php
-class Article implements EntityResource
-{
-    // ...
-
-    /**
-     * @ORM\OneToMany(targetEntity="ArticleEditorRole", mappedBy="article", cascade={"remove"})
-     */
-    protected $roles;
-
-    public function __construct()
-    {
-        $this->roles = new ArrayCollection();
-    }
-}
-```
-
-This association can also be useful if you need to find all the "editors" of an article for example.
-
-Here the association targets `ArticleEditorRole`, but if you have several roles that apply to articles, you
-might want to have an abstract `BaseArticleRole` that you can reference in your Doctrine association.
-
 
 ### 3. Create a new role
 
@@ -111,30 +85,31 @@ The role gives the authorizations.
 They are declared in an array and must be registered with the ACLSetup class:
 
 ```php
-$roles = [];
-$roles = ['articleEditor'] = [
-    'resource' => 'My\Model\Article',
-    'actions' => new Actions([Actions::VIEW, Actions::EDIT])
+$roles = [
+    'ArticleEditor' => [
+        'resourceType' => 'My\Model\Article',
+        'actions'      => [Actions::VIEW, Actions::EDIT],
+    ],
 ];
 
 $aclSetup->registerRoles($roles);
 ```
 
-The authorizations given by the role are created in the `createAuthorizations()` method.
-
 For each role you need to specify:
 
-- *the role name*
-- *the resource* (here the article)
+- *the role name* as the array key (here `ArticleEditor`)
+- *the resource type* (here the article)
 - *the actions* that can be performed on the resource
 
 The resource can be either a class name (as shown above) or an class resource, which will
 give access to all entities of that type:
 
 ```php
-$roles = ['allArticlesEditor'] = [
-    'resource' => new ClassResource('Tests\MyCLabs\ACL\Integration\Model\Article'),
-    'actions' => new Actions([Actions::VIEW, Actions::EDIT])
+$roles = [
+    'AllArticlesEditor' => [
+        'resource' => new ClassResource('Tests\MyCLabs\ACL\Integration\Model\Article'),
+        'actions'  => [Actions::VIEW, Actions::EDIT],
+    ],
 ];
 ```
 
@@ -142,13 +117,15 @@ Authorizations that are granted on class resources (i.e. *all entities of that c
 automatically to each sub-resource (i.e. all entities). Read the documentation about
 [authorization cascading](cascading.md) to learn more.
 
-Another common use case for class resources are object creation. For example, you want an article editor
-to be able to create new articles. You can do this in the `ArticleEditorRole`:
+Another common use case for class resources are object creation. For example, you want an article creator
+to be able to create new articles:
 
 ```php
-$roles = ['articleCreator'] = [
-    'resource' => new ClassResource('My\Model\Article'),
-    'actions' => new Actions([Actions::CREATE])
+$roles = [
+    'ArticleCreator' => [
+        'resource' => new ClassResource('My\Model\Article'),
+        'actions'  => [Actions::CREATE],
+    ],
 ];
 ```
 
@@ -158,8 +135,9 @@ $roles = ['articleCreator'] = [
 Now that everything is defined, we can grant users some roles very simply:
 
 ```php
-// On a single resource
+// On an entity resource
 $acl->grant($user, 'ArticleEditor', $article);
+
 // On a class resource
 $acl->grant($user, 'AllArticlesEditor');
 ```
@@ -168,9 +146,11 @@ Here, the ACL will add the role to the user and use the role to automatically ge
 related authorizations.
 
 To revoke a role to an user, use the revoke method:
+
 ```php
-// For a single resource
+// For an entity resource
 $acl->revoke($user, 'ArticleEditor', $article);
+
 // For a class resource
 $acl->revoke($user, 'AllArticlesEditor');
 ```
