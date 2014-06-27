@@ -47,7 +47,7 @@ class AuthorizationRepository extends EntityRepository
             }
 
             $data = [
-                'role_id'                => $authorization->getRole()->getId(),
+                'role_entry_id'          => $authorization->getRoleEntry()->getId(),
                 'securityIdentity_id'    => $authorization->getSecurityIdentity()->getId(),
                 'parentAuthorization_id' => $parent ? $parent->getId() : null,
                 'entity_class'           => $authorization->getEntityClass(),

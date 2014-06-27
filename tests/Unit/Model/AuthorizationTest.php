@@ -24,7 +24,7 @@ class AuthorizationTest extends \PHPUnit_Framework_TestCase
         $authorization = Authorization::create($role, Actions::all(), $resource);
 
         $this->assertInstanceOf('MyCLabs\ACL\Model\Authorization', $authorization);
-        $this->assertSame($role, $authorization->getRole());
+        $this->assertSame($role, $authorization->getRoleEntry());
         $this->assertSame($user, $authorization->getSecurityIdentity());
         $this->assertEquals(Actions::all(), $authorization->getActions());
         $this->assertEquals(get_class(), $authorization->getEntityClass());
@@ -50,7 +50,7 @@ class AuthorizationTest extends \PHPUnit_Framework_TestCase
         $authorization = Authorization::create($role, Actions::all(), $resource);
 
         $this->assertInstanceOf('MyCLabs\ACL\Model\Authorization', $authorization);
-        $this->assertSame($role, $authorization->getRole());
+        $this->assertSame($role, $authorization->getRoleEntry());
         $this->assertSame($user, $authorization->getSecurityIdentity());
         $this->assertEquals(Actions::all(), $authorization->getActions());
         $this->assertEquals(get_class($resource), $authorization->getEntityClass());
@@ -76,7 +76,7 @@ class AuthorizationTest extends \PHPUnit_Framework_TestCase
         $childAuthorization = $authorization->createChildAuthorization($subResource);
 
         $this->assertInstanceOf('MyCLabs\ACL\Model\Authorization', $childAuthorization);
-        $this->assertSame($authorization->getRole(), $childAuthorization->getRole());
+        $this->assertSame($authorization->getRoleEntry(), $childAuthorization->getRoleEntry());
         $this->assertSame($authorization->getSecurityIdentity(), $childAuthorization->getSecurityIdentity());
         $this->assertEquals($authorization->getActions(), $childAuthorization->getActions());
         $this->assertEquals(get_class(), $childAuthorization->getEntityClass());

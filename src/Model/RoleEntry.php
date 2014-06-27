@@ -41,7 +41,7 @@ class RoleEntry
 
     /**
      * @var Authorization[]|Collection
-     * @ORM\OneToMany(targetEntity="Authorization", mappedBy="role", fetch="EXTRA_LAZY")
+     * @ORM\OneToMany(targetEntity="Authorization", mappedBy="roleEntry", fetch="EXTRA_LAZY")
      */
     protected $authorizations;
 

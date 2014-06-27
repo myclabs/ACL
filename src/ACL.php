@@ -80,14 +80,14 @@ class ACL
      *
      * This method should only be called in roles.
      *
-     * @param RoleEntry              $role
+     * @param RoleEntry         $roleEntry
      * @param Actions           $actions
      * @param ResourceInterface $resource
      * @param bool              $cascade  Should the authorization cascade to sub-resources?
      */
-    public function allow(RoleEntry $role, Actions $actions, ResourceInterface $resource, $cascade = true)
+    public function allow(RoleEntry $roleEntry, Actions $actions, ResourceInterface $resource, $cascade = true)
     {
-        $authorization = Authorization::create($role, $actions, $resource, $cascade);
+        $authorization = Authorization::create($roleEntry, $actions, $resource, $cascade);
 
         if ($cascade) {
             $cascadedAuthorizations = $this->cascadeStrategy->cascadeAuthorization($authorization, $resource);

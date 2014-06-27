@@ -32,9 +32,9 @@ class Authorization
      *
      * @var RoleEntry
      * @ORM\ManyToOne(targetEntity="RoleEntry", inversedBy="authorizations")
-     * @ORM\JoinColumn(name="role_id", nullable=false, onDelete="CASCADE")
+     * @ORM\JoinColumn(name="role_entry_id", nullable=false, onDelete="CASCADE")
      */
-    protected $role;
+    protected $roleEntry;
 
     /**
      * @var SecurityIdentityInterface
@@ -88,40 +88,40 @@ class Authorization
     /**
      * Creates an authorization on a resource.
      *
-     * @param RoleEntry $role
+     * @param RoleEntry $roleEntry
      * @param Actions $actions
      * @param ResourceInterface $resource
      * @param bool $cascade Should this authorization cascade?
      * @throws \RuntimeException
      * @return static
      */
-    public static function create(RoleEntry $role, Actions $actions, ResourceInterface $resource, $cascade = true)
+    public static function create(RoleEntry $roleEntry, Actions $actions, ResourceInterface $resource, $cascade = true)
     {
         if ($resource instanceof EntityResource) {
-            return new static($role, $actions, $cascade, ClassUtils::getClass($resource), $resource->getId());
+            return new static($roleEntry, $actions, $cascade, ClassUtils::getClass($resource), $resource->getId());
         } elseif ($resource instanceof ClassResource) {
-            return new static($role, $actions, $cascade, $resource->getClass());
+            return new static($roleEntry, $actions, $cascade, $resource->getClass());
         }
 
         throw new \RuntimeException('Unknown type of resource: ' . get_class($resource));
     }
 
     /**
-     * @param RoleEntry    $role
+     * @param RoleEntry    $roleEntry
      * @param Actions $actions
      * @param bool    $cascade Should this authorization cascade?
      * @param string  $entityClass
      * @param int     $entityId
      */
     private function __construct(
-        RoleEntry $role,
+        RoleEntry $roleEntry,
         Actions $actions,
         $cascade,
         $entityClass,
         $entityId = null
     ) {
-        $this->role = $role;
-        $this->securityIdentity = $role->getSecurityIdentity();
+        $this->roleEntry = $roleEntry;
+        $this->securityIdentity = $roleEntry->getSecurityIdentity();
         $this->actions = $actions;
         $this->cascadable = $cascade;
         $this->entityClass = $entityClass;
@@ -138,7 +138,7 @@ class Authorization
      */
     public function createChildAuthorization(ResourceInterface $resource)
     {
-        $authorization = self::create($this->role, $this->actions, $resource);
+        $authorization = self::create($this->roleEntry, $this->actions, $resource);
 
         $authorization->parentAuthorization = $this;
 
@@ -204,9 +204,9 @@ class Authorization
     /**
      * @return RoleEntry
      */
-    public function getRole()
+    public function getRoleEntry()
     {
-        return $this->role;
+        return $this->roleEntry;
     }
 
     /**

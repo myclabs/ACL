@@ -94,7 +94,7 @@ class AuthorizationRepositoryTest extends \PHPUnit_Framework_TestCase
 
         /** @var Authorization $authorization */
         $authorization = $inserted[0];
-        $this->assertSame($role, $authorization->getRole());
+        $this->assertSame($role, $authorization->getRoleEntry());
         $this->assertSame($user, $authorization->getSecurityIdentity());
         $this->assertEquals($resource->getId(), $authorization->getEntityId());
         $this->assertEquals('Tests\MyCLabs\ACL\Unit\Repository\Model\File', $authorization->getEntityClass());
