@@ -24,14 +24,14 @@ class User implements SecurityIdentityInterface
 
     /**
      * @var RoleEntry[]|Collection
-     * @ORM\OneToMany(targetEntity="MyCLabs\ACL\Model\Role", mappedBy="securityIdentity",
+     * @ORM\OneToMany(targetEntity="MyCLabs\ACL\Model\RoleEntry", mappedBy="securityIdentity",
      * cascade={"persist", "remove"}, orphanRemoval=true)
      */
-    protected $roles;
+    protected $roleEntries;
 
     public function __construct()
     {
-        $this->roles = new ArrayCollection();
+        $this->roleEntries = new ArrayCollection();
     }
 
     public function getId()

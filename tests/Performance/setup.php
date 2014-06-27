@@ -33,18 +33,18 @@ $em = EntityManager::create($dbParams, $config);
 $acl = new ACL($em);
 
 $roles = [
-    'ArticleEditor' => [
-        'resource' => 'Tests\MyCLabs\ACL\Performance\Model\Article',
-        'actions' => new Actions([Actions::VIEW, Actions::EDIT])
+    'ArticleEditor'     => [
+        'resourceType' => 'Tests\MyCLabs\ACL\Performance\Model\Article',
+        'actions'      => [ Actions::VIEW, Actions::EDIT ],
     ],
     'AllArticlesEditor' => [
         'resource' => new ClassResource('Tests\MyCLabs\ACL\Performance\Model\Article'),
-        'actions' => new Actions([Actions::VIEW, Actions::EDIT])
+        'actions'  => [ Actions::VIEW, Actions::EDIT ],
     ],
-    'CategoryManager' => [
-        'resource' => 'Tests\MyCLabs\ACL\Performance\Model\Category',
-        'actions' => new Actions([Actions::VIEW])
-    ]
+    'CategoryManager'   => [
+        'resourceType' => 'Tests\MyCLabs\ACL\Performance\Model\Category',
+        'actions'      => [ Actions::VIEW ],
+    ],
 ];
 
 $setup = new ACLSetup();
