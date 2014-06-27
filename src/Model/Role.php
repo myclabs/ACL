@@ -137,10 +137,11 @@ class Role
         if (isset($this->resource)) {
             if ($resource) {
                 throw new InvalidArgumentException(sprintf(
-                    'Cannot grant role %s to a resource of type %s. The resource %s should be'
-                    . ' granted upon is set in the configuration and cannot be overridden',
+                    'Cannot grant role %s on a resource of type %s. The role will be granted upon'
+                    . ' a resource that is set in the configuration and cannot be overridden',
                     $this->name,
-                    ClassUtils::getClass($resource)
+                    ClassUtils::getClass($resource),
+                    $this->name
                 ));
             }
 
@@ -149,22 +150,31 @@ class Role
 
         if ($resource === null) {
             throw new InvalidArgumentException(sprintf(
-                'The role %s must be granted to a resource, no resource was given',
+                'The role %s must be granted on a resource, no resource was given',
                 $this->name
             ));
         }
 
         if (isset($this->resourceType) && (! $resource instanceof $this->resourceType)) {
             throw new InvalidArgumentException(sprintf(
-                'Cannot grant role %s to a resource of type %s. Per the configuration, %s can only be granted'
+                'Cannot grant role %s on a resource of type %s. Per the configuration, %s can only be granted'
                 . ' on resources of type %s',
                 $this->name,
                 ClassUtils::getClass($resource),
+                $this->name,
                 $this->resourceType
             ));
         }
 
         return $resource;
+    }
+
+    /**
+     * @return string
+     */
+    public function getName()
+    {
+        return $this->name;
     }
 
     private function __construct($name)
