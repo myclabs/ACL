@@ -174,7 +174,7 @@ class AuthorizationRepository extends EntityRepository
      * @param ResourceInterface $resource
      * @throws \RuntimeException If the resource is an entity, it must be persisted.
      */
-    public function removeAuthorizationsForResource(ResourceInterface $resource)
+    public function removeForResource(ResourceInterface $resource)
     {
         $qb = $this->_em->createQueryBuilder();
 

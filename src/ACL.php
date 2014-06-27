@@ -2,7 +2,7 @@
 
 namespace MyCLabs\ACL;
 
-use Doctrine\Common\Util\ClassUtils;
+use BadMethodCallException;
 use Doctrine\ORM\EntityManager;
 use InvalidArgumentException;
 use MyCLabs\ACL\CascadeStrategy\CascadeStrategy;
@@ -12,9 +12,11 @@ use MyCLabs\ACL\Model\Authorization;
 use MyCLabs\ACL\Model\ClassResource;
 use MyCLabs\ACL\Model\EntityResource;
 use MyCLabs\ACL\Model\ResourceInterface;
+use MyCLabs\ACL\Model\Role;
 use MyCLabs\ACL\Model\RoleEntry;
 use MyCLabs\ACL\Model\SecurityIdentityInterface;
 use MyCLabs\ACL\Repository\AuthorizationRepository;
+use MyCLabs\ACL\Repository\RoleEntryRepository;
 
 /**
  * Manages ACL.
@@ -24,9 +26,9 @@ use MyCLabs\ACL\Repository\AuthorizationRepository;
 class ACL
 {
     /**
-     * @var array
+     * @var Role[]
      */
-    protected $roles;
+    private $roles = [];
 
     /**
      * @var EntityManager
@@ -110,27 +112,26 @@ class ACL
      * @param SecurityIdentityInterface $identity
      * @param string $roleName
      * @param ResourceInterface $resource
-     * @throws InvalidArgumentException
+     *
+     * @throws InvalidArgumentException The role doesn't exist.
+     * @throws BadMethodCallException No resource given to grant the role, and no resource configured in the role
      * @throws AlreadyHasRoleException The security identity already has this role.
      */
     public function grant(SecurityIdentityInterface $identity, $roleName, ResourceInterface $resource = null)
     {
-        $this->checkGrantAndRevokeParameters($roleName, $resource);
+        $role = $this->getRole($roleName, $resource);
 
-        if ($this->roles[$roleName]['resource'] instanceof ClassResource) {
-            $resource = $this->roles[$roleName]['resource'];
-        }
-        if (null !== $this->getRole($identity, $roleName, $resource)) {
-            throw new AlreadyHasRoleException('The security identity already has this role');
-        }
-        $role = new RoleEntry($identity, $roleName, $resource);
+        $resource = $role->validateAndReturnResourceForGrant($resource);
 
-        $identity->addRole($role);
+        $this->guardAgainstDuplicateRole($identity, $roleName, $resource);
 
-        $this->entityManager->persist($role);
-        $this->entityManager->flush($role);
+        $roleEntry = new RoleEntry($identity, $roleName, $resource);
+        $identity->addRole($roleEntry);
 
-        $this->allow($role, $this->roles[$roleName]['actions'], $resource);
+        $this->entityManager->persist($roleEntry);
+        $this->entityManager->flush($roleEntry);
+
+        $role->createAuthorizations($this, $roleEntry, $resource);
     }
 
     /**
@@ -146,40 +147,19 @@ class ACL
      */
     public function revoke(SecurityIdentityInterface $identity, $roleName, EntityResource $resource = null)
     {
-        $this->checkGrantAndRevokeParameters($roleName, $resource);
+        $role = $this->getRole($roleName, $resource);
 
-        $role = $this->getRole($identity, $roleName, $resource);
+        $resource = $role->validateAndReturnResourceForGrant($resource);
 
-        $identity->removeRole($role);
-        $this->entityManager->remove($role);
+        /** @var RoleEntryRepository $roleEntryRepository */
+        $roleEntryRepository = $this->entityManager->getRepository('Myclabs\ACL\Model\RoleEntry');
+        $roleEntry = $roleEntryRepository->findOneByIdentityAndRoleAndResource($identity, $roleName, $resource);
+
+        $identity->removeRole($roleEntry);
+        $this->entityManager->remove($roleEntry);
 
         // Authorizations are deleted in cascade in database
-        $this->entityManager->flush($role);
-    }
-
-    /**
-     * Check the parameters for revoke and grant
-     *
-     * @param $roleName
-     * @param ResourceInterface $resource
-     * @throws InvalidArgumentException
-     */
-    protected function checkGrantAndRevokeParameters($roleName, ResourceInterface $resource = null)
-    {
-        if (!array_key_exists($roleName, $this->roles)) {
-            throw new InvalidArgumentException(sprintf(
-                "The role name %s doesn't exists in the roles list",
-                $roleName
-            ));
-        }
-        if (!($this->roles[$roleName]['resource'] instanceof ClassResource)) {
-            if (null === $resource) {
-                throw new InvalidArgumentException("The resource is null and the role's resource is not a ClassResource");
-            }
-            if ($this->roles[$roleName]['resource'] != ClassUtils::getClass($resource)) {
-                throw new InvalidArgumentException("The given resource class doesn't match the role resource class");
-            }
-        }
+        $this->entityManager->flush($roleEntry);
     }
 
     /**
@@ -208,24 +188,16 @@ class ACL
      */
     public function processDeletedResource(EntityResource $resource)
     {
-        /** @var AuthorizationRepository $repository */
-        $repository = $this->entityManager->getRepository('MyCLabs\ACL\Model\Authorization');
-        $roleRepo = $this->entityManager->getRepository('MyCLabs\ACL\Model\RoleEntry');
+        /** @var AuthorizationRepository $authorizationRepository */
+        $authorizationRepository = $this->entityManager->getRepository('MyCLabs\ACL\Model\Authorization');
+        /** @var RoleEntryRepository $roleEntryRepository */
+        $roleEntryRepository = $this->entityManager->getRepository('MyCLabs\ACL\Model\RoleEntry');
 
-        // Remove the roles for this resource
-        foreach ($this->getRolesForResource($resource) as $roleName) {
-            $roles = $roleRepo->findBy([
-                'resourceId' => $resource->getId(),
-                'name' => $roleName
-            ]);
+        // Remove the role entries for this resource
+        $roleEntryRepository->removeForResource($resource);
 
-            foreach ($roles as $role) {
-                $this->entityManager->remove($role);
-            }
-        }
-
-        // Delete the authorizations for this resource
-        $repository->removeAuthorizationsForResource($resource);
+        // Remove the authorizations for this resource
+        $authorizationRepository->removeForResource($resource);
     }
 
     /**
@@ -233,73 +205,72 @@ class ACL
      */
     public function rebuildAuthorizations()
     {
-        $roleRepository = $this->entityManager->getRepository('MyCLabs\ACL\Model\RoleEntry');
+        $roleEntryRepository = $this->entityManager->getRepository('MyCLabs\ACL\Model\RoleEntry');
 
         // Clear
         $this->entityManager->createQuery('DELETE MyCLabs\ACL\Model\Authorization')->execute();
         $this->entityManager->clear('MyCLabs\ACL\Model\Authorization');
 
         // Regenerate
-        foreach ($roleRepository->findAll() as $role) {
-            /** @var RoleEntry $role */
-            $actions = $this->roles[$role->getName()]['actions'];
-            $resourceClass = $this->roles[$role->getName()]['resource'];
-            if ($resourceClass instanceof ClassResource) {
-                $this->allow($role, $actions, $resourceClass);
+        foreach ($roleEntryRepository->findAll() as $roleEntry) {
+            /** @var RoleEntry $roleEntry */
+            $role = $this->getRole($roleEntry->getRoleName());
+
+            // Get the resource from the role entry
+            $entityClass = $roleEntry->getEntityClass();
+            $entityId = $roleEntry->getEntityId();
+            if ($entityId) {
+                $resource = $this->entityManager->find($entityClass, $entityId);
             } else {
-                $resourceRepo = $this->entityManager->getRepository($resourceClass);
-                /** @var EntityResource $resource */
-                $resource = $resourceRepo->find($role->getResourceId());
-                $this->allow($role, $actions, $resource);
+                $resource = new ClassResource($entityClass);
             }
+
+            $role->createAuthorizations($this, $roleEntry, $resource);
         }
+
         $this->entityManager->flush();
         $this->entityManager->clear();
     }
 
-
     /**
-     * Return a specific role given an identity, a rolename and a resource
+     * Configure the roles using an array.
      *
-     * @param SecurityIdentityInterface $identity
-     * @param $roleName
-     * @param ResourceInterface $resource
-     * @return RoleEntry
+     * @todo Move in the constructor.
+     *
+     * @param array $roles
      */
-    protected function getRole(SecurityIdentityInterface $identity, $roleName, ResourceInterface $resource = null)
+    public function setRoles(array $roles)
     {
-        $roleRepo = $this->entityManager->getRepository('Myclabs\ACL\Model\RoleEntry');
-        if ($this->roles[$roleName]['resource'] instanceof ClassResource) {
-            return $roleRepo->findOneBy([ 'securityIdentity' => $identity->getId(), 'name' => $roleName ]);
-        } else {
-            /** @var EntityResource $resource */
-            return $roleRepo->findOneBy([
-                'securityIdentity' => $identity->getId(),
-                'resourceId' => $resource->getId(),
-                'name' => $roleName
-            ]);
+        foreach ($roles as $roleName => $roleArray) {
+            $this->roles[$roleName] = Role::fromArray($roleName, $roleArray);
         }
-    }
-
-    public function setRoles($roles)
-    {
-        $this->roles = $roles;
     }
 
     /**
-     * @param EntityResource $entity
-     * @return array
+     * @param string $roleName
+     * @throws InvalidArgumentException The role doesn't exist.
+     * @return Role
      */
-    public function getRolesForResource(EntityResource $entity)
+    private function getRole($roleName)
     {
-        $roleNames = [];
-        $className = ClassUtils::getClass($entity);
-
-        foreach ($this->roles as $roleName => $role) {
-            if (isset($role['resource']) && $role['resource'] === $className) {
-                $roleNames[] = $roleName;
-            }
+        if (! isset($this->roles[$roleName])) {
+            throw new InvalidArgumentException(sprintf("The role %s doesn't exist", $roleName));
         }
-        return $roleNames;
+
+        return $this->roles[$roleName];
+    }
+
+    private function guardAgainstDuplicateRole(
+        SecurityIdentityInterface $identity,
+        $roleName,
+        ResourceInterface $resource
+    ) {
+        /** @var RoleEntryRepository $roleEntryRepository */
+        $roleEntryRepository = $this->entityManager->getRepository('Myclabs\ACL\Model\RoleEntry');
+        $roleEntry = $roleEntryRepository->findOneByIdentityAndRoleAndResource($identity, $roleName, $resource);
+
+        if ($roleEntry) {
+            throw new AlreadyHasRoleException('The security identity already has this role');
+        }
     }
 }

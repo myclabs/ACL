@@ -71,7 +71,7 @@ abstract class AbstractIntegrationTest extends \PHPUnit_Framework_TestCase
 
         $roles = [
             'articleEditor' => [
-                'resource' => 'Tests\MyCLabs\ACL\Integration\Model\Article',
+                'resourceType' => 'Tests\MyCLabs\ACL\Integration\Model\Article',
                 'actions' => new Actions([Actions::VIEW, Actions::EDIT])
             ],
             'allArticlesEditor' => [
@@ -79,19 +79,19 @@ abstract class AbstractIntegrationTest extends \PHPUnit_Framework_TestCase
                 'actions' => new Actions([Actions::VIEW, Actions::EDIT])
             ],
             'articlePublisher' => [
-                'resource' => 'Tests\MyCLabs\ACL\Integration\Model\Article',
+                'resourceType' => 'Tests\MyCLabs\ACL\Integration\Model\Article',
                 'actions' => new Actions([Actions::VIEW, Actions::PUBLISH])
             ],
             'categoryManager' => [
-                'resource' => 'Tests\MyCLabs\ACL\Integration\Model\Category',
+                'resourceType' => 'Tests\MyCLabs\ACL\Integration\Model\Category',
                 'actions' => new Actions([Actions::VIEW])
             ],
             'articleEditorCopy' => [
-                'resource' => 'Tests\MyCLabs\ACL\Integration\Model\Article',
+                'resourceType' => 'Tests\MyCLabs\ACL\Integration\Model\Article',
                 'actions' => new Actions([Actions::VIEW, Actions::EDIT])
             ],
             'accountAdmin' => [
-                'resource' => 'Tests\MyCLabs\ACL\Integration\Issues\Issue10\Account',
+                'resourceType' => 'Tests\MyCLabs\ACL\Integration\Issues\Issue10\Account',
                 'actions' => Actions::all()
             ]
         ];

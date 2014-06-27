@@ -46,7 +46,7 @@ class AuthorizationRepositoryTest extends \PHPUnit_Framework_TestCase
         $setup->setSecurityIdentityClass('Tests\MyCLabs\ACL\Unit\Repository\Model\User');
         $roles = [
             'fileOwner' => [
-                'resource' => 'Tests\MyCLabs\ACL\Unit\Repository\Model\File',
+                'resourceType' => 'Tests\MyCLabs\ACL\Unit\Repository\Model\File',
                 'actions' => new Actions([Actions::VIEW, Actions::EDIT])
             ]
         ];
@@ -232,7 +232,7 @@ class AuthorizationRepositoryTest extends \PHPUnit_Framework_TestCase
         $repository->insertBulk($authorizations);
 
         // We remove the authorizations for the resource 1
-        $repository->removeAuthorizationsForResource($resource1);
+        $repository->removeForResource($resource1);
         // We check that they were removed
         $this->assertFalse($repository->isAllowedOnEntity($user, Actions::VIEW, $resource1));
         // and that authorizations for the resource 2 weren't removed

@@ -4,15 +4,19 @@ namespace MyCLabs\ACL\Model;
 
 use Doctrine\Common\Collections\ArrayCollection;
 use Doctrine\Common\Collections\Collection;
+use Doctrine\Common\Util\ClassUtils;
 use Doctrine\ORM\Mapping as ORM;
 use MyCLabs\ACL\ACL;
 
 /**
- * RoleEntry.
+ * Instance of a role for a user.
  *
- * @ORM\Entity
- * @ORM\Table(name="ACL_Role")
+ * For example, given a role "Article Editor", this class represents "User X is Article Editor for Article Y"
  *
+ * @ORM\Entity(readOnly=true, repositoryClass="MyCLabs\ACL\Repository\RoleEntryRepository")
+ * @ORM\Table(name="ACL_RoleEntry")
+ *
+ * @author Matthieu Napoli <matthieu@mnapoli.fr>
  */
 class RoleEntry
 {
@@ -22,6 +26,12 @@ class RoleEntry
      * @ORM\Column(type="integer")
      */
     protected $id;
+
+    /**
+     * @var string
+     * @ORM\Column(type="string", name="role_name")
+     */
+    protected $roleName;
 
     /**
      * @var SecurityIdentityInterface
@@ -36,24 +46,34 @@ class RoleEntry
     protected $authorizations;
 
     /**
-     * @ORM\Column(type="integer", nullable=true)
+     * The entity targeted by the authorization.
+     * If null, then $entityClass is used and this authorization is at class-scope.
+     *
+     * @ORM\Column(name="entity_id", type="integer", nullable=true)
+     * @var int|null
      **/
-    protected $resourceId;
+    protected $entityId;
 
     /**
+     * The class of the entity.
+     *
+     * @ORM\Column(name="entity_class")
      * @var string
-     * @ORM\Column(type="string")
      */
-    protected $name;
+    protected $entityClass;
 
     public function __construct(SecurityIdentityInterface $identity, $name, ResourceInterface $resource)
     {
+        $this->roleName = $name;
         $this->authorizations = new ArrayCollection();
         $this->securityIdentity = $identity;
+
         if ($resource instanceof EntityResource) {
-            $this->resourceId = $resource->getId();
+            $this->entityId = $resource->getId();
+            $this->entityClass = ClassUtils::getClass($resource);
+        } elseif ($resource instanceof ClassResource) {
+            $this->entityClass = $resource->getClass();
         }
-        $this->name = $name;
     }
 
     /**
@@ -65,6 +85,14 @@ class RoleEntry
     }
 
     /**
+     * @return string
+     */
+    public function getRoleName()
+    {
+        return $this->roleName;
+    }
+
+    /**
      * @return SecurityIdentityInterface
      */
     public function getSecurityIdentity()
@@ -73,18 +101,18 @@ class RoleEntry
     }
 
     /**
-     * @return string
+     * @return int
      */
-    public function getName()
+    public function getEntityId()
     {
-        return $this->name;
+        return $this->entityId;
     }
 
     /**
-     * @return mixed
+     * @return string
      */
-    public function getResourceId()
+    public function getEntityClass()
     {
-        return $this->resourceId;
+        return $this->entityClass;
     }
 }
