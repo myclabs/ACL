@@ -111,7 +111,7 @@ class ACL
      * @param string $roleName
      * @param ResourceInterface $resource
      * @throws InvalidArgumentException
-     * @throws AlreadyExistsException
+     * @throws AlreadyHasRoleException
      */
     public function grant(SecurityIdentityInterface $identity, $roleName, ResourceInterface $resource = null)
     {
@@ -121,7 +121,7 @@ class ACL
             $resource = $this->roles[$roleName]['resource'];
         }
         if (null !== $this->getRole($identity, $roleName, $resource)) {
-            throw new AlreadyExistsException('The role already exists for the specified user and the specified resource');
+            throw new AlreadyHasRoleException('The role already exists for the specified user and the specified resource');
         }
         $role = new RoleEntry($identity, $roleName, $resource);
 
