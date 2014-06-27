@@ -163,6 +163,29 @@ class ACL
     }
 
     /**
+     * Check if a security identity is granted a role.
+     *
+     * @param SecurityIdentityInterface $identity
+     * @param string                    $roleName
+     * @param ResourceInterface|null    $resource
+     *
+     * @return bool
+     */
+    public function isGranted(SecurityIdentityInterface $identity, $roleName, ResourceInterface $resource = null)
+    {
+        $role = $this->getRole($roleName, $resource);
+
+        $resource = $role->validateAndReturnResourceForGrant($resource);
+
+        /** @var RoleEntryRepository $roleEntryRepository */
+        $roleEntryRepository = $this->entityManager->getRepository('Myclabs\ACL\Model\RoleEntry');
+
+        $roleEntry = $roleEntryRepository->findOneByIdentityAndRoleAndResource($identity, $roleName, $resource);
+
+        return ($roleEntry !== null);
+    }
+
+    /**
      * Process a new resource that has been persisted.
      *
      * Called by the EntityResourcesListener.
