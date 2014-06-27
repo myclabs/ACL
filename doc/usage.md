@@ -80,37 +80,55 @@ class Article implements EntityResource
 
 ### 3. Create a new role
 
-The role gives the authorizations.
+The role gives the authorizations. They are declared in an array and must be registered with the `ACLSetup` class.
 
-They are declared in an array and must be registered with the ACLSetup class:
+You can define several types of roles:
+
+#### A role that applies to an entity resource
+
+This is the most common role, it looks like this:
 
 ```php
 $roles = [
     'ArticleEditor' => [
         'resourceType' => 'My\Model\Article',
-        'actions'      => [Actions::VIEW, Actions::EDIT],
+        'actions'      => [ Actions::VIEW, Actions::EDIT ],
     ],
 ];
 
 $aclSetup->registerRoles($roles);
 ```
 
-For each role you need to specify:
+It is pretty straightforward. Each time you grant the `ArticleEditor` role on an article, the user
+will be allowed to VIEW and EDIT it.
 
-- *the role name* as the array key (here `ArticleEditor`)
-- *the resource type* (here the article)
-- *the actions* that can be performed on the resource
+The `resourceType` configuration allows to restrict the type of the resource this role will apply to.
+It can be ignored, but it is recommended to configure it explicitely to avoid mistakes later
+(for example attributing the ArticleEditor role on a completely different object).
 
-The resource can be either a class name (as shown above) or an class resource, which will
-give access to all entities of that type:
+To grant this role, you will need to pass a resource of the correct class:
+
+```php
+$acl->grant($user, 'ArticleEditor', $article);
+```
+
+#### A role that applies to a class resource
+
+These roles allow to do the actions on **all** the entities of the given class:
 
 ```php
 $roles = [
     'AllArticlesEditor' => [
-        'resource' => new ClassResource('Tests\MyCLabs\ACL\Integration\Model\Article'),
-        'actions'  => [Actions::VIEW, Actions::EDIT],
+        'resource' => new ClassResource('My\Model\Article'),
+        'actions'  => [ Actions::VIEW, Actions::EDIT ],
     ],
 ];
+```
+
+To grant this roles, you don't need to pass a resource:
+
+```php
+$acl->grant($user, 'AllArticlesEditor');
 ```
 
 Authorizations that are granted on class resources (i.e. *all entities of that class*) are cascaded
@@ -124,10 +142,31 @@ to be able to create new articles:
 $roles = [
     'ArticleCreator' => [
         'resource' => new ClassResource('My\Model\Article'),
-        'actions'  => [Actions::CREATE],
+        'actions'  => [ Actions::CREATE ],
     ],
 ];
 ```
+
+#### A role that has custom authorizations
+
+You can also configure freely how the authorizations are created with a closure, for example:
+
+```php
+$roles = [
+    'Administrator' => [
+        'resource' => new ClassResource('My\Model\Article'),
+        'authorizations' => function (ACL $acl, RoleEntry $roleEntry, ResourceInterface $resource) {
+            // Allows to do everything on all the articles
+            $acl->allow($roleEntry, Actions::all(), $resource);
+
+            // Allows to create new articles
+            $acl->allow($roleEntry, new Actions([ Actions::CREATE ]), $resource);
+        },
+    ],
+];
+```
+
+As you might have guessed, `authorizations` replaces `actions` in the array.
 
 
 ### 4. Grant/revoke roles to users
