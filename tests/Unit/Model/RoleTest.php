@@ -10,6 +10,9 @@ use MyCLabs\ACL\Model\Role;
 use MyCLabs\ACL\Model\RoleEntry;
 use PHPUnit_Framework_MockObject_MockObject;
 
+/**
+ * @covers \MyCLabs\ACL\Model\Role
+ */
 class RoleTest extends \PHPUnit_Framework_TestCase
 {
     /**
@@ -108,6 +111,20 @@ class RoleTest extends \PHPUnit_Framework_TestCase
         $this->setExpectedException('InvalidArgumentException', $message);
 
         $role->validateAndReturnResourceForGrant(new ClassResource('foo'));
+    }
+
+    /**
+     * @test
+     */
+    public function it_should_error_when_no_resource()
+    {
+        $role = Role::fromArray('foo', [
+        ]);
+
+        $message = 'The role foo must be granted on a resource, no resource was given';
+        $this->setExpectedException('InvalidArgumentException', $message);
+
+        $role->validateAndReturnResourceForGrant();
     }
 
     /**
