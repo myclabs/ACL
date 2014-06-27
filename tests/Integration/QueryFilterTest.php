@@ -24,7 +24,7 @@ class QueryFilterTest extends AbstractIntegrationTest
 
         $this->em->flush();
 
-        $this->acl->grant($user, 'articleEditor', $article2);
+        $this->acl->grant($user, 'ArticleEditor', $article2);
 
         $query = $this->em->createQuery(
             'SELECT a FROM Tests\MyCLabs\ACL\Integration\Model\Article a
@@ -53,7 +53,7 @@ class QueryFilterTest extends AbstractIntegrationTest
 
         $this->em->flush();
 
-        $this->acl->grant($user, 'articleEditor', $article2);
+        $this->acl->grant($user, 'ArticleEditor', $article2);
 
         $qb = $this->em->createQueryBuilder();
         $qb->select('a')->from('Tests\MyCLabs\ACL\Integration\Model\Article', 'a');
@@ -81,8 +81,8 @@ class QueryFilterTest extends AbstractIntegrationTest
         $this->em->flush();
 
         // Add the role twice => 2 authorizations for the same resource
-        $this->acl->grant($user, 'articleEditor', $article2);
-        $this->acl->grant($user, 'articleEditorCopy', $article2);
+        $this->acl->grant($user, 'ArticleEditor', $article2);
+        $this->acl->grant($user, 'ArticleEditorCopy', $article2);
 
         // Check that there is really 2 authorizations created
         $authorizations = $this->em->getRepository('MyCLabs\ACL\Model\Authorization')->findAll();

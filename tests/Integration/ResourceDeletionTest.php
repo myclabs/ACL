@@ -23,7 +23,7 @@ class ResourceDeletionTest extends AbstractIntegrationTest
         $this->em->flush();
 
         // The role will create 1 authorization
-        $this->acl->grant($user, 'articleEditor', $resource);
+        $this->acl->grant($user, 'ArticleEditor', $resource);
         $this->assertTrue($this->acl->isAllowed($user, Actions::VIEW, $resource));
 
         // We need to reload the resource because the role hasn't been added automatically to
@@ -60,7 +60,7 @@ class ResourceDeletionTest extends AbstractIntegrationTest
         $this->em->flush();
 
         // We apply a role on the parent resource, authorizations will cascade to the sub-resource
-        $this->acl->grant($user, 'categoryManager', $category);
+        $this->acl->grant($user, 'CategoryManager', $category);
         $this->assertTrue($this->acl->isAllowed($user, Actions::VIEW, $category));
         $this->assertTrue($this->acl->isAllowed($user, Actions::VIEW, $subCategory));
 

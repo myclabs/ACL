@@ -31,7 +31,7 @@ class ClassScopeTest extends AbstractIntegrationTest
 
         $this->em->flush();
 
-        $this->acl->grant($user, 'allArticlesEditor');
+        $this->acl->grant($user, 'AllArticlesEditor');
 
         // Test on the resource class
         $classResource = new ClassResource('Tests\MyCLabs\ACL\Integration\Model\Article');
@@ -63,7 +63,7 @@ class ClassScopeTest extends AbstractIntegrationTest
 
         $this->em->flush();
 
-        $this->acl->grant($user, 'allArticlesEditor');
+        $this->acl->grant($user, 'AllArticlesEditor');
 
         // Add a new resource after the role was given
         $article2 = new Article();
@@ -95,8 +95,8 @@ class ClassScopeTest extends AbstractIntegrationTest
 
         $this->em->flush();
 
-        $this->acl->grant($user, 'allArticlesEditor');
-        $this->acl->revoke($user, 'allArticlesEditor');
+        $this->acl->grant($user, 'AllArticlesEditor');
+        $this->acl->revoke($user, 'AllArticlesEditor');
 
         // Test on the resource class
         $classResource = new ClassResource('Tests\MyCLabs\ACL\Integration\Model\Article');

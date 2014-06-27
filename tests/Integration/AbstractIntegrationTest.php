@@ -70,27 +70,27 @@ abstract class AbstractIntegrationTest extends \PHPUnit_Framework_TestCase
         $setup->setSecurityIdentityClass('Tests\MyCLabs\ACL\Integration\Model\User');
 
         $roles = [
-            'articleEditor' => [
+            'ArticleEditor' => [
                 'resourceType' => 'Tests\MyCLabs\ACL\Integration\Model\Article',
                 'actions' => new Actions([Actions::VIEW, Actions::EDIT])
             ],
-            'allArticlesEditor' => [
+            'AllArticlesEditor' => [
                 'resource' => new ClassResource('Tests\MyCLabs\ACL\Integration\Model\Article'),
                 'actions' => new Actions([Actions::VIEW, Actions::EDIT])
             ],
-            'articlePublisher' => [
+            'ArticlePublisher' => [
                 'resourceType' => 'Tests\MyCLabs\ACL\Integration\Model\Article',
                 'actions' => new Actions([Actions::VIEW, Actions::PUBLISH])
             ],
-            'categoryManager' => [
+            'CategoryManager' => [
                 'resourceType' => 'Tests\MyCLabs\ACL\Integration\Model\Category',
                 'actions' => new Actions([Actions::VIEW])
             ],
-            'articleEditorCopy' => [
+            'ArticleEditorCopy' => [
                 'resourceType' => 'Tests\MyCLabs\ACL\Integration\Model\Article',
                 'actions' => new Actions([Actions::VIEW, Actions::EDIT])
             ],
-            'accountAdmin' => [
+            'AccountAdmin' => [
                 'resourceType' => 'Tests\MyCLabs\ACL\Integration\Issues\Issue10\Account',
                 'actions' => Actions::all()
             ]

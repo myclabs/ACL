@@ -22,7 +22,7 @@ class RebuildAuthorizationTest extends AbstractIntegrationTest
         $this->em->persist($user);
         $this->em->flush();
 
-        $this->acl->grant($user, 'articleEditor', $article2);
+        $this->acl->grant($user, 'ArticleEditor', $article2);
 
         $this->em->clear();
 
@@ -54,7 +54,7 @@ class RebuildAuthorizationTest extends AbstractIntegrationTest
         $this->em->persist($user);
         $this->em->flush();
 
-        $this->acl->grant($user, 'allArticlesEditor');
+        $this->acl->grant($user, 'AllArticlesEditor');
 
         $this->em->clear();
 

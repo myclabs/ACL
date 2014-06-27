@@ -30,7 +30,7 @@ class CascadingTest extends AbstractIntegrationTest
 
         $this->em->flush();
 
-        $this->acl->grant($user, 'categoryManager', $category1);
+        $this->acl->grant($user, 'CategoryManager', $category1);
 
         // Direct authorization
         $this->assertTrue($this->acl->isAllowed($user, Actions::VIEW, $category1));
@@ -58,7 +58,7 @@ class CascadingTest extends AbstractIntegrationTest
 
         $this->em->flush();
 
-        $this->acl->grant($user, 'categoryManager', $category1);
+        $this->acl->grant($user, 'CategoryManager', $category1);
 
         // Direct authorization
         $this->assertTrue($this->acl->isAllowed($user, Actions::VIEW, $category1));
