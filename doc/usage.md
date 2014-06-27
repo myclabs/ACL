@@ -42,11 +42,11 @@ class User implements SecurityIdentityInterface
      * @ORM\OneToMany(targetEntity="MyCLabs\ACL\Model\RoleEntry", mappedBy="securityIdentity",
      *     cascade={"persist", "remove"}, orphanRemoval=true)
      */
-    protected $roles;
+    protected $roleEntries;
 
     public function __construct()
     {
-        $this->roles = new ArrayCollection();
+        $this->roleEntries = new ArrayCollection();
     }
 
     public function getId()
@@ -57,7 +57,7 @@ class User implements SecurityIdentityInterface
 ```
 
 As you can see we used the `SecurityIdentityTrait` to implement methods required by the interface, but we still
-need to declare the `$roles` association to map it with Doctrine.
+need to declare the `$roleEntries` association to map it with Doctrine.
 
 
 ### 2. Mark an entity as a resource

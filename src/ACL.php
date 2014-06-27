@@ -126,7 +126,7 @@ class ACL
         $this->guardAgainstDuplicateRole($identity, $roleName, $resource);
 
         $roleEntry = new RoleEntry($identity, $roleName, $resource);
-        $identity->addRole($roleEntry);
+        $identity->addRoleEntry($roleEntry);
 
         $this->entityManager->persist($roleEntry);
         $this->entityManager->flush($roleEntry);
@@ -155,7 +155,7 @@ class ACL
         $roleEntryRepository = $this->entityManager->getRepository('Myclabs\ACL\Model\RoleEntry');
         $roleEntry = $roleEntryRepository->findOneByIdentityAndRoleAndResource($identity, $roleName, $resource);
 
-        $identity->removeRole($roleEntry);
+        $identity->removeRoleEntry($roleEntry);
         $this->entityManager->remove($roleEntry);
 
         // Authorizations are deleted in cascade in database

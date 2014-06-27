@@ -7,9 +7,9 @@ use Doctrine\Common\Collections\Collection;
 /**
  * Security identity trait.
  *
- * This trait needs a $roles attribute.
+ * This trait needs a $roleEntries attribute.
  *
- * @property RoleEntry[]|Collection $roles
+ * @property RoleEntry[]|Collection $roleEntries
  *
  * @author Matthieu Napoli <matthieu@mnapoli.fr>
  */
@@ -18,24 +18,24 @@ trait SecurityIdentityTrait
     /**
      * @return RoleEntry[]
      */
-    public function getRoles()
+    public function getRoleEntries()
     {
-        return $this->roles;
+        return $this->roleEntries;
     }
 
     /**
-     * @param RoleEntry $role
+     * @param RoleEntry $roleEntry
      */
-    public function addRole(RoleEntry $role)
+    public function addRoleEntry(RoleEntry $roleEntry)
     {
-        $this->roles[] = $role;
+        $this->roleEntries[] = $roleEntry;
     }
 
     /**
-     * @param RoleEntry $role
+     * @param RoleEntry $roleEntry
      */
-    public function removeRole(RoleEntry $role)
+    public function removeRoleEntry(RoleEntry $roleEntry)
     {
-        $this->roles->removeElement($role);
+        $this->roleEntries->removeElement($roleEntry);
     }
 }

@@ -35,7 +35,7 @@ class RoleEntry
 
     /**
      * @var SecurityIdentityInterface
-     * @ORM\ManyToOne(targetEntity="SecurityIdentityInterface", inversedBy="roles")
+     * @ORM\ManyToOne(targetEntity="SecurityIdentityInterface", inversedBy="roleEntries")
      */
     protected $securityIdentity;
 
