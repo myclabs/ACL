@@ -95,7 +95,7 @@ This is the most common role, it looks like this:
 $roles = [
     'ArticleEditor' => [
         'resourceType' => 'My\Model\Article',
-        'actions'      => [ Actions::VIEW, Actions::EDIT ],
+        'actions'      => new Actions([ Actions::VIEW, Actions::EDIT ]),
     ],
 ];
 
@@ -123,7 +123,7 @@ These roles allow to do the actions on **all** the entities of the given class:
 $roles = [
     'AllArticlesEditor' => [
         'resource' => new ClassResource('My\Model\Article'),
-        'actions'  => [ Actions::VIEW, Actions::EDIT ],
+        'actions'  => new Actions([ Actions::VIEW, Actions::EDIT ]),
     ],
 ];
 ```
@@ -145,7 +145,7 @@ to be able to create new articles:
 $roles = [
     'ArticleCreator' => [
         'resource' => new ClassResource('My\Model\Article'),
-        'actions'  => [ Actions::CREATE ],
+        'actions'  => new Actions([ Actions::CREATE ]),
     ],
 ];
 ```

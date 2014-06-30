@@ -60,7 +60,7 @@ $aclSetup->setIdentityClass('My\Model\User');
 $aclSetup->registerRoles([
     'ArticleEditorRole' => [
         'resourceType' => 'My\Model\Article',
-        'actions'      => [ Actions::Edit ],
+        'actions'      => new Actions([ Actions::Edit ]),
     ],
 ]);
 

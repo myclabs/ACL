@@ -28,27 +28,7 @@ class RoleTest extends \PHPUnit_Framework_TestCase
     /**
      * @test
      */
-    public function it_should_create_authorizations_using_actions_as_array()
-    {
-        $acl = $this->given_the_acl();
-        $roleEntry = $this->given_a_role_entry();
-        $resource = $this->given_a_resource();
-
-        $role = Role::fromArray('foo', [
-            'actions' => [Actions::VIEW, Actions::EDIT],
-        ]);
-
-        $acl->expects($this->once())
-            ->method('allow')
-            ->with($roleEntry, new Actions([Actions::VIEW, Actions::EDIT]), $resource);
-
-        $role->createAuthorizations($acl, $roleEntry, $resource);
-    }
-
-    /**
-     * @test
-     */
-    public function it_should_create_authorizations_using_actions_as_object()
+    public function it_should_create_authorizations()
     {
         $acl = $this->given_the_acl();
         $roleEntry = $this->given_a_role_entry();

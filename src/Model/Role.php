@@ -68,11 +68,13 @@ class Role
         $role = new self($name);
 
         if (isset($configuration['actions'])) {
-            if (is_array($configuration['actions'])) {
-                $role->actions = new Actions($configuration['actions']);
-            } else {
-                $role->actions = $configuration['actions'];
+            if (! $configuration['actions'] instanceof Actions) {
+                throw new InvalidArgumentException(sprintf(
+                    "The actions configured for role %s is not a MyCLabs\\ACL\\Model\\Actions object",
+                    $name
+                ));
             }
+            $role->actions = $configuration['actions'];
         }
 
         if (isset($configuration['authorizations']) && $configuration['authorizations'] instanceof \Closure) {
