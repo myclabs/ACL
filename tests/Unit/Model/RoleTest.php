@@ -90,7 +90,7 @@ class RoleTest extends \PHPUnit_Framework_TestCase
             'resource' => $resource,
         ]);
 
-        $message = 'Cannot grant role foo on a resource of type MyCLabs\ACL\Model\ClassResource.'
+        $message = 'Cannot grant role foo on a resource of type ' . ClassResource::class . '.'
             . ' The role will be granted upon a resource that is set in the configuration and cannot be overridden';
         $this->setExpectedException('InvalidArgumentException', $message);
 
@@ -103,11 +103,11 @@ class RoleTest extends \PHPUnit_Framework_TestCase
     public function it_should_error_when_the_resource_is_not_of_the_good_type()
     {
         $role = Role::fromArray('foo', [
-            'resourceType' => 'MyCLabs\ACL\Model\EntityResource',
+            'resourceType' => 'FooBar',
         ]);
 
-        $message = 'Cannot grant role foo on a resource of type MyCLabs\ACL\Model\ClassResource.'
-            . ' Per the configuration, foo can only be granted on resources of type MyCLabs\ACL\Model\EntityResource';
+        $message = 'Cannot grant role foo on a resource of type ' . ClassResource::class . '.'
+            . ' Per the configuration, foo can only be granted on resources of type FooBar';
         $this->setExpectedException('InvalidArgumentException', $message);
 
         $role->validateAndReturnResourceForGrant(new ClassResource('foo'));
@@ -122,7 +122,7 @@ class RoleTest extends \PHPUnit_Framework_TestCase
         ]);
 
         $message = 'The role foo must be granted on a resource, no resource was given';
-        $this->setExpectedException('InvalidArgumentException', $message);
+        $this->setExpectedException(\InvalidArgumentException::class, $message);
 
         $role->validateAndReturnResourceForGrant();
     }
@@ -161,7 +161,7 @@ class RoleTest extends \PHPUnit_Framework_TestCase
      */
     private function given_the_acl()
     {
-        return $this->getMock('MyCLabs\ACL\ACL', [], [], '', false);
+        return $this->getMock(ACL::class, [], [], '', false);
     }
 
     /**
@@ -169,7 +169,7 @@ class RoleTest extends \PHPUnit_Framework_TestCase
      */
     private function given_a_role_entry()
     {
-        return $this->getMock('MyCLabs\ACL\Model\RoleEntry', [], [], '', false);
+        return $this->getMock(RoleEntry::class, [], [], '', false);
     }
 
     private function given_a_resource()

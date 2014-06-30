@@ -3,6 +3,7 @@
 namespace MyCLabs\ACL\Doctrine;
 
 use Doctrine\ORM\QueryBuilder;
+use MyCLabs\ACL\Model\Authorization;
 use MyCLabs\ACL\Model\SecurityIdentityInterface;
 
 /**
@@ -48,7 +49,7 @@ class ACLQueryHelper
         }
 
         $qb->innerJoin(
-            'MyCLabs\ACL\Model\Authorization',
+            Authorization::class,
             'authorization',
             'WITH',
             $entityAlias . '.id = authorization.resource.id'

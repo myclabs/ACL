@@ -5,6 +5,9 @@ namespace Tests\MyCLabs\ACL\Unit\Model;
 use MyCLabs\ACL\Model\Authorization;
 use MyCLabs\ACL\Model\ClassResource;
 use MyCLabs\ACL\Model\ResourceId;
+use MyCLabs\ACL\Model\ResourceInterface;
+use MyCLabs\ACL\Model\RoleEntry;
+use MyCLabs\ACL\Model\SecurityIdentityInterface;
 use Tests\MyCLabs\ACL\Integration\Model\Actions;
 
 /**
@@ -14,8 +17,8 @@ class AuthorizationTest extends \PHPUnit_Framework_TestCase
 {
     public function testCreateWithClassResource()
     {
-        $user = $this->getMockForAbstractClass('MyCLabs\ACL\Model\SecurityIdentityInterface');
-        $role = $this->getMock('MyCLabs\ACL\Model\RoleEntry', [], [], '', false);
+        $user = $this->getMockForAbstractClass(SecurityIdentityInterface::class);
+        $role = $this->getMock(RoleEntry::class, [], [], '', false);
         $role->expects($this->once())
             ->method('getSecurityIdentity')
             ->will($this->returnValue($user));
@@ -24,7 +27,7 @@ class AuthorizationTest extends \PHPUnit_Framework_TestCase
 
         $authorization = Authorization::create($role, Actions::all(), $resource);
 
-        $this->assertInstanceOf('MyCLabs\ACL\Model\Authorization', $authorization);
+        $this->assertInstanceOf(Authorization::class, $authorization);
         $this->assertSame($role, $authorization->getRoleEntry());
         $this->assertSame($user, $authorization->getSecurityIdentity());
         $this->assertEquals(Actions::all(), $authorization->getActions());
@@ -37,20 +40,20 @@ class AuthorizationTest extends \PHPUnit_Framework_TestCase
 
     public function testCreateWithEntityResource()
     {
-        $user = $this->getMockForAbstractClass('MyCLabs\ACL\Model\SecurityIdentityInterface');
-        $role = $this->getMock('MyCLabs\ACL\Model\RoleEntry', [], [], '', false);
+        $user = $this->getMockForAbstractClass(SecurityIdentityInterface::class);
+        $role = $this->getMock(RoleEntry::class, [], [], '', false);
         $role->expects($this->once())
             ->method('getSecurityIdentity')
             ->will($this->returnValue($user));
 
-        $resource = $this->getMockForAbstractClass('MyCLabs\ACL\Model\ResourceInterface');
+        $resource = $this->getMockForAbstractClass(ResourceInterface::class);
         $resource->expects($this->once())
             ->method('getResourceId')
             ->will($this->returnValue(new ResourceId(get_class($resource), 1)));
 
         $authorization = Authorization::create($role, Actions::all(), $resource);
 
-        $this->assertInstanceOf('MyCLabs\ACL\Model\Authorization', $authorization);
+        $this->assertInstanceOf(Authorization::class, $authorization);
         $this->assertSame($role, $authorization->getRoleEntry());
         $this->assertSame($user, $authorization->getSecurityIdentity());
         $this->assertEquals(Actions::all(), $authorization->getActions());
@@ -63,8 +66,8 @@ class AuthorizationTest extends \PHPUnit_Framework_TestCase
 
     public function testCreateChildAuthorization()
     {
-        $user = $this->getMockForAbstractClass('MyCLabs\ACL\Model\SecurityIdentityInterface');
-        $role = $this->getMock('MyCLabs\ACL\Model\RoleEntry', [], [], '', false);
+        $user = $this->getMockForAbstractClass(SecurityIdentityInterface::class);
+        $role = $this->getMock(RoleEntry::class, [], [], '', false);
         $role->expects($this->any())
             ->method('getSecurityIdentity')
             ->will($this->returnValue($user));
@@ -76,7 +79,7 @@ class AuthorizationTest extends \PHPUnit_Framework_TestCase
 
         $childAuthorization = $authorization->createChildAuthorization($subResource);
 
-        $this->assertInstanceOf('MyCLabs\ACL\Model\Authorization', $childAuthorization);
+        $this->assertInstanceOf(Authorization::class, $childAuthorization);
         $this->assertSame($authorization->getRoleEntry(), $childAuthorization->getRoleEntry());
         $this->assertSame($authorization->getSecurityIdentity(), $childAuthorization->getSecurityIdentity());
         $this->assertEquals($authorization->getActions(), $childAuthorization->getActions());

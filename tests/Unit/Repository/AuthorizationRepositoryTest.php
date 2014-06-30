@@ -43,11 +43,11 @@ class AuthorizationRepositoryTest extends \PHPUnit_Framework_TestCase
         ];
 
         $setup = new ACLSetup();
-        $setup->setSecurityIdentityClass('Tests\MyCLabs\ACL\Unit\Repository\Model\User');
+        $setup->setSecurityIdentityClass(Model\User::class);
         $roles = [
             'fileOwner' => [
-                'resourceType' => 'Tests\MyCLabs\ACL\Unit\Repository\Model\File',
-                'actions' => new Actions([Actions::VIEW, Actions::EDIT])
+                'resourceType' => Model\File::class,
+                'actions'      => new Actions([Actions::VIEW, Actions::EDIT])
             ]
         ];
 
@@ -83,7 +83,7 @@ class AuthorizationRepositoryTest extends \PHPUnit_Framework_TestCase
         ];
 
         /** @var AuthorizationRepository $repository */
-        $repository = $this->em->getRepository('MyCLabs\ACL\Model\Authorization');
+        $repository = $this->em->getRepository(Authorization::class);
 
         $repository->insertBulk($authorizations);
 
@@ -97,7 +97,7 @@ class AuthorizationRepositoryTest extends \PHPUnit_Framework_TestCase
         $this->assertSame($role, $authorization->getRoleEntry());
         $this->assertSame($user, $authorization->getSecurityIdentity());
         $this->assertEquals($resource->getId(), $authorization->getResourceId()->getId());
-        $this->assertEquals('Tests\MyCLabs\ACL\Unit\Repository\Model\File', $authorization->getResourceId()->getName());
+        $this->assertEquals(Model\File::class, $authorization->getResourceId()->getName());
         $this->assertEquals(Actions::all(), $authorization->getActions());
         $this->assertNull($authorization->getParentAuthorization());
         $this->assertEquals(0, count($authorization->getChildAuthorizations()));
@@ -117,7 +117,7 @@ class AuthorizationRepositoryTest extends \PHPUnit_Framework_TestCase
         $this->em->persist($role);
         $this->em->flush();
 
-        $classResource = new ClassResource('Tests\MyCLabs\ACL\Unit\Repository\Model\File');
+        $classResource = new ClassResource(Model\File::class);
 
         $authorizations = [
             // VIEW cascades (entity resource)
@@ -132,7 +132,7 @@ class AuthorizationRepositoryTest extends \PHPUnit_Framework_TestCase
         ];
 
         /** @var AuthorizationRepository $repository */
-        $repository = $this->em->getRepository('MyCLabs\ACL\Model\Authorization');
+        $repository = $this->em->getRepository(Authorization::class);
 
         $repository->insertBulk($authorizations);
 
@@ -167,7 +167,7 @@ class AuthorizationRepositoryTest extends \PHPUnit_Framework_TestCase
         ];
 
         /** @var AuthorizationRepository $repository */
-        $repository = $this->em->getRepository('MyCLabs\ACL\Model\Authorization');
+        $repository = $this->em->getRepository(Authorization::class);
         $repository->insertBulk($authorizations);
 
         $this->assertTrue($repository->hasAuthorization($user, Actions::VIEW, $resource));
@@ -187,14 +187,14 @@ class AuthorizationRepositoryTest extends \PHPUnit_Framework_TestCase
         $this->em->persist($role);
         $this->em->flush();
 
-        $classResource = new ClassResource('Tests\MyCLabs\ACL\Unit\Repository\Model\File');
+        $classResource = new ClassResource(Model\File::class);
 
         $authorizations = [
             Authorization::create($role, new Actions([ Actions::VIEW ]), $classResource),
         ];
 
         /** @var AuthorizationRepository $repository */
-        $repository = $this->em->getRepository('MyCLabs\ACL\Model\Authorization');
+        $repository = $this->em->getRepository(Authorization::class);
         $repository->insertBulk($authorizations);
 
         $this->assertTrue($repository->hasAuthorization($user, Actions::VIEW, $classResource));
@@ -227,7 +227,7 @@ class AuthorizationRepositoryTest extends \PHPUnit_Framework_TestCase
         ];
 
         /** @var AuthorizationRepository $repository */
-        $repository = $this->em->getRepository('MyCLabs\ACL\Model\Authorization');
+        $repository = $this->em->getRepository(Authorization::class);
         $repository->insertBulk($authorizations);
 
         // We remove the authorizations for the resource 1

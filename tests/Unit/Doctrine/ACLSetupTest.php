@@ -3,6 +3,7 @@
 namespace Tests\MyCLabs\ACL\Unit\Doctrine;
 
 use MyCLabs\ACL\Doctrine\ACLSetup;
+use MyCLabs\ACL\Model\SecurityIdentityInterface;
 
 /**
  * @covers \MyCLabs\ACL\Doctrine\ACLSetup
@@ -11,7 +12,7 @@ class ACLSetupTest extends \PHPUnit_Framework_TestCase
 {
     public function testSetSecurityIdentityClass()
     {
-        $user = $this->getMockForAbstractClass('MyCLabs\ACL\Model\SecurityIdentityInterface');
+        $user = $this->getMockForAbstractClass(SecurityIdentityInterface::class);
 
         $loader = new ACLSetup();
         $loader->setSecurityIdentityClass(get_class($user));

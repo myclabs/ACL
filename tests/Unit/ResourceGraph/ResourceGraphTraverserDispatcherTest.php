@@ -3,6 +3,8 @@
 namespace Tests\MyCLabs\ACL\Unit\Model;
 
 use MyCLabs\ACL\Model\ResourceId;
+use MyCLabs\ACL\Model\ResourceInterface;
+use MyCLabs\ACL\ResourceGraph\ResourceGraphTraverser;
 use MyCLabs\ACL\ResourceGraph\ResourceGraphTraverserDispatcher;
 
 /**
@@ -14,12 +16,12 @@ class ResourceGraphTraverserDispatcherTest extends \PHPUnit_Framework_TestCase
     {
         $traverser = new ResourceGraphTraverserDispatcher();
 
-        $resource = $this->getMockForAbstractClass('MyCLabs\ACL\Model\ResourceInterface');
+        $resource = $this->getMockForAbstractClass(ResourceInterface::class);
         $resource->expects($this->any())
             ->method('getResourceId')
             ->will($this->returnValue(new ResourceId(get_class($resource))));
 
-        $subTraverser = $this->getMockForAbstractClass('\MyCLabs\ACL\ResourceGraph\ResourceGraphTraverser');
+        $subTraverser = $this->getMockForAbstractClass(ResourceGraphTraverser::class);
         $subTraverser->expects($this->once())
             ->method('getAllParentResources')
             ->with($resource)
@@ -34,12 +36,12 @@ class ResourceGraphTraverserDispatcherTest extends \PHPUnit_Framework_TestCase
     {
         $traverser = new ResourceGraphTraverserDispatcher();
 
-        $resource = $this->getMockForAbstractClass('MyCLabs\ACL\Model\ResourceInterface');
+        $resource = $this->getMockForAbstractClass(ResourceInterface::class);
         $resource->expects($this->any())
             ->method('getResourceId')
             ->will($this->returnValue(new ResourceId(get_class($resource))));
 
-        $subTraverser = $this->getMockForAbstractClass('\MyCLabs\ACL\ResourceGraph\ResourceGraphTraverser');
+        $subTraverser = $this->getMockForAbstractClass(ResourceGraphTraverser::class);
         $subTraverser->expects($this->once())
             ->method('getAllSubResources')
             ->with($resource)
@@ -53,11 +55,11 @@ class ResourceGraphTraverserDispatcherTest extends \PHPUnit_Framework_TestCase
     public function testSetTraverserWithExactClass()
     {
         $traverser = new ResourceGraphTraverserDispatcher();
-        $resource = $this->getMockForAbstractClass('MyCLabs\ACL\Model\ResourceInterface');
+        $resource = $this->getMockForAbstractClass(ResourceInterface::class);
         $resource->expects($this->any())
             ->method('getResourceId')
             ->will($this->returnValue(new ResourceId(get_class($resource))));
-        $subTraverser = $this->getMockForAbstractClass('\MyCLabs\ACL\ResourceGraph\ResourceGraphTraverser');
+        $subTraverser = $this->getMockForAbstractClass(ResourceGraphTraverser::class);
 
         // Set the traverser by passing the class of the resource
         $traverser->setResourceGraphTraverser(get_class($resource), $subTraverser);
@@ -73,14 +75,14 @@ class ResourceGraphTraverserDispatcherTest extends \PHPUnit_Framework_TestCase
     public function testSetTraverserWithInterface()
     {
         $traverser = new ResourceGraphTraverserDispatcher();
-        $resource = $this->getMockForAbstractClass('MyCLabs\ACL\Model\ResourceInterface');
+        $resource = $this->getMockForAbstractClass(ResourceInterface::class);
         $resource->expects($this->any())
             ->method('getResourceId')
             ->will($this->returnValue(new ResourceId(get_class($resource))));
-        $subTraverser = $this->getMockForAbstractClass('\MyCLabs\ACL\ResourceGraph\ResourceGraphTraverser');
+        $subTraverser = $this->getMockForAbstractClass(ResourceGraphTraverser::class);
 
         // Set the traverser by passing the interface (and not the concrete class)
-        $traverser->setResourceGraphTraverser('MyCLabs\ACL\Model\ResourceInterface', $subTraverser);
+        $traverser->setResourceGraphTraverser(ResourceInterface::class, $subTraverser);
 
         // Check that the $subTraverser is indeed called
         $subTraverser->expects($this->once())

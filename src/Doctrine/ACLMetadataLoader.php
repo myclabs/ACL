@@ -6,6 +6,7 @@ use Doctrine\ORM\Event\LoadClassMetadataEventArgs;
 use Doctrine\ORM\Mapping\ClassMetadata;
 use Doctrine\ORM\Mapping\ClassMetadataFactory;
 use MyCLabs\ACL\Model\Actions;
+use MyCLabs\ACL\Model\Authorization;
 
 /**
  * Loads metadata relative to ACL in Doctrine.
@@ -30,8 +31,8 @@ class ACLMetadataLoader
      */
     public function setActionsClass($class)
     {
-        if (! is_subclass_of($class, 'MyCLabs\ACL\Model\Actions')) {
-            throw new \InvalidArgumentException('The given class doesn\'t extend MyCLabs\ACL\Model\Actions');
+        if (! is_subclass_of($class, Actions::class)) {
+            throw new \InvalidArgumentException("The given class doesn't extend " . Actions::class);
         }
 
         $this->actionsClass = $class;
@@ -45,7 +46,7 @@ class ACLMetadataLoader
         /** @var ClassMetadata $metadata */
         $metadata = $eventArgs->getClassMetadata();
 
-        if (($this->actionsClass !== null) && ($metadata->getName() === 'MyCLabs\ACL\Model\Authorization')) {
+        if (($this->actionsClass !== null) && ($metadata->getName() === Authorization::class)) {
             $this->remapActions($metadata, $eventArgs->getEntityManager()->getMetadataFactory());
         }
     }

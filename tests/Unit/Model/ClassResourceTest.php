@@ -2,7 +2,9 @@
 
 namespace Tests\MyCLabs\ACL\Unit\Model;
 
+use Doctrine\ORM\EntityManager;
 use MyCLabs\ACL\Model\ClassResource;
+use MyCLabs\ACL\Repository\AuthorizationRepository;
 
 /**
  * @covers \MyCLabs\ACL\Model\ClassResource
@@ -18,7 +20,7 @@ class ClassResourceTest extends \PHPUnit_Framework_TestCase
 
     public function testParentResources()
     {
-        $em = $this->getMock('Doctrine\ORM\EntityManager', [], [], '', false);
+        $em = $this->getMock(EntityManager::class, [], [], '', false);
         $resource = new ClassResource('foo');
 
         $this->assertSame([], $resource->getParentResources($em));
@@ -26,12 +28,12 @@ class ClassResourceTest extends \PHPUnit_Framework_TestCase
 
     public function testSubResources()
     {
-        $repo = $this->getMock('MyCLabs\ACL\Repository\AuthorizationRepository', [], [], '', false);
+        $repo = $this->getMock(AuthorizationRepository::class, [], [], '', false);
         $repo->expects($this->once())
             ->method('findAll')
             ->will($this->returnValue(['foo', 'bar']));
 
-        $em = $this->getMock('Doctrine\ORM\EntityManager', [], [], '', false);
+        $em = $this->getMock(EntityManager::class, [], [], '', false);
         $em->expects($this->once())
             ->method('getRepository')
             ->will($this->returnValue($repo));

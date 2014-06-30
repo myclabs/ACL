@@ -62,7 +62,7 @@ class AuthorizationRepository extends EntityRepository
             // Set authorization ID (used if parent of other authorizations to be inserted)
             $authorization->setId($connection->lastInsertId());
 
-            // Commit every 1000 inserts to avoid locking the table too long
+            // Commit every 1000 inserts to avoid locking the table for too long
             if (($i % 1000) === 0) {
                 $connection->commit();
                 $connection->beginTransaction();

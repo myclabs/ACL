@@ -3,6 +3,7 @@
 namespace Tests\MyCLabs\ACL\Integration;
 
 use MyCLabs\ACL\Model\Actions;
+use MyCLabs\ACL\Model\Authorization;
 use Tests\MyCLabs\ACL\Integration\Model\Article;
 use Tests\MyCLabs\ACL\Integration\Model\User;
 
@@ -28,7 +29,7 @@ class RebuildAuthorizationTest extends AbstractIntegrationTest
 
         $qb = $this->em->createQueryBuilder();
         $qb->select('count(authorization.id)');
-        $qb->from('MyCLabs\ACL\Model\Authorization', 'authorization');
+        $qb->from(Authorization::class, 'authorization');
         $query = $qb->getQuery();
 
         $initialCount = $query->getSingleScalarResult();

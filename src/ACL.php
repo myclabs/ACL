@@ -63,7 +63,7 @@ class ACL
     public function isAllowed(SecurityIdentityInterface $identity, $action, ResourceInterface $resource)
     {
         /** @var AuthorizationRepository $repository */
-        $repository = $this->entityManager->getRepository('MyCLabs\ACL\Model\Authorization');
+        $repository = $this->entityManager->getRepository(Authorization::class);
 
         return $repository->hasAuthorization($identity, $action, $resource);
     }
@@ -91,7 +91,7 @@ class ACL
         }
 
         /** @var AuthorizationRepository $repository */
-        $repository = $this->entityManager->getRepository('MyCLabs\ACL\Model\Authorization');
+        $repository = $this->entityManager->getRepository(Authorization::class);
 
         $repository->insertBulk($authorizations);
     }
@@ -145,7 +145,7 @@ class ACL
         $resource = $role->validateAndReturnResourceForGrant($resource);
 
         /** @var RoleEntryRepository $roleEntryRepository */
-        $roleEntryRepository = $this->entityManager->getRepository('Myclabs\ACL\Model\RoleEntry');
+        $roleEntryRepository = $this->entityManager->getRepository(RoleEntry::class);
         $roleEntry = $roleEntryRepository->findOneByIdentityAndRoleAndResource($identity, $roleName, $resource);
 
         $identity->removeRoleEntry($roleEntry);
@@ -171,7 +171,7 @@ class ACL
         $resource = $role->validateAndReturnResourceForGrant($resource);
 
         /** @var RoleEntryRepository $roleEntryRepository */
-        $roleEntryRepository = $this->entityManager->getRepository('Myclabs\ACL\Model\RoleEntry');
+        $roleEntryRepository = $this->entityManager->getRepository(RoleEntry::class);
 
         $roleEntry = $roleEntryRepository->findOneByIdentityAndRoleAndResource($identity, $roleName, $resource);
 
@@ -190,7 +190,7 @@ class ACL
         $cascadedAuthorizations = $this->cascadeStrategy->processNewResource($resource);
 
         /** @var AuthorizationRepository $repository */
-        $repository = $this->entityManager->getRepository('MyCLabs\ACL\Model\Authorization');
+        $repository = $this->entityManager->getRepository(Authorization::class);
 
         $repository->insertBulk($cascadedAuthorizations);
     }
@@ -205,9 +205,9 @@ class ACL
     public function processDeletedResource(ResourceInterface $resource)
     {
         /** @var AuthorizationRepository $authorizationRepository */
-        $authorizationRepository = $this->entityManager->getRepository('MyCLabs\ACL\Model\Authorization');
+        $authorizationRepository = $this->entityManager->getRepository(Authorization::class);
         /** @var RoleEntryRepository $roleEntryRepository */
-        $roleEntryRepository = $this->entityManager->getRepository('MyCLabs\ACL\Model\RoleEntry');
+        $roleEntryRepository = $this->entityManager->getRepository(RoleEntry::class);
 
         // Remove the role entries for this resource
         $roleEntryRepository->removeForResource($resource);
@@ -221,11 +221,11 @@ class ACL
      */
     public function rebuildAuthorizations()
     {
-        $roleEntryRepository = $this->entityManager->getRepository('MyCLabs\ACL\Model\RoleEntry');
+        $roleEntryRepository = $this->entityManager->getRepository(RoleEntry::class);
 
         // Clear
-        $this->entityManager->createQuery('DELETE MyCLabs\ACL\Model\Authorization')->execute();
-        $this->entityManager->clear('MyCLabs\ACL\Model\Authorization');
+        $this->entityManager->createQuery('DELETE ' . Authorization::class)->execute();
+        $this->entityManager->clear(Authorization::class);
 
         // Regenerate
         foreach ($roleEntryRepository->findAll() as $roleEntry) {
@@ -281,7 +281,7 @@ class ACL
         ResourceInterface $resource
     ) {
         /** @var RoleEntryRepository $roleEntryRepository */
-        $roleEntryRepository = $this->entityManager->getRepository('Myclabs\ACL\Model\RoleEntry');
+        $roleEntryRepository = $this->entityManager->getRepository(RoleEntry::class);
         $roleEntry = $roleEntryRepository->findOneByIdentityAndRoleAndResource($identity, $roleName, $resource);
 
         if ($roleEntry) {

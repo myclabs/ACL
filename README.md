@@ -22,7 +22,7 @@ allow very efficient filtering at the SQL level through Doctrine queries
 
 Requirements:
 
-- PHP 5.4
+- PHP 5.5
 - Use Doctrine as the ORM for your model
 - Doctrine 2.5 (currently in beta)
 

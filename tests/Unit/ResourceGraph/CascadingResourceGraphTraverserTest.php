@@ -2,7 +2,11 @@
 
 namespace Tests\MyCLabs\ACL\Unit\Model;
 
+use Doctrine\ORM\EntityManager;
+use MyCLabs\ACL\Model\CascadingResource;
+use MyCLabs\ACL\Model\ResourceInterface;
 use MyCLabs\ACL\ResourceGraph\CascadingResourceGraphTraverser;
+use MyCLabs\ACL\ResourceGraph\ResourceGraphTraverser;
 
 /**
  * @covers \MyCLabs\ACL\ResourceGraph\CascadingResourceGraphTraverser
@@ -11,12 +15,12 @@ class CascadingResourceGraphTraverserTest extends \PHPUnit_Framework_TestCase
 {
     public function testGetParentResources()
     {
-        $em = $this->getMock('Doctrine\ORM\EntityManager', [], [], '', false);
+        $em = $this->getMock(EntityManager::class, [], [], '', false);
 
-        $parentTraverser = $this->getMockForAbstractClass('MyCLabs\ACL\ResourceGraph\ResourceGraphTraverser');
+        $parentTraverser = $this->getMockForAbstractClass(ResourceGraphTraverser::class);
         $traverser = new CascadingResourceGraphTraverser($em, $parentTraverser);
 
-        $cascadingResource = $this->getMockForAbstractClass('MyCLabs\ACL\Model\CascadingResource');
+        $cascadingResource = $this->getMockForAbstractClass(CascadingResource::class);
 
         // Check that getParentResources() is called on the CascadingResource
         $cascadingResource->expects($this->once())
@@ -32,13 +36,13 @@ class CascadingResourceGraphTraverserTest extends \PHPUnit_Framework_TestCase
      */
     public function testGetParentResourcesRecursive()
     {
-        $em = $this->getMock('Doctrine\ORM\EntityManager', [], [], '', false);
+        $em = $this->getMock(EntityManager::class, [], [], '', false);
 
-        $parentTraverser = $this->getMockForAbstractClass('MyCLabs\ACL\ResourceGraph\ResourceGraphTraverser');
+        $parentTraverser = $this->getMockForAbstractClass(ResourceGraphTraverser::class);
         $traverser = new CascadingResourceGraphTraverser($em, $parentTraverser);
 
-        $cascadingResource = $this->getMockForAbstractClass('MyCLabs\ACL\Model\CascadingResource');
-        $parentResource = $this->getMockForAbstractClass('MyCLabs\ACL\Model\ResourceInterface');
+        $cascadingResource = $this->getMockForAbstractClass(CascadingResource::class);
+        $parentResource = $this->getMockForAbstractClass(ResourceInterface::class);
 
         $cascadingResource->expects($this->once())
             ->method('getParentResources')
@@ -59,12 +63,12 @@ class CascadingResourceGraphTraverserTest extends \PHPUnit_Framework_TestCase
 
     public function testGetSubResources()
     {
-        $em = $this->getMock('Doctrine\ORM\EntityManager', [], [], '', false);
+        $em = $this->getMock(EntityManager::class, [], [], '', false);
 
-        $parentTraverser = $this->getMockForAbstractClass('MyCLabs\ACL\ResourceGraph\ResourceGraphTraverser');
+        $parentTraverser = $this->getMockForAbstractClass(ResourceGraphTraverser::class);
         $traverser = new CascadingResourceGraphTraverser($em, $parentTraverser);
 
-        $cascadingResource = $this->getMockForAbstractClass('MyCLabs\ACL\Model\CascadingResource');
+        $cascadingResource = $this->getMockForAbstractClass(CascadingResource::class);
 
         // Check that getParentResources() is called on the CascadingResource
         $cascadingResource->expects($this->once())
@@ -80,13 +84,13 @@ class CascadingResourceGraphTraverserTest extends \PHPUnit_Framework_TestCase
      */
     public function testGetSubResourcesRecursive()
     {
-        $em = $this->getMock('Doctrine\ORM\EntityManager', [], [], '', false);
+        $em = $this->getMock(EntityManager::class, [], [], '', false);
 
-        $parentTraverser = $this->getMockForAbstractClass('MyCLabs\ACL\ResourceGraph\ResourceGraphTraverser');
+        $parentTraverser = $this->getMockForAbstractClass(ResourceGraphTraverser::class);
         $traverser = new CascadingResourceGraphTraverser($em, $parentTraverser);
 
-        $cascadingResource = $this->getMockForAbstractClass('MyCLabs\ACL\Model\CascadingResource');
-        $subResource = $this->getMockForAbstractClass('MyCLabs\ACL\Model\ResourceInterface');
+        $cascadingResource = $this->getMockForAbstractClass(CascadingResource::class);
+        $subResource = $this->getMockForAbstractClass(ResourceInterface::class);
 
         $cascadingResource->expects($this->once())
             ->method('getSubResources')

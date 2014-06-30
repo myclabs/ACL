@@ -23,7 +23,7 @@ class Issue10Test extends AbstractIntegrationTest
     {
         $cascadeStrategy = new SimpleCascadeStrategy($this->em);
         $cascadeStrategy->setResourceGraphTraverser(
-            'Tests\MyCLabs\ACL\Integration\Issues\Issue10\Project',
+            Issue10\Project::class,
             new ProjectGraphTraverser()
         );
 

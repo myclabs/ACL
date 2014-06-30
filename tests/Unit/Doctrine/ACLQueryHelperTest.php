@@ -2,9 +2,12 @@
 
 namespace Tests\MyCLabs\ACL\Unit\Doctrine;
 
+use Doctrine\ORM\EntityManager;
 use Doctrine\ORM\QueryBuilder;
 use MyCLabs\ACL\Doctrine\ACLQueryHelper;
 use MyCLabs\ACL\Model\Actions;
+use MyCLabs\ACL\Model\Authorization;
+use MyCLabs\ACL\Model\SecurityIdentityInterface;
 
 /**
  * @covers \MyCLabs\ACL\Doctrine\ACLQueryHelper
@@ -13,8 +16,8 @@ class ACLQueryHelperTest extends \PHPUnit_Framework_TestCase
 {
     public function testJoinACL()
     {
-        $em = $this->getMock('Doctrine\ORM\EntityManager', [], [], '', false);
-        $identity = $this->getMockForAbstractClass('MyCLabs\ACL\Model\SecurityIdentityInterface');
+        $em = $this->getMock(EntityManager::class, [], [], '', false);
+        $identity = $this->getMockForAbstractClass(SecurityIdentityInterface::class);
 
         $qb = new QueryBuilder($em);
 
@@ -23,7 +26,7 @@ class ACLQueryHelperTest extends \PHPUnit_Framework_TestCase
 
         ACLQueryHelper::joinACL($qb, $identity, Actions::VIEW, 'test', 'test');
 
-        $dql = 'SELECT test FROM test test INNER JOIN MyCLabs\ACL\Model\Authorization authorization '
+        $dql = 'SELECT test FROM test test INNER JOIN ' . Authorization::class . ' authorization '
             . 'WITH test.id = authorization.resource.id '
             . 'WHERE authorization.resource.name = :acl_resource_name '
             . 'AND authorization.securityIdentity = :acl_identity '
@@ -36,8 +39,8 @@ class ACLQueryHelperTest extends \PHPUnit_Framework_TestCase
 
     public function testJoinACLWithoutEntityAliasAndClass()
     {
-        $em = $this->getMock('Doctrine\ORM\EntityManager', [], [], '', false);
-        $identity = $this->getMockForAbstractClass('MyCLabs\ACL\Model\SecurityIdentityInterface');
+        $em = $this->getMock(EntityManager::class, [], [], '', false);
+        $identity = $this->getMockForAbstractClass(SecurityIdentityInterface::class);
 
         $qb = new QueryBuilder($em);
 
@@ -46,7 +49,7 @@ class ACLQueryHelperTest extends \PHPUnit_Framework_TestCase
 
         ACLQueryHelper::joinACL($qb, $identity, Actions::VIEW);
 
-        $dql = 'SELECT test FROM test test INNER JOIN MyCLabs\ACL\Model\Authorization authorization '
+        $dql = 'SELECT test FROM test test INNER JOIN ' . Authorization::class . ' authorization '
             . 'WITH test.id = authorization.resource.id '
             . 'WHERE authorization.resource.name = :acl_resource_name '
             . 'AND authorization.securityIdentity = :acl_identity '

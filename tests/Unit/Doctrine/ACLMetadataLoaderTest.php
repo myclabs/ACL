@@ -3,6 +3,7 @@
 namespace Tests\MyCLabs\ACL\Unit\Doctrine;
 
 use MyCLabs\ACL\Doctrine\ACLMetadataLoader;
+use MyCLabs\ACL\Model\Actions;
 
 /**
  * @covers \MyCLabs\ACL\Doctrine\ACLMetadataLoader
@@ -11,7 +12,7 @@ class ACLMetadataLoaderTest extends \PHPUnit_Framework_TestCase
 {
     public function testSetActionsClass()
     {
-        $actions = $this->getMock('MyCLabs\ACL\Model\Actions', [], [], '', false);
+        $actions = $this->getMock(Actions::class, [], [], '', false);
 
         $loader = new ACLMetadataLoader();
         $loader->setActionsClass(get_class($actions));

@@ -6,6 +6,7 @@ use Doctrine\ORM\EntityManager;
 use Doctrine\ORM\Events;
 use Doctrine\ORM\Tools\ResolveTargetEntityListener;
 use MyCLabs\ACL\ACL;
+use MyCLabs\ACL\Model\SecurityIdentityInterface;
 
 /**
  * Configures the entity manager.
@@ -41,7 +42,7 @@ class ACLSetup
 
         // Configure which entity implements the SecurityIdentityInterface
         $rtel = new ResolveTargetEntityListener();
-        $rtel->addResolveTargetEntity('MyCLabs\ACL\Model\SecurityIdentityInterface', $this->securityIdentityClass, []);
+        $rtel->addResolveTargetEntity(SecurityIdentityInterface::class, $this->securityIdentityClass, []);
         $evm->addEventListener(Events::loadClassMetadata, $rtel);
 
         // Register the metadata loader
@@ -56,12 +57,12 @@ class ACLSetup
      *
      * @param string $class
      *
-     * @throws \InvalidArgumentException The given class doesn't implement SecurityIdentityInterface
+     * @throws \InvalidArgumentException The given class doesn't implement the SecurityIdentityInterface interface
      */
     public function setSecurityIdentityClass($class)
     {
-        if (! is_subclass_of($class, 'MyCLabs\ACL\Model\SecurityIdentityInterface')) {
-            throw new \InvalidArgumentException('The given class doesn\'t implement SecurityIdentityInterface');
+        if (! is_subclass_of($class, SecurityIdentityInterface::class)) {
+            throw new \InvalidArgumentException("The given class doesn't implement SecurityIdentityInterface");
         }
 
         $this->securityIdentityClass = $class;

@@ -67,38 +67,38 @@ abstract class AbstractIntegrationTest extends \PHPUnit_Framework_TestCase
     private function configureACL()
     {
         $setup = new ACLSetup();
-        $setup->setSecurityIdentityClass('Tests\MyCLabs\ACL\Integration\Model\User');
+        $setup->setSecurityIdentityClass(Model\User::class);
 
         $roles = [
             'ArticleEditor' => [
-                'resourceType' => 'Tests\MyCLabs\ACL\Integration\Model\Article',
+                'resourceType' => Model\Article::class,
                 'actions' => new Actions([Actions::VIEW, Actions::EDIT])
             ],
             'AllArticlesEditor' => [
-                'resource' => new ClassResource('Tests\MyCLabs\ACL\Integration\Model\Article'),
+                'resource' => new ClassResource(Model\Article::class),
                 'actions' => new Actions([Actions::VIEW, Actions::EDIT])
             ],
             'ArticlePublisher' => [
-                'resourceType' => 'Tests\MyCLabs\ACL\Integration\Model\Article',
+                'resourceType' => Model\Article::class,
                 'actions' => new Actions([Actions::VIEW, Actions::PUBLISH])
             ],
             'CategoryManager' => [
-                'resourceType' => 'Tests\MyCLabs\ACL\Integration\Model\Category',
+                'resourceType' => Model\Category::class,
                 'actions' => new Actions([Actions::VIEW])
             ],
             'ArticleEditorCopy' => [
-                'resourceType' => 'Tests\MyCLabs\ACL\Integration\Model\Article',
+                'resourceType' => Model\Article::class,
                 'actions' => new Actions([Actions::VIEW, Actions::EDIT])
             ],
             'AccountAdmin' => [
-                'resourceType' => 'Tests\MyCLabs\ACL\Integration\Issues\Issue10\Account',
+                'resourceType' => Issues\Issue10\Account::class,
                 'actions' => Actions::all()
             ]
         ];
 
         $setup->registerRoles($roles, $this->acl);
 
-        $setup->setActionsClass('Tests\MyCLabs\ACL\Integration\Model\Actions');
+        $setup->setActionsClass(Model\Actions::class);
 
         return $setup;
     }
