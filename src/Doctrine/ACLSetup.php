@@ -6,7 +6,7 @@ use Doctrine\ORM\EntityManager;
 use Doctrine\ORM\Events;
 use Doctrine\ORM\Tools\ResolveTargetEntityListener;
 use MyCLabs\ACL\ACL;
-use MyCLabs\ACL\Model\SecurityIdentityInterface;
+use MyCLabs\ACL\Model\Identity;
 
 /**
  * Configures the entity manager.
@@ -23,7 +23,7 @@ class ACLSetup
     /**
      * @var string
      */
-    private $securityIdentityClass;
+    private $identityClass;
 
     public function __construct()
     {
@@ -32,17 +32,17 @@ class ACLSetup
 
     public function setUpEntityManager(EntityManager $entityManager, callable $aclLocator)
     {
-        if ($this->securityIdentityClass === null) {
+        if ($this->identityClass === null) {
             throw new \RuntimeException(
-                'The security identity class must be configured: call ->setSecurityIdentityClass("...")'
+                'The identity class must be configured: call $aclSetup->setIdentityClass("...")'
             );
         }
 
         $evm = $entityManager->getEventManager();
 
-        // Configure which entity implements the SecurityIdentityInterface
+        // Configure which entity implements the Identity interface
         $rtel = new ResolveTargetEntityListener();
-        $rtel->addResolveTargetEntity(SecurityIdentityInterface::class, $this->securityIdentityClass, []);
+        $rtel->addResolveTargetEntity(Identity::class, $this->identityClass, []);
         $evm->addEventListener(Events::loadClassMetadata, $rtel);
 
         // Register the metadata loader
@@ -53,19 +53,19 @@ class ACLSetup
     }
 
     /**
-     * Register which class is the security identity. Must be called exactly once.
+     * Register which class is the identity. Must be called exactly once.
      *
      * @param string $class
      *
-     * @throws \InvalidArgumentException The given class doesn't implement the SecurityIdentityInterface interface
+     * @throws \InvalidArgumentException The given class doesn't implement the Identity interface
      */
-    public function setSecurityIdentityClass($class)
+    public function setIdentityClass($class)
     {
-        if (! is_subclass_of($class, SecurityIdentityInterface::class)) {
-            throw new \InvalidArgumentException("The given class doesn't implement SecurityIdentityInterface");
+        if (! is_subclass_of($class, Identity::class)) {
+            throw new \InvalidArgumentException("The given class doesn't implement the Identity interface");
         }
 
-        $this->securityIdentityClass = $class;
+        $this->identityClass = $class;
     }
 
     /**

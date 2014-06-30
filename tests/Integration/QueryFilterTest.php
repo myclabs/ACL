@@ -30,7 +30,7 @@ class QueryFilterTest extends AbstractIntegrationTest
         $query = $this->em->createQuery(
             'SELECT a FROM ' . Model\Article::class . ' a
             JOIN ' . Authorization::class . ' authorization WITH a.id = authorization.resource.id
-            WHERE authorization.securityIdentity = :identity
+            WHERE authorization.identity = :identity
             AND authorization.resource.name = :resourceName
             AND authorization.actions.view = true'
         );

@@ -28,9 +28,9 @@ Requirements:
 
 Vocabulary:
 
-- **Security identity**: the entity which will be granted some access (this is generally the user)
+- **Identity**: the entity which will be granted some access (this is generally the user)
 - **Resource**: a *thing* to which we want to control the access
-- **Authorization**: allows a security identity (user) to do something on a resource
+- **Authorization**: allows an identity (user) to do something on a resource
 - **Role**: a role gives authorizations to a user (e.g. an administrator, an article editor, a project owner, …)
 
 There are 2 kinds of resources:

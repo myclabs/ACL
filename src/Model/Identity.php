@@ -3,11 +3,13 @@
 namespace MyCLabs\ACL\Model;
 
 /**
- * Security identity.
+ * ACL identity.
+ *
+ * @see IdentityTrait
  *
  * @author Matthieu Napoli <matthieu@mnapoli.fr>
  */
-interface SecurityIdentityInterface
+interface Identity
 {
     /**
      * @return mixed

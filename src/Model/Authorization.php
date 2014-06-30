@@ -7,11 +7,11 @@ use Doctrine\Common\Collections\Collection;
 use Doctrine\ORM\Mapping as ORM;
 
 /**
- * Authorization of a security identity to do something on a resource.
+ * Authorization of an identity to do something on a resource.
  *
  * @ORM\Entity(readOnly=true, repositoryClass="MyCLabs\ACL\Repository\AuthorizationRepository")
  * @ORM\Table(name="ACL_Authorization", indexes={
- *     @ORM\Index(name="is_allowed", columns={"resource_id", "resource_name", "securityIdentity_id"}),
+ *     @ORM\Index(name="is_allowed", columns={"resource_id", "resource_name", "identity_id"}),
  *     @ORM\Index(name="root_authorizations", columns={"parentAuthorization_id", "resource_id", "resource_name"})
  * })
  *
@@ -36,11 +36,11 @@ class Authorization
     protected $roleEntry;
 
     /**
-     * @var SecurityIdentityInterface
-     * @ORM\ManyToOne(targetEntity="SecurityIdentityInterface")
-     * @ORM\JoinColumn(name="securityIdentity_id", nullable=false, onDelete="CASCADE")
+     * @var Identity
+     * @ORM\ManyToOne(targetEntity="Identity")
+     * @ORM\JoinColumn(name="identity_id", nullable=false, onDelete="CASCADE")
      */
-    protected $securityIdentity;
+    protected $identity;
 
     /**
      * @var Actions
@@ -101,7 +101,7 @@ class Authorization
         $cascade
     ) {
         $this->roleEntry = $roleEntry;
-        $this->securityIdentity = $roleEntry->getSecurityIdentity();
+        $this->identity = $roleEntry->getIdentity();
         $this->actions = $actions;
         $this->resource = $resourceId;
         $this->cascadable = $cascade;
@@ -125,11 +125,11 @@ class Authorization
     }
 
     /**
-     * @return SecurityIdentityInterface
+     * @return Identity
      */
-    public function getSecurityIdentity()
+    public function getIdentity()
     {
-        return $this->securityIdentity;
+        return $this->identity;
     }
 
     /**

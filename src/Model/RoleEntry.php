@@ -32,10 +32,10 @@ class RoleEntry
     protected $roleName;
 
     /**
-     * @var SecurityIdentityInterface
-     * @ORM\ManyToOne(targetEntity="SecurityIdentityInterface", inversedBy="roleEntries")
+     * @var Identity
+     * @ORM\ManyToOne(targetEntity="Identity", inversedBy="roleEntries")
      */
-    protected $securityIdentity;
+    protected $identity;
 
     /**
      * @var Authorization[]|Collection
@@ -49,11 +49,11 @@ class RoleEntry
      */
     protected $resource;
 
-    public function __construct(SecurityIdentityInterface $identity, $name, ResourceInterface $resource)
+    public function __construct(Identity $identity, $name, ResourceInterface $resource)
     {
         $this->roleName = $name;
         $this->authorizations = new ArrayCollection();
-        $this->securityIdentity = $identity;
+        $this->identity = $identity;
         $this->resource = $resource->getResourceId();
     }
 
@@ -74,11 +74,11 @@ class RoleEntry
     }
 
     /**
-     * @return SecurityIdentityInterface
+     * @return Identity
      */
-    public function getSecurityIdentity()
+    public function getIdentity()
     {
-        return $this->securityIdentity;
+        return $this->identity;
     }
 
     /**

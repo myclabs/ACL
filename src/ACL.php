@@ -10,10 +10,10 @@ use MyCLabs\ACL\CascadeStrategy\SimpleCascadeStrategy;
 use MyCLabs\ACL\Model\Actions;
 use MyCLabs\ACL\Model\Authorization;
 use MyCLabs\ACL\Model\ClassResource;
+use MyCLabs\ACL\Model\Identity;
 use MyCLabs\ACL\Model\ResourceInterface;
 use MyCLabs\ACL\Model\Role;
 use MyCLabs\ACL\Model\RoleEntry;
-use MyCLabs\ACL\Model\SecurityIdentityInterface;
 use MyCLabs\ACL\Repository\AuthorizationRepository;
 use MyCLabs\ACL\Repository\RoleEntryRepository;
 
@@ -53,14 +53,14 @@ class ACL
     /**
      * Checks if the identity is allowed to do the action on the resource.
      *
-     * @param SecurityIdentityInterface $identity
-     * @param string                    $action
-     * @param ResourceInterface         $resource
+     * @param Identity          $identity
+     * @param string            $action
+     * @param ResourceInterface $resource
      *
      * @throws \RuntimeException The entity is not persisted (ID must be not null).
      * @return boolean Is allowed, or not.
      */
-    public function isAllowed(SecurityIdentityInterface $identity, $action, ResourceInterface $resource)
+    public function isAllowed(Identity $identity, $action, ResourceInterface $resource)
     {
         /** @var AuthorizationRepository $repository */
         $repository = $this->entityManager->getRepository(Authorization::class);
@@ -97,20 +97,20 @@ class ACL
     }
 
     /**
-     * Grant a role to a security identity.
+     * Grant a role to an identity.
      *
      * The role will be flushed in database.
      * The authorizations related to this role will be automatically created.
      *
-     * @param SecurityIdentityInterface $identity
-     * @param string $roleName
+     * @param Identity          $identity
+     * @param string            $roleName
      * @param ResourceInterface $resource
      *
      * @throws InvalidArgumentException The role doesn't exist.
      * @throws BadMethodCallException No resource given to grant the role, and no resource configured in the role
-     * @throws AlreadyHasRoleException The security identity already has this role.
+     * @throws AlreadyHasRoleException The identity already has this role.
      */
-    public function grant(SecurityIdentityInterface $identity, $roleName, ResourceInterface $resource = null)
+    public function grant(Identity $identity, $roleName, ResourceInterface $resource = null)
     {
         $role = $this->getRole($roleName, $resource);
 
@@ -133,12 +133,12 @@ class ACL
      * The role deletion will be flushed in database.
      * The authorizations will be automatically removed.
      *
-     * @param SecurityIdentityInterface $identity
-     * @param string                    $roleName
-     * @param ResourceInterface         $resource
+     * @param Identity          $identity
+     * @param string            $roleName
+     * @param ResourceInterface $resource
      * @throws InvalidArgumentException
      */
-    public function revoke(SecurityIdentityInterface $identity, $roleName, ResourceInterface $resource = null)
+    public function revoke(Identity $identity, $roleName, ResourceInterface $resource = null)
     {
         $role = $this->getRole($roleName, $resource);
 
@@ -156,15 +156,15 @@ class ACL
     }
 
     /**
-     * Check if a security identity is granted a role.
+     * Check if an identity is granted a role.
      *
-     * @param SecurityIdentityInterface $identity
-     * @param string                    $roleName
-     * @param ResourceInterface|null    $resource
+     * @param Identity               $identity
+     * @param string                 $roleName
+     * @param ResourceInterface|null $resource
      *
      * @return bool
      */
-    public function isGranted(SecurityIdentityInterface $identity, $roleName, ResourceInterface $resource = null)
+    public function isGranted(Identity $identity, $roleName, ResourceInterface $resource = null)
     {
         $role = $this->getRole($roleName, $resource);
 
@@ -276,7 +276,7 @@ class ACL
     }
 
     private function guardAgainstDuplicateRole(
-        SecurityIdentityInterface $identity,
+        Identity $identity,
         $roleName,
         ResourceInterface $resource
     ) {
@@ -285,7 +285,7 @@ class ACL
         $roleEntry = $roleEntryRepository->findOneByIdentityAndRoleAndResource($identity, $roleName, $resource);
 
         if ($roleEntry) {
-            throw new AlreadyHasRoleException('The security identity already has this role');
+            throw new AlreadyHasRoleException('The identity already has this role');
         }
     }
 }

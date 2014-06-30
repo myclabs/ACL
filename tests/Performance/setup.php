@@ -48,7 +48,7 @@ $roles = [
 ];
 
 $setup = new ACLSetup();
-$setup->setSecurityIdentityClass('Tests\MyCLabs\ACL\Performance\Model\User');
+$setup->setIdentityClass('Tests\MyCLabs\ACL\Performance\Model\User');
 $setup->registerRoles($roles, $acl);
 
 $setup->setUpEntityManager($em, function () use ($acl) {

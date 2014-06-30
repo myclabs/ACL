@@ -7,7 +7,7 @@ use Doctrine\ORM\QueryBuilder;
 use MyCLabs\ACL\Doctrine\ACLQueryHelper;
 use MyCLabs\ACL\Model\Actions;
 use MyCLabs\ACL\Model\Authorization;
-use MyCLabs\ACL\Model\SecurityIdentityInterface;
+use MyCLabs\ACL\Model\Identity;
 
 /**
  * @covers \MyCLabs\ACL\Doctrine\ACLQueryHelper
@@ -17,7 +17,7 @@ class ACLQueryHelperTest extends \PHPUnit_Framework_TestCase
     public function testJoinACL()
     {
         $em = $this->getMock(EntityManager::class, [], [], '', false);
-        $identity = $this->getMockForAbstractClass(SecurityIdentityInterface::class);
+        $identity = $this->getMockForAbstractClass(Identity::class);
 
         $qb = new QueryBuilder($em);
 
@@ -29,7 +29,7 @@ class ACLQueryHelperTest extends \PHPUnit_Framework_TestCase
         $dql = 'SELECT test FROM test test INNER JOIN ' . Authorization::class . ' authorization '
             . 'WITH test.id = authorization.resource.id '
             . 'WHERE authorization.resource.name = :acl_resource_name '
-            . 'AND authorization.securityIdentity = :acl_identity '
+            . 'AND authorization.identity = :acl_identity '
             . 'AND authorization.actions.view = true';
         $this->assertEquals($dql, $qb->getDQL());
 
@@ -40,7 +40,7 @@ class ACLQueryHelperTest extends \PHPUnit_Framework_TestCase
     public function testJoinACLWithoutEntityAliasAndClass()
     {
         $em = $this->getMock(EntityManager::class, [], [], '', false);
-        $identity = $this->getMockForAbstractClass(SecurityIdentityInterface::class);
+        $identity = $this->getMockForAbstractClass(Identity::class);
 
         $qb = new QueryBuilder($em);
 
@@ -52,7 +52,7 @@ class ACLQueryHelperTest extends \PHPUnit_Framework_TestCase
         $dql = 'SELECT test FROM test test INNER JOIN ' . Authorization::class . ' authorization '
             . 'WITH test.id = authorization.resource.id '
             . 'WHERE authorization.resource.name = :acl_resource_name '
-            . 'AND authorization.securityIdentity = :acl_identity '
+            . 'AND authorization.identity = :acl_identity '
             . 'AND authorization.actions.view = true';
         $this->assertEquals($dql, $qb->getDQL());
 

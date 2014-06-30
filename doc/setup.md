@@ -44,7 +44,7 @@ Creating the ACL object is simple:
 $acl = new ACL($entityManager);
 ```
 
-Note that you'll need to define a SecurityIdentity class, usually a user class
+Note that you'll need to define a Identity class, usually a user class
 (you can see an example in the [Usage section](usage.md)).
 
 Then, you must separately register some listeners on the entity manager and your roles.
@@ -53,8 +53,8 @@ The `ACLSetup` class is here to help you:
 ```php
 $aclSetup = new \MyCLabs\ACL\Doctrine\ACLSetup();
 
-// Set which class implements the SecurityIdentityInterface (must be called once)
-$aclSetup->setSecurityIdentityClass('My\Model\User');
+// Set which class implements the Identity interface (must be called once)
+$aclSetup->setIdentityClass('My\Model\User');
 
 // Register roles
 $aclSetup->registerRoles([

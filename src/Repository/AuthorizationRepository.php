@@ -5,8 +5,8 @@ namespace MyCLabs\ACL\Repository;
 use Doctrine\ORM\EntityRepository;
 use Doctrine\ORM\QueryBuilder;
 use MyCLabs\ACL\Model\Authorization;
+use MyCLabs\ACL\Model\Identity;
 use MyCLabs\ACL\Model\ResourceInterface;
-use MyCLabs\ACL\Model\SecurityIdentityInterface;
 
 /**
  * Authorizations repository.
@@ -46,7 +46,7 @@ class AuthorizationRepository extends EntityRepository
 
             $data = [
                 'role_entry_id'          => $authorization->getRoleEntry()->getId(),
-                'securityIdentity_id'    => $authorization->getSecurityIdentity()->getId(),
+                'identity_id'            => $authorization->getIdentity()->getId(),
                 'parentAuthorization_id' => $parent ? $parent->getId() : null,
                 'resource_name'          => $authorization->getResourceId()->getName(),
                 'resource_id'            => $authorization->getResourceId()->getId(),
@@ -77,20 +77,20 @@ class AuthorizationRepository extends EntityRepository
     /**
      * Check if there is at least one authorization for the given identity, action and resource.
      *
-     * @param SecurityIdentityInterface $identity
-     * @param string                    $action
-     * @param ResourceInterface         $resource
+     * @param Identity          $identity
+     * @param string            $action
+     * @param ResourceInterface $resource
      *
      * @return boolean There is an authorization or not.
      */
-    public function hasAuthorization(SecurityIdentityInterface $identity, $action, ResourceInterface $resource)
+    public function hasAuthorization(Identity $identity, $action, ResourceInterface $resource)
     {
         $qb = $this->createQueryBuilder('a');
         $qb->select('COUNT(a)');
 
-        $qb->andWhere('a.securityIdentity = :securityIdentity');
+        $qb->andWhere('a.identity = :identity');
         $qb->andWhere("a.actions.$action = true");
-        $qb->setParameter('securityIdentity', $identity);
+        $qb->setParameter('identity', $identity);
 
         $this->filterQueryWithResource($qb, $resource);
 
@@ -102,6 +102,7 @@ class AuthorizationRepository extends EntityRepository
      * i.e. they are "cascadable" and have no parent authorization (we only want "root" authorizations).
      *
      * @param ResourceInterface $resource
+     *
      * @return Authorization[]
      */
     public function findCascadableAuthorizationsForResource(ResourceInterface $resource)

@@ -1,5 +1,9 @@
 # Change log
 
+## 2.0.0
+
+- `SecurityIdentityInterface` has been renamed to `Identity`, and `SecurityIdentityTrait` to `IdentityTrait`.
+
 ## 1.1.1
 
 - Optimized the rebuild of the authorizations

@@ -5,7 +5,7 @@ namespace MyCLabs\ACL\Model;
 use Doctrine\Common\Collections\Collection;
 
 /**
- * Security identity trait.
+ * Identity trait.
  *
  * This trait needs a $roleEntries attribute.
  *
@@ -13,7 +13,7 @@ use Doctrine\Common\Collections\Collection;
  *
  * @author Matthieu Napoli <matthieu@mnapoli.fr>
  */
-trait SecurityIdentityTrait
+trait IdentityTrait
 {
     /**
      * @return RoleEntry[]

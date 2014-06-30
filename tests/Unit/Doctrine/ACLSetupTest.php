@@ -3,28 +3,28 @@
 namespace Tests\MyCLabs\ACL\Unit\Doctrine;
 
 use MyCLabs\ACL\Doctrine\ACLSetup;
-use MyCLabs\ACL\Model\SecurityIdentityInterface;
+use MyCLabs\ACL\Model\Identity;
 
 /**
  * @covers \MyCLabs\ACL\Doctrine\ACLSetup
  */
 class ACLSetupTest extends \PHPUnit_Framework_TestCase
 {
-    public function testSetSecurityIdentityClass()
+    public function testSetIdentityClass()
     {
-        $user = $this->getMockForAbstractClass(SecurityIdentityInterface::class);
+        $user = $this->getMockForAbstractClass(Identity::class);
 
         $loader = new ACLSetup();
-        $loader->setSecurityIdentityClass(get_class($user));
+        $loader->setIdentityClass(get_class($user));
     }
 
     /**
      * @expectedException \InvalidArgumentException
-     * @expectedExceptionMessage The given class doesn't implement SecurityIdentityInterface
+     * @expectedExceptionMessage The given class doesn't implement the Identity interface
      */
-    public function testSetInvalidSecurityIdentityClass()
+    public function testSetInvalidIdentityClass()
     {
         $loader = new ACLSetup();
-        $loader->setSecurityIdentityClass('foo', 'foo');
+        $loader->setIdentityClass('foo', 'foo');
     }
 }

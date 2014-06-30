@@ -43,7 +43,7 @@ class AuthorizationRepositoryTest extends \PHPUnit_Framework_TestCase
         ];
 
         $setup = new ACLSetup();
-        $setup->setSecurityIdentityClass(Model\User::class);
+        $setup->setIdentityClass(Model\User::class);
         $roles = [
             'fileOwner' => [
                 'resourceType' => Model\File::class,
@@ -95,7 +95,7 @@ class AuthorizationRepositoryTest extends \PHPUnit_Framework_TestCase
         /** @var Authorization $authorization */
         $authorization = $inserted[0];
         $this->assertSame($role, $authorization->getRoleEntry());
-        $this->assertSame($user, $authorization->getSecurityIdentity());
+        $this->assertSame($user, $authorization->getIdentity());
         $this->assertEquals($resource->getId(), $authorization->getResourceId()->getId());
         $this->assertEquals(Model\File::class, $authorization->getResourceId()->getName());
         $this->assertEquals(Actions::all(), $authorization->getActions());

@@ -11,25 +11,25 @@ The first thing to do is to create some access rules.
 For example, let's say you are creating a blog engine and you want to define who can access the articles.
 You'll have the following objects:
 
-- users accounts are the security identities
+- users accounts are the identities
 - articles are the resources to which you want to restrict access
 - there will be several roles, like an "article editor", an administrator, …
 - each role will be able to do specific actions on the articles (edit, delete, …)
 
 
-### 1. Define the security identity
+### 1. Define the identity
 
-As we said, users are the security identities (they could also be customers, clients, usergroups, profiles, accounts …).
+As we said, users are the identities (they could also be customers, clients, usergroups, profiles, accounts …).
 
-Here is an example of a simple user class that implements the `SecurityIdentityInterface`:
+Here is an example of a simple user class that implements the `Identity` interface:
 
 ```php
 /**
  * @ORM\Entity
  */
-class User implements SecurityIdentityInterface
+class User implements Identity
 {
-    use SecurityIdentityTrait;
+    use IdentityTrait;
 
     /**
      * @ORM\Id @ORM\GeneratedValue
@@ -39,7 +39,7 @@ class User implements SecurityIdentityInterface
 
     /**
      * @var RoleEntry[]
-     * @ORM\OneToMany(targetEntity="MyCLabs\ACL\Model\RoleEntry", mappedBy="securityIdentity",
+     * @ORM\OneToMany(targetEntity="MyCLabs\ACL\Model\RoleEntry", mappedBy="identity",
      *     cascade={"persist", "remove"}, orphanRemoval=true)
      */
     protected $roleEntries;
@@ -56,7 +56,7 @@ class User implements SecurityIdentityInterface
 }
 ```
 
-As you can see we used the `SecurityIdentityTrait` to implement methods required by the interface, but we still
+As you can see we used the `IdentityTrait` to implement methods required by the interface, but we still
 need to declare the `$roleEntries` association to map it with Doctrine.
 
 

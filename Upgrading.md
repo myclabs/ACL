@@ -4,6 +4,20 @@
 
 This is the upgrade guide from 1.x to 2.0.
 
+### Identities
+
+The `SecurityIdentityInterface` has been renamed to `Identity`. In the same vein, the trait has been
+renamed to `IdentityTrait`. So you need to rename the interface and trait in your User class:
+
+```php
+class User implements Identity
+{
+    use IdentityTrait;
+
+    // ...
+}
+```
+
 ### Entities
 
 First, the interface `EntityResource` doesn't exist anymore. It has been unified with `ResourceInterface`

@@ -67,7 +67,7 @@ abstract class AbstractIntegrationTest extends \PHPUnit_Framework_TestCase
     private function configureACL()
     {
         $setup = new ACLSetup();
-        $setup->setSecurityIdentityClass(Model\User::class);
+        $setup->setIdentityClass(Model\User::class);
 
         $roles = [
             'ArticleEditor' => [

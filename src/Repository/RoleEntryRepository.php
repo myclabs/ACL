@@ -3,9 +3,9 @@
 namespace MyCLabs\ACL\Repository;
 
 use Doctrine\ORM\EntityRepository;
+use MyCLabs\ACL\Model\Identity;
 use MyCLabs\ACL\Model\ResourceInterface;
 use MyCLabs\ACL\Model\RoleEntry;
-use MyCLabs\ACL\Model\SecurityIdentityInterface;
 
 /**
  * Role entries repository.
@@ -36,24 +36,24 @@ class RoleEntryRepository extends EntityRepository
     /**
      * Find a role entry.
      *
-     * @param SecurityIdentityInterface $identity
-     * @param string                    $roleName
-     * @param ResourceInterface         $resource
+     * @param Identity          $identity
+     * @param string            $roleName
+     * @param ResourceInterface $resource
      *
      * @return RoleEntry|null
      */
     public function findOneByIdentityAndRoleAndResource(
-        SecurityIdentityInterface $identity,
+        Identity $identity,
         $roleName,
         ResourceInterface $resource
     ) {
         $resourceId = $resource->getResourceId();
 
         return $this->findOneBy([
-            'securityIdentity' => $identity->getId(),
-            'roleName'         => $roleName,
-            'resource.name'    => $resourceId->getName(),
-            'resource.id'      => $resourceId->getId(),
+            'identity'      => $identity->getId(),
+            'roleName'      => $roleName,
+            'resource.name' => $resourceId->getName(),
+            'resource.id'   => $resourceId->getId(),
         ]);
     }
 
