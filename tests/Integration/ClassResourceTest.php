@@ -8,11 +8,11 @@ use Tests\MyCLabs\ACL\Integration\Model\Article;
 use Tests\MyCLabs\ACL\Integration\Model\User;
 
 /**
- * Tests authorizations applied at class scope (i.e. all entities of type X).
+ * Tests authorizations applied on class resources (i.e. all entities of type X).
  *
  * @coversNothing
  */
-class ClassScopeTest extends AbstractIntegrationTest
+class ClassResourceTest extends AbstractIntegrationTest
 {
     /**
      * Check when adding the role and all entities are already created and flushed

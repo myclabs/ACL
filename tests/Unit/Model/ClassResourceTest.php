@@ -18,6 +18,14 @@ class ClassResourceTest extends \PHPUnit_Framework_TestCase
         $this->assertEquals('foo', $resource->getClass());
     }
 
+    public function testGetResourceId()
+    {
+        $resource = new ClassResource('foo');
+
+        $this->assertEquals('foo', $resource->getResourceId()->getName());
+        $this->assertNull($resource->getResourceId()->getId());
+    }
+
     public function testParentResources()
     {
         $em = $this->getMock(EntityManager::class, [], [], '', false);
