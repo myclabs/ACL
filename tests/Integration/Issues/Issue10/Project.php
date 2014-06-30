@@ -5,13 +5,16 @@ namespace Tests\MyCLabs\ACL\Integration\Issues\Issue10;
 use Doctrine\Common\Collections\ArrayCollection;
 use Doctrine\Common\Collections\Collection;
 use Doctrine\ORM\Mapping as ORM;
-use MyCLabs\ACL\Model\EntityResource;
+use MyCLabs\ACL\Model\EntityResourceTrait;
+use MyCLabs\ACL\Model\ResourceInterface;
 
 /**
  * @ORM\Entity
  */
-class Project implements EntityResource
+class Project implements ResourceInterface
 {
+    use EntityResourceTrait;
+
     /**
      * @ORM\Id @ORM\GeneratedValue
      * @ORM\Column(type="integer")

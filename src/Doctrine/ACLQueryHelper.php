@@ -51,13 +51,13 @@ class ACLQueryHelper
             'MyCLabs\ACL\Model\Authorization',
             'authorization',
             'WITH',
-            $entityAlias . '.id = authorization.entityId'
+            $entityAlias . '.id = authorization.resource.id'
         );
-        $qb->andWhere('authorization.entityClass = :acl_entity_class');
+        $qb->andWhere('authorization.resource.name = :acl_resource_name');
         $qb->andWhere('authorization.securityIdentity = :acl_identity');
         $qb->andWhere('authorization.actions.' . $action . ' = true');
 
         $qb->setParameter('acl_identity', $identity);
-        $qb->setParameter('acl_entity_class', $entityClass);
+        $qb->setParameter('acl_resource_name', $entityClass);
     }
 }

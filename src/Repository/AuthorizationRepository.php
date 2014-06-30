@@ -2,11 +2,9 @@
 
 namespace MyCLabs\ACL\Repository;
 
-use Doctrine\Common\Util\ClassUtils;
 use Doctrine\ORM\EntityRepository;
+use Doctrine\ORM\QueryBuilder;
 use MyCLabs\ACL\Model\Authorization;
-use MyCLabs\ACL\Model\ClassResource;
-use MyCLabs\ACL\Model\EntityResource;
 use MyCLabs\ACL\Model\ResourceInterface;
 use MyCLabs\ACL\Model\SecurityIdentityInterface;
 
@@ -50,8 +48,8 @@ class AuthorizationRepository extends EntityRepository
                 'role_entry_id'          => $authorization->getRoleEntry()->getId(),
                 'securityIdentity_id'    => $authorization->getSecurityIdentity()->getId(),
                 'parentAuthorization_id' => $parent ? $parent->getId() : null,
-                'entity_class'           => $authorization->getEntityClass(),
-                'entity_id'              => $authorization->getEntityId(),
+                'resource_name'          => $authorization->getResourceId()->getName(),
+                'resource_id'            => $authorization->getResourceId()->getId(),
                 'cascadable'             => (int) $authorization->isCascadable(),
             ];
 
@@ -77,63 +75,26 @@ class AuthorizationRepository extends EntityRepository
     }
 
     /**
-     * Checks if the identity is allowed to do the action on the entity by searching for at least 1 authorization.
+     * Check if there is at least one authorization for the given identity, action and resource.
      *
      * @param SecurityIdentityInterface $identity
      * @param string                    $action
-     * @param EntityResource            $entity
+     * @param ResourceInterface         $resource
      *
-     * @throws \RuntimeException The entity is not persisted (ID must be not null).
-     * @return boolean Is allowed, or not.
+     * @return boolean There is an authorization or not.
      */
-    public function isAllowedOnEntity(SecurityIdentityInterface $identity, $action, EntityResource $entity)
+    public function hasAuthorization(SecurityIdentityInterface $identity, $action, ResourceInterface $resource)
     {
-        $entityClass = ClassUtils::getClass($entity);
+        $qb = $this->createQueryBuilder('a');
+        $qb->select('COUNT(a)');
 
-        if ($entity->getId() === null) {
-            throw new \RuntimeException(sprintf(
-                'The entity resource %s must be persisted (id not null) to be able to test the permissions',
-                $entityClass
-            ));
-        }
+        $qb->andWhere('a.securityIdentity = :securityIdentity');
+        $qb->andWhere("a.actions.$action = true");
+        $qb->setParameter('securityIdentity', $identity);
 
-        $dql = "SELECT count(authorization)
-                FROM MyCLabs\\ACL\\Model\\Authorization authorization
-                WHERE authorization.entityId = :entityId
-                    AND authorization.entityClass = :entityClass
-                    AND authorization.securityIdentity = :securityIdentity
-                    AND authorization.actions.$action = true";
+        $this->filterQueryWithResource($qb, $resource);
 
-        $query = $this->_em->createQuery($dql);
-        $query->setParameter('entityId', $entity->getId());
-        $query->setParameter('entityClass', $entityClass);
-        $query->setParameter('securityIdentity', $identity);
-
-        return ($query->getSingleScalarResult() > 0);
-    }
-
-    /**
-     * Checks if the identity is allowed to do the action on the entity class by searching for at least 1 authorization.
-     *
-     * @param SecurityIdentityInterface $identity
-     * @param string                    $action
-     * @param string                    $entityClass
-     *
-     * @return boolean Is allowed, or not.
-     */
-    public function isAllowedOnEntityClass(SecurityIdentityInterface $identity, $action, $entityClass)
-    {
-        $dql = "SELECT count(authorization)
-                FROM MyCLabs\\ACL\\Model\\Authorization authorization
-                WHERE authorization.entityClass = :entityClass
-                    AND authorization.securityIdentity = :securityIdentity
-                    AND authorization.actions.$action = true";
-
-        $query = $this->_em->createQuery($dql);
-        $query->setParameter('entityClass', $entityClass);
-        $query->setParameter('securityIdentity', $identity);
-
-        return ($query->getSingleScalarResult() > 0);
+        return ($qb->getQuery()->getSingleScalarResult() > 0);
     }
 
     /**
@@ -153,17 +114,7 @@ class AuthorizationRepository extends EntityRepository
         // Root authorizations means no parent
         $qb->andWhere('a.parentAuthorization IS NULL');
 
-        if ($resource instanceof EntityResource) {
-            $qb->andWhere('a.entityClass = :entityClass');
-            $qb->andWhere('a.entityId = :entityId');
-            $qb->setParameter('entityClass', ClassUtils::getClass($resource));
-            $qb->setParameter('entityId', $resource->getId());
-        }
-        if ($resource instanceof ClassResource) {
-            $qb->andWhere('a.entityClass = :entityClass');
-            $qb->andWhere('a.entityId IS NULL');
-            $qb->setParameter('entityClass', $resource->getClass());
-        }
+        $this->filterQueryWithResource($qb, $resource);
 
         return $qb->getQuery()->getResult();
     }
@@ -180,25 +131,23 @@ class AuthorizationRepository extends EntityRepository
 
         $qb->delete($this->getEntityName(), 'a');
 
-        if ($resource instanceof EntityResource) {
-            if ($resource->getId() === null) {
-                throw new \RuntimeException(sprintf(
-                    'The entity resource %s must be persisted (id not null) to be able to remove the authorizations',
-                    ClassUtils::getClass($resource)
-                ));
-            }
-
-            $qb->andWhere('a.entityClass = :entityClass');
-            $qb->andWhere('a.entityId = :entityId');
-            $qb->setParameter('entityClass', ClassUtils::getClass($resource));
-            $qb->setParameter('entityId', $resource->getId());
-        }
-        if ($resource instanceof ClassResource) {
-            $qb->andWhere('a.entityClass = :entityClass');
-            $qb->andWhere('a.entityId IS NULL');
-            $qb->setParameter('entityClass', $resource->getClass());
-        }
+        $this->filterQueryWithResource($qb, $resource);
 
         $qb->getQuery()->execute();
+    }
+
+    private function filterQueryWithResource(QueryBuilder $query, ResourceInterface $resource)
+    {
+        $resourceId = $resource->getResourceId();
+
+        $query->andWhere('a.resource.name = :resourceName');
+        $query->setParameter('resourceName', $resourceId->getName());
+
+        if ($resourceId->getId() !== null) {
+            $query->andWhere('a.resource.id = :resourceId');
+            $query->setParameter('resourceId', $resourceId->getId());
+        } else {
+            $query->andWhere('a.resource.id IS NULL');
+        }
     }
 }
