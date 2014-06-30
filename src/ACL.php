@@ -10,7 +10,6 @@ use MyCLabs\ACL\CascadeStrategy\SimpleCascadeStrategy;
 use MyCLabs\ACL\Model\Actions;
 use MyCLabs\ACL\Model\Authorization;
 use MyCLabs\ACL\Model\ClassResource;
-use MyCLabs\ACL\Model\EntityResource;
 use MyCLabs\ACL\Model\ResourceInterface;
 use MyCLabs\ACL\Model\Role;
 use MyCLabs\ACL\Model\RoleEntry;
@@ -63,16 +62,10 @@ class ACL
      */
     public function isAllowed(SecurityIdentityInterface $identity, $action, ResourceInterface $resource)
     {
-        /** @var AuthorizationRepository $repo */
-        $repo = $this->entityManager->getRepository('MyCLabs\ACL\Model\Authorization');
+        /** @var AuthorizationRepository $repository */
+        $repository = $this->entityManager->getRepository('MyCLabs\ACL\Model\Authorization');
 
-        if ($resource instanceof EntityResource) {
-            return $repo->isAllowedOnEntity($identity, $action, $resource);
-        } elseif ($resource instanceof ClassResource) {
-            return $repo->isAllowedOnEntityClass($identity, $action, $resource->getClass());
-        }
-
-        throw new \RuntimeException('Unknown type of resource: ' . get_class($resource));
+        return $repository->hasAuthorization($identity, $action, $resource);
     }
 
     /**
@@ -141,11 +134,11 @@ class ACL
      * The authorizations will be automatically removed.
      *
      * @param SecurityIdentityInterface $identity
-     * @param string $roleName
-     * @param EntityResource $resource
+     * @param string                    $roleName
+     * @param ResourceInterface         $resource
      * @throws InvalidArgumentException
      */
-    public function revoke(SecurityIdentityInterface $identity, $roleName, EntityResource $resource = null)
+    public function revoke(SecurityIdentityInterface $identity, $roleName, ResourceInterface $resource = null)
     {
         $role = $this->getRole($roleName, $resource);
 
@@ -190,9 +183,9 @@ class ACL
      *
      * Called by the EntityResourcesListener.
      *
-     * @param EntityResource $resource
+     * @param ResourceInterface $resource
      */
-    public function processNewResource(EntityResource $resource)
+    public function processNewResource(ResourceInterface $resource)
     {
         $cascadedAuthorizations = $this->cascadeStrategy->processNewResource($resource);
 
@@ -207,9 +200,9 @@ class ACL
      *
      * Called by the EntityResourcesListener.
      *
-     * @param EntityResource $resource
+     * @param ResourceInterface $resource
      */
-    public function processDeletedResource(EntityResource $resource)
+    public function processDeletedResource(ResourceInterface $resource)
     {
         /** @var AuthorizationRepository $authorizationRepository */
         $authorizationRepository = $this->entityManager->getRepository('MyCLabs\ACL\Model\Authorization');
@@ -240,12 +233,11 @@ class ACL
             $role = $this->getRole($roleEntry->getRoleName());
 
             // Get the resource from the role entry
-            $entityClass = $roleEntry->getEntityClass();
-            $entityId = $roleEntry->getEntityId();
-            if ($entityId) {
-                $resource = $this->entityManager->find($entityClass, $entityId);
+            $resourceId = $roleEntry->getResourceId();
+            if ($resourceId->getId()) {
+                $resource = $this->entityManager->find($resourceId->getName(), $resourceId->getId());
             } else {
-                $resource = new ClassResource($entityClass);
+                $resource = new ClassResource($resourceId->getName());
             }
 
             $role->createAuthorizations($this, $roleEntry, $resource);

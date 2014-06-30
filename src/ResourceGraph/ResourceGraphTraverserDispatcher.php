@@ -2,17 +2,18 @@
 
 namespace MyCLabs\ACL\ResourceGraph;
 
-use Doctrine\Common\Util\ClassUtils;
 use MyCLabs\ACL\Model\ResourceInterface;
 
 /**
- * This is a traverser that dispatches to other traversers based on the resource class.
+ * This is a traverser that dispatches to other traversers based on the resource name.
  *
  * @author Matthieu Napoli <matthieu@mnapoli.fr>
  */
 class ResourceGraphTraverserDispatcher implements ResourceGraphTraverser
 {
     /**
+     * Resource graph traversers indexed by the resource name.
+     *
      * @var ResourceGraphTraverser[]
      */
     private $traversers = [];
@@ -44,24 +45,24 @@ class ResourceGraphTraverserDispatcher implements ResourceGraphTraverser
     }
 
     /**
-     * @param string                 $entityClass
-     * @param ResourceGraphTraverser $resourceGraphTraverser
+     * @param string                 $resourceName
+     * @param ResourceGraphTraverser $traverser
      */
-    public function setResourceGraphTraverser($entityClass, ResourceGraphTraverser $resourceGraphTraverser)
+    public function setResourceGraphTraverser($resourceName, ResourceGraphTraverser $traverser)
     {
-        $this->traversers[$entityClass] = $resourceGraphTraverser;
+        $this->traversers[$resourceName] = $traverser;
     }
 
     /**
-     * @param object $resource
+     * @param ResourceInterface $resource
      * @return ResourceGraphTraverser|null
      */
-    private function getResourceGraphTraverser($resource)
+    private function getResourceGraphTraverser(ResourceInterface $resource)
     {
-        $entityClass = ClassUtils::getClass($resource);
+        $name = $resource->getResourceId()->getName();
 
-        if (isset($this->traversers[$entityClass])) {
-            return $this->traversers[$entityClass];
+        if (isset($this->traversers[$name])) {
+            return $this->traversers[$name];
         }
 
         // We also try using instanceof so that we cover inheritance and interfaces

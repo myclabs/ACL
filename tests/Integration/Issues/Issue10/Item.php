@@ -5,13 +5,16 @@ namespace Tests\MyCLabs\ACL\Integration\Issues\Issue10;
 use Doctrine\ORM\EntityManager;
 use Doctrine\ORM\Mapping as ORM;
 use MyCLabs\ACL\Model\CascadingResource;
-use MyCLabs\ACL\Model\EntityResource;
+use MyCLabs\ACL\Model\EntityResourceTrait;
+use MyCLabs\ACL\Model\ResourceInterface;
 
 /**
  * @ORM\Entity
  */
-class Item implements EntityResource, CascadingResource
+class Item implements ResourceInterface, CascadingResource
 {
+    use EntityResourceTrait;
+
     /**
      * @ORM\Id @ORM\GeneratedValue
      * @ORM\Column(type="integer")

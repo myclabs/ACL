@@ -4,9 +4,7 @@ namespace MyCLabs\ACL\Model;
 
 use Doctrine\Common\Collections\ArrayCollection;
 use Doctrine\Common\Collections\Collection;
-use Doctrine\Common\Util\ClassUtils;
 use Doctrine\ORM\Mapping as ORM;
-use MyCLabs\ACL\ACL;
 
 /**
  * Instance of a role for a user.
@@ -46,34 +44,17 @@ class RoleEntry
     protected $authorizations;
 
     /**
-     * The entity targeted by the authorization.
-     * If null, then $entityClass is used and this authorization is at class-scope.
-     *
-     * @ORM\Column(name="entity_id", type="integer", nullable=true)
-     * @var int|null
-     **/
-    protected $entityId;
-
-    /**
-     * The class of the entity.
-     *
-     * @ORM\Column(name="entity_class")
-     * @var string
+     * @var ResourceId
+     * @ORM\Embedded(class="ResourceId")
      */
-    protected $entityClass;
+    protected $resource;
 
     public function __construct(SecurityIdentityInterface $identity, $name, ResourceInterface $resource)
     {
         $this->roleName = $name;
         $this->authorizations = new ArrayCollection();
         $this->securityIdentity = $identity;
-
-        if ($resource instanceof EntityResource) {
-            $this->entityId = $resource->getId();
-            $this->entityClass = ClassUtils::getClass($resource);
-        } elseif ($resource instanceof ClassResource) {
-            $this->entityClass = $resource->getClass();
-        }
+        $this->resource = $resource->getResourceId();
     }
 
     /**
@@ -101,18 +82,10 @@ class RoleEntry
     }
 
     /**
-     * @return int
+     * @return ResourceId
      */
-    public function getEntityId()
+    public function getResourceId()
     {
-        return $this->entityId;
-    }
-
-    /**
-     * @return string
-     */
-    public function getEntityClass()
-    {
-        return $this->entityClass;
+        return $this->resource;
     }
 }

@@ -2,8 +2,8 @@
 
 namespace Tests\MyCLabs\ACL\Integration;
 
-use MyCLabs\ACL\Model\Actions;
 use MyCLabs\ACL\Doctrine\ACLQueryHelper;
+use MyCLabs\ACL\Model\Actions;
 use Tests\MyCLabs\ACL\Integration\Model\Article;
 use Tests\MyCLabs\ACL\Integration\Model\User;
 
@@ -28,9 +28,9 @@ class QueryFilterTest extends AbstractIntegrationTest
 
         $query = $this->em->createQuery(
             'SELECT a FROM Tests\MyCLabs\ACL\Integration\Model\Article a
-            JOIN MyCLabs\ACL\Model\Authorization authorization WITH a.id = authorization.entityId
+            JOIN MyCLabs\ACL\Model\Authorization authorization WITH a.id = authorization.resource.id
             WHERE authorization.securityIdentity = :identity
-            AND authorization.entityClass = :entityClass
+            AND authorization.resource.name = :entityClass
             AND authorization.actions.view = true'
         );
         $query->setParameter('entityClass', 'Tests\MyCLabs\ACL\Integration\Model\Article');

@@ -6,7 +6,13 @@ This is the upgrade guide from 1.x to 2.0.
 
 ### Entities
 
-You need to remove the `$roles` collection that you may have added to your entities (resources):
+First, the interface `EntityResource` doesn't exist anymore. It has been unified with `ResourceInterface`
+so that everything is simpler and more consistent.
+
+What you can simply do is replace `EntityResource` with `ResourceInterface`, and use the
+`EntityResourceTrait` to have the methods implemented.
+
+You also need to remove the `$roles` collection that you may have added to your entities (resources):
 
 ```php
 class Article implements EntityResource

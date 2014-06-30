@@ -6,7 +6,7 @@ use Doctrine\Common\EventSubscriber;
 use Doctrine\ORM\Event\OnFlushEventArgs;
 use Doctrine\ORM\Events;
 use MyCLabs\ACL\ACL;
-use MyCLabs\ACL\Model\EntityResource;
+use MyCLabs\ACL\Model\ResourceInterface;
 
 /**
  * Listens the entity manager for new resources.
@@ -26,7 +26,7 @@ class EntityResourcesListener implements EventSubscriber
     private $acl;
 
     /**
-     * @var EntityResource[]
+     * @var ResourceInterface[]
      */
     private $newResources = [];
 
@@ -58,14 +58,14 @@ class EntityResourcesListener implements EventSubscriber
         // Remember new resources for after flush (we need them to have an ID)
         $this->newResources = [];
         foreach ($uow->getScheduledEntityInsertions() as $entity) {
-            if ($entity instanceof EntityResource) {
+            if ($entity instanceof ResourceInterface) {
                 $this->newResources[] = $entity;
             }
         }
 
         // Process deleted resources
         foreach ($uow->getScheduledEntityDeletions() as $entity) {
-            if ($entity instanceof EntityResource) {
+            if ($entity instanceof ResourceInterface) {
                 $acl->processDeletedResource($entity);
             }
         }

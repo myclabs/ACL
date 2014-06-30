@@ -2,10 +2,7 @@
 
 namespace MyCLabs\ACL\Repository;
 
-use Doctrine\Common\Util\ClassUtils;
 use Doctrine\ORM\EntityRepository;
-use MyCLabs\ACL\Model\ClassResource;
-use MyCLabs\ACL\Model\EntityResource;
 use MyCLabs\ACL\Model\ResourceInterface;
 use MyCLabs\ACL\Model\RoleEntry;
 use MyCLabs\ACL\Model\SecurityIdentityInterface;
@@ -27,19 +24,12 @@ class RoleEntryRepository extends EntityRepository
      */
     public function findByRoleAndResource($roleName, ResourceInterface $resource)
     {
-        if ($resource instanceof EntityResource) {
-            return $this->findOneBy([
-                'roleName'         => $roleName,
-                'entityClass'      => ClassUtils::getClass($resource),
-                'entityId'         => $resource->getId(),
-            ]);
-        }
+        $resourceId = $resource->getResourceId();
 
-        /** @var ClassResource $resource */
         return $this->findBy([
-            'roleName'         => $roleName,
-            'entityClass'      => $resource->getClass(),
-            'entityId'         => null,
+            'roleName'      => $roleName,
+            'resource.name' => $resourceId->getName(),
+            'resource.id'   => $resourceId->getId(),
         ]);
     }
 
@@ -57,21 +47,13 @@ class RoleEntryRepository extends EntityRepository
         $roleName,
         ResourceInterface $resource
     ) {
-        if ($resource instanceof EntityResource) {
-            return $this->findOneBy([
-                'securityIdentity' => $identity->getId(),
-                'roleName'         => $roleName,
-                'entityClass'      => ClassUtils::getClass($resource),
-                'entityId'         => $resource->getId(),
-            ]);
-        }
+        $resourceId = $resource->getResourceId();
 
-        /** @var ClassResource $resource */
         return $this->findOneBy([
             'securityIdentity' => $identity->getId(),
             'roleName'         => $roleName,
-            'entityClass'      => $resource->getClass(),
-            'entityId'         => null,
+            'resource.name'    => $resourceId->getName(),
+            'resource.id'      => $resourceId->getId(),
         ]);
     }
 
@@ -84,18 +66,19 @@ class RoleEntryRepository extends EntityRepository
      */
     public function removeForResource(ResourceInterface $resource)
     {
-        if ($resource instanceof EntityResource) {
+        $resourceId = $resource->getResourceId();
+
+        if ($resourceId->getId() !== null) {
             $query = $this->_em->createQuery(
-                'DELETE MyCLabs\ACL\Model\RoleEntry r WHERE r.entityClass = ?1 AND r.entityId = ?2'
+                'DELETE MyCLabs\ACL\Model\RoleEntry r WHERE r.resource.name = ?1 AND r.resource.id = ?2'
             );
-            $query->setParameter(1, ClassUtils::getClass($resource));
-            $query->setParameter(2, $resource->getId());
+            $query->setParameter(1, $resourceId->getName());
+            $query->setParameter(2, $resourceId->getId());
         } else {
-            /** @var ClassResource $resource */
             $query = $this->_em->createQuery(
-                'DELETE MyCLabs\ACL\Model\RoleEntry r WHERE r.entityClass = ?1 AND r.entityId IS NULL'
+                'DELETE MyCLabs\ACL\Model\RoleEntry r WHERE r.resource.name = ?1 AND r.resource.id IS NULL'
             );
-            $query->setParameter(1, $resource->getClass());
+            $query->setParameter(1, $resourceId->getName());
         }
 
         return $query->getResult();

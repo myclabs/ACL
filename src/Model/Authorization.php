@@ -4,7 +4,6 @@ namespace MyCLabs\ACL\Model;
 
 use Doctrine\Common\Collections\ArrayCollection;
 use Doctrine\Common\Collections\Collection;
-use Doctrine\Common\Util\ClassUtils;
 use Doctrine\ORM\Mapping as ORM;
 
 /**
@@ -12,8 +11,8 @@ use Doctrine\ORM\Mapping as ORM;
  *
  * @ORM\Entity(readOnly=true, repositoryClass="MyCLabs\ACL\Repository\AuthorizationRepository")
  * @ORM\Table(name="ACL_Authorization", indexes={
- *     @ORM\Index(name="is_allowed", columns={"entity_id", "entity_class", "securityIdentity_id"}),
- *     @ORM\Index(name="root_authorizations", columns={"parentAuthorization_id", "entity_id", "entity_class"})
+ *     @ORM\Index(name="is_allowed", columns={"resource_id", "resource_name", "securityIdentity_id"}),
+ *     @ORM\Index(name="root_authorizations", columns={"parentAuthorization_id", "resource_id", "resource_name"})
  * })
  *
  * @author Matthieu Napoli <matthieu@mnapoli.fr>
@@ -50,21 +49,10 @@ class Authorization
     protected $actions;
 
     /**
-     * The entity targeted by the authorization.
-     * If null, then $entityClass is used and this authorization is at class-scope.
-     *
-     * @ORM\Column(name="entity_id", type="integer", nullable=true)
-     * @var int|null
+     * @var ResourceId
+     * @ORM\Embedded(class="ResourceId")
      */
-    protected $entityId;
-
-    /**
-     * The class of the entity.
-     *
-     * @ORM\Column(name="entity_class")
-     * @var string
-     */
-    protected $entityClass;
+    protected $resource;
 
     /**
      * @var Authorization
@@ -88,44 +76,35 @@ class Authorization
     /**
      * Creates an authorization on a resource.
      *
-     * @param RoleEntry $roleEntry
-     * @param Actions $actions
+     * @param RoleEntry         $roleEntry
+     * @param Actions           $actions
      * @param ResourceInterface $resource
-     * @param bool $cascade Should this authorization cascade?
+     * @param bool              $cascade Should this authorization cascade?
      * @throws \RuntimeException
      * @return static
      */
     public static function create(RoleEntry $roleEntry, Actions $actions, ResourceInterface $resource, $cascade = true)
     {
-        if ($resource instanceof EntityResource) {
-            return new static($roleEntry, $actions, $cascade, ClassUtils::getClass($resource), $resource->getId());
-        } elseif ($resource instanceof ClassResource) {
-            return new static($roleEntry, $actions, $cascade, $resource->getClass());
-        }
-
-        throw new \RuntimeException('Unknown type of resource: ' . get_class($resource));
+        return new static($roleEntry, $actions, $resource->getResourceId(), $cascade);
     }
 
     /**
-     * @param RoleEntry    $roleEntry
-     * @param Actions $actions
-     * @param bool    $cascade Should this authorization cascade?
-     * @param string  $entityClass
-     * @param int     $entityId
+     * @param RoleEntry  $roleEntry
+     * @param Actions    $actions
+     * @param ResourceId $resourceId
+     * @param bool       $cascade Should this authorization cascade?
      */
     private function __construct(
         RoleEntry $roleEntry,
         Actions $actions,
-        $cascade,
-        $entityClass,
-        $entityId = null
+        ResourceId $resourceId,
+        $cascade
     ) {
         $this->roleEntry = $roleEntry;
         $this->securityIdentity = $roleEntry->getSecurityIdentity();
         $this->actions = $actions;
+        $this->resource = $resourceId;
         $this->cascadable = $cascade;
-        $this->entityClass = $entityClass;
-        $this->entityId = $entityId;
 
         $this->childAuthorizations = new ArrayCollection();
     }
@@ -162,19 +141,11 @@ class Authorization
     }
 
     /**
-     * @return int|null
+     * @return ResourceId
      */
-    public function getEntityId()
+    public function getResourceId()
     {
-        return $this->entityId;
-    }
-
-    /**
-     * @return string|null
-     */
-    public function getEntityClass()
-    {
-        return $this->entityClass;
+        return $this->resource;
     }
 
     /**

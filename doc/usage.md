@@ -63,11 +63,14 @@ need to declare the `$roleEntries` association to map it with Doctrine.
 ### 2. Mark an entity as a resource
 
 If you want to restrict access to an entity (e.g. the article #42), you need to make it
-implement the `EntityResource` interface:
+implement the `ResourceInterface` interface. You can then either implement `getResourceId()` manually
+or use the `EntityResourceTrait` that will do it for you (as long as you have a `getId()` method).
 
 ```php
-class Article implements EntityResource
+class Article implements ResourceInterface
 {
+    use EntityResourceTrait;
+
     // ...
 
     public function getId()

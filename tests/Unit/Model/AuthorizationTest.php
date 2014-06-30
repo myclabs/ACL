@@ -4,6 +4,7 @@ namespace Tests\MyCLabs\ACL\Unit\Model;
 
 use MyCLabs\ACL\Model\Authorization;
 use MyCLabs\ACL\Model\ClassResource;
+use MyCLabs\ACL\Model\ResourceId;
 use Tests\MyCLabs\ACL\Integration\Model\Actions;
 
 /**
@@ -27,8 +28,8 @@ class AuthorizationTest extends \PHPUnit_Framework_TestCase
         $this->assertSame($role, $authorization->getRoleEntry());
         $this->assertSame($user, $authorization->getSecurityIdentity());
         $this->assertEquals(Actions::all(), $authorization->getActions());
-        $this->assertEquals(get_class(), $authorization->getEntityClass());
-        $this->assertNull($authorization->getEntityId());
+        $this->assertEquals(get_class(), $authorization->getResourceId()->getName());
+        $this->assertNull($authorization->getResourceId()->getId());
         $this->assertNull($authorization->getParentAuthorization());
         $this->assertTrue($authorization->isCascadable());
         $this->assertTrue($authorization->isRoot());
@@ -42,10 +43,10 @@ class AuthorizationTest extends \PHPUnit_Framework_TestCase
             ->method('getSecurityIdentity')
             ->will($this->returnValue($user));
 
-        $resource = $this->getMockForAbstractClass('MyCLabs\ACL\Model\EntityResource');
+        $resource = $this->getMockForAbstractClass('MyCLabs\ACL\Model\ResourceInterface');
         $resource->expects($this->once())
-            ->method('getId')
-            ->will($this->returnValue(1));
+            ->method('getResourceId')
+            ->will($this->returnValue(new ResourceId(get_class($resource), 1)));
 
         $authorization = Authorization::create($role, Actions::all(), $resource);
 
@@ -53,8 +54,8 @@ class AuthorizationTest extends \PHPUnit_Framework_TestCase
         $this->assertSame($role, $authorization->getRoleEntry());
         $this->assertSame($user, $authorization->getSecurityIdentity());
         $this->assertEquals(Actions::all(), $authorization->getActions());
-        $this->assertEquals(get_class($resource), $authorization->getEntityClass());
-        $this->assertEquals(1, $authorization->getEntityId());
+        $this->assertEquals(get_class($resource), $authorization->getResourceId()->getName());
+        $this->assertEquals(1, $authorization->getResourceId()->getId());
         $this->assertNull($authorization->getParentAuthorization());
         $this->assertTrue($authorization->isCascadable());
         $this->assertTrue($authorization->isRoot());
@@ -79,21 +80,10 @@ class AuthorizationTest extends \PHPUnit_Framework_TestCase
         $this->assertSame($authorization->getRoleEntry(), $childAuthorization->getRoleEntry());
         $this->assertSame($authorization->getSecurityIdentity(), $childAuthorization->getSecurityIdentity());
         $this->assertEquals($authorization->getActions(), $childAuthorization->getActions());
-        $this->assertEquals(get_class(), $childAuthorization->getEntityClass());
-        $this->assertNull($childAuthorization->getEntityId());
+        $this->assertEquals(get_class(), $childAuthorization->getResourceId()->getName());
+        $this->assertNull($childAuthorization->getResourceId()->getId());
         $this->assertSame($authorization, $childAuthorization->getParentAuthorization());
         $this->assertTrue($childAuthorization->isCascadable());
         $this->assertFalse($childAuthorization->isRoot());
-    }
-
-    /**
-     * @expectedException RuntimeException
-     */
-    public function testCreateAuthorizationWithInvalidResourceClass()
-    {
-        $role = $this->getMock('MyCLabs\ACL\Model\RoleEntry', [], [], '', false);
-        $resource = $this->getMock('MyCLabs\ACL\Model\ResourceInterface');
-
-        Authorization::create($role, Actions::all(), $resource);
     }
 }
