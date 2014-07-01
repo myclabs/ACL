@@ -18,7 +18,9 @@ Install the library with Composer:
 
 ## Configuration
 
-You first need to add the mapping of `MyCLabs\ACL` classes to your Doctrine configuration.
+### 1. Doctrine mapping
+
+You first need to add the mapping of `MyCLabs\ACL\Model` classes to your Doctrine configuration.
 
 Here is for example how you would do it with the most basic Doctrine setup:
 
@@ -31,49 +33,49 @@ $paths = [
     __DIR__ . '/../vendor/myclabs/acl/src/Model',
 ];
 
-// Doctrine configuration
 $config = Setup::createConfiguration($isDevMode);
 // Myclabs/ACL uses namespaces annotations
 $config->setMetadataDriverImpl($config->newDefaultAnnotationDriver($paths, false));
+
 $em = EntityManager::create($dbParams, $config);
 ```
+
+### 2. Create the ACL object
 
 Creating the ACL object is simple:
 
 ```php
-$acl = new ACL($entityManager);
+$roles = [
+    // we will define roles here later
+];
+
+$acl = new ACL($entityManager, $roles);
 ```
 
-Note that you'll need to define a Identity class, usually a user class
-(you can see an example in the [Usage section](usage.md)).
+You'll need to define roles, and also define an Identity class. This is shown in the next section: [Usage](usage.md).
 
-Then, you must separately register some listeners on the entity manager and your roles.
+### 3. Set up Doctrine listeners
+
+Then, you must separately register some listeners on the entity manager.
 The `ACLSetup` class is here to help you:
 
 ```php
-$aclSetup = new \MyCLabs\ACL\Doctrine\ACLSetup();
+$aclSetup = new ACLSetup();
 
 // Set which class implements the Identity interface (must be called once)
 $aclSetup->setIdentityClass('My\Model\User');
-
-// Register roles
-$aclSetup->registerRoles([
-    'ArticleEditorRole' => [
-        'resourceType' => 'My\Model\Article',
-        'actions'      => new Actions([ Actions::Edit ]),
-    ],
-]);
 
 // Apply the configuration to the entity manager
 $aclSetup->setUpEntityManager($entityManager, function () use ($acl) { return $acl; });
 ```
 
-These listeners handle different things, like registering your role and user classes, and registering
+These listeners handle different things, like registering your user classes, and registering
 a listener that will act when new resources/entities are created (to cascade authorizations).
 
-## Using a container
+## Using a DI container
 
-You can also use a container to avoid instantiating the ACL uselessly (and avoid a circular dependency):
+You can also use a container to avoid instantiating the ACL automatically when the entity manager is created
+(and avoid a circular dependency):
 
 ```php
 $aclLocator = function () {
@@ -82,6 +84,8 @@ $aclLocator = function () {
 
 $aclSetup->setUpEntityManager($entityManager, $aclLocator);
 ```
+
+This is not required, don't worry if you don't understand that part, you can skip it.
 
 ## Cascade delete
 

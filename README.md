@@ -44,20 +44,16 @@ We hate being lost and confused, so everything you have to do with ACL is done o
 You can start by creating it:
 
 ```php
-// full configuration shown in the documentation
-$acl = new ACL($entityManager);
-```
-
-Let's define a role:
-
-```php
-$acl->setRoles([
+$roles = [
     // An article editor will be allowed to VIEW and EDIT an article
     'ArticleEditor' => [
         'resourceType' => 'Acme\Model\Article',
-        'actions'      => [ Actions::VIEW, Actions::EDIT ],
+        'actions'      => new Actions([ Actions::VIEW, Actions::EDIT ]),
     ],
-]);
+];
+
+// full configuration shown in the documentation
+$acl = new ACL($entityManager, $roles);
 ```
 
 Now you can grant a user the role and the resource to which it applies:
@@ -70,12 +66,6 @@ Test permissions:
 
 ```php
 echo $acl->isAllowed($user, Actions::EDIT, $article); // true
-```
-
-You remove permissions to a user by revoking the role:
-
-```php
-$acl->revoke($user, 'ArticleEditor', $article);
 ```
 
 You can also filter your queries to get only the entities the user has access to:

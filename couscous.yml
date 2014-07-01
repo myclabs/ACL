@@ -32,6 +32,9 @@ template:
             advanced-topics:
                 name: Advanced topics
                 items:
+                    roles:
+                        text: Roles
+                        relativeUrl: doc/roles.html
                     actions:
                         text: Actions
                         relativeUrl: doc/actions.html
