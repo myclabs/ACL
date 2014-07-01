@@ -144,3 +144,19 @@ Read more about this in
 [this excellent article about RBAC](https://stormpath.com/blog/new-rbac-resource-based-access-control/).
 
 In short, **prefer using `isAllowed()` instead of `isGranted()`**.
+
+### Find all users that are granted a role
+
+To find all the users (identities) that are granted a specific role you can use the RoleEntry repository:
+
+```php
+$repository = $this->entityManager->getRepository(RoleEntry::class);
+
+$roleEntries = $repository->findByRoleAndResource('ArticleEditor', $article);
+
+foreach ($roleEntries as $roleEntry) {
+    $user = $roleEntry->getIdentity();
+
+    echo $user->getName();
+}
+```
