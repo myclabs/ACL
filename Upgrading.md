@@ -10,7 +10,8 @@ This is the upgrade guide from 1.x to 2.0.
 
 ### Roles
 
-In 1.x, roles were defined as classes. Now they are defined in an array. You can read the
+In 1.x, roles were defined as classes. Now they are defined in an array. You can read the "Roles" documentation
+for upgrading.
 
 ### Identities
 
