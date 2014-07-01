@@ -61,43 +61,13 @@ abstract class AbstractIntegrationTest extends \PHPUnit_Framework_TestCase
 
     protected function createACL()
     {
-        return new ACL($this->em);
+        return new ACL($this->em, $this->getRoles());
     }
 
     private function configureACL()
     {
         $setup = new ACLSetup();
         $setup->setIdentityClass(Model\User::class);
-
-        $roles = [
-            'ArticleEditor' => [
-                'resourceType' => Model\Article::class,
-                'actions' => new Actions([Actions::VIEW, Actions::EDIT])
-            ],
-            'AllArticlesEditor' => [
-                'resource' => new ClassResource(Model\Article::class),
-                'actions' => new Actions([Actions::VIEW, Actions::EDIT])
-            ],
-            'ArticlePublisher' => [
-                'resourceType' => Model\Article::class,
-                'actions' => new Actions([Actions::VIEW, Actions::PUBLISH])
-            ],
-            'CategoryManager' => [
-                'resourceType' => Model\Category::class,
-                'actions' => new Actions([Actions::VIEW])
-            ],
-            'ArticleEditorCopy' => [
-                'resourceType' => Model\Article::class,
-                'actions' => new Actions([Actions::VIEW, Actions::EDIT])
-            ],
-            'AccountAdmin' => [
-                'resourceType' => Issues\Issue10\Account::class,
-                'actions' => Actions::all()
-            ]
-        ];
-
-        $setup->registerRoles($roles, $this->acl);
-
         $setup->setActionsClass(Model\Actions::class);
 
         return $setup;
@@ -151,5 +121,39 @@ abstract class AbstractIntegrationTest extends \PHPUnit_Framework_TestCase
                 $connection->exec($stmt);
             }
         }
+    }
+
+    /**
+     * @return array
+     */
+    protected function getRoles()
+    {
+        $roles = [
+            'ArticleEditor'     => [
+                'resourceType' => Model\Article::class,
+                'actions'      => new Actions([Actions::VIEW, Actions::EDIT])
+            ],
+            'AllArticlesEditor' => [
+                'resource' => new ClassResource(Model\Article::class),
+                'actions'  => new Actions([Actions::VIEW, Actions::EDIT])
+            ],
+            'ArticlePublisher'  => [
+                'resourceType' => Model\Article::class,
+                'actions'      => new Actions([Actions::VIEW, Actions::PUBLISH])
+            ],
+            'CategoryManager'   => [
+                'resourceType' => Model\Category::class,
+                'actions'      => new Actions([Actions::VIEW])
+            ],
+            'ArticleEditorCopy' => [
+                'resourceType' => Model\Article::class,
+                'actions'      => new Actions([Actions::VIEW, Actions::EDIT])
+            ],
+            'AccountAdmin'      => [
+                'resourceType' => Issues\Issue10\Account::class,
+                'actions'      => Actions::all()
+            ]
+        ];
+        return $roles;
     }
 }

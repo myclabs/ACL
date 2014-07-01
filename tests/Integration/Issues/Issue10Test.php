@@ -27,7 +27,7 @@ class Issue10Test extends AbstractIntegrationTest
             new ProjectGraphTraverser()
         );
 
-        return new ACL($this->em, $cascadeStrategy);
+        return new ACL($this->em, $this->getRoles(), $cascadeStrategy);
     }
 
     /**

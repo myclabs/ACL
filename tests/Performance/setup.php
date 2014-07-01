@@ -29,9 +29,6 @@ $dbParams = [
 $config = Setup::createAnnotationMetadataConfiguration($paths, true, null, new ArrayCache(), false);
 $em = EntityManager::create($dbParams, $config);
 
-// Create the ACL object
-$acl = new ACL($em);
-
 $roles = [
     'ArticleEditor'     => [
         'resourceType' => 'Tests\MyCLabs\ACL\Performance\Model\Article',
@@ -47,10 +44,11 @@ $roles = [
     ],
 ];
 
+// Create the ACL object
+$acl = new ACL($em, $roles);
+
 $setup = new ACLSetup();
 $setup->setIdentityClass('Tests\MyCLabs\ACL\Performance\Model\User');
-$setup->registerRoles($roles, $acl);
-
 $setup->setUpEntityManager($em, function () use ($acl) {
     return $acl;
 });

@@ -5,7 +5,6 @@ namespace MyCLabs\ACL\Doctrine;
 use Doctrine\ORM\EntityManager;
 use Doctrine\ORM\Events;
 use Doctrine\ORM\Tools\ResolveTargetEntityListener;
-use MyCLabs\ACL\ACL;
 use MyCLabs\ACL\Model\Identity;
 
 /**
@@ -80,18 +79,5 @@ class ACLSetup
     public function setActionsClass($class)
     {
         $this->metadataLoader->setActionsClass($class);
-    }
-
-    /**
-     * @todo Move to ACL
-     * @param array $roles
-     * @param ACL   $acl
-     */
-    public function registerRoles(array $roles, ACL $acl)
-    {
-        // send to metadataloader
-        /** @var ACL $acl */
-        //$acl = $aclLocator();
-        $acl->setRoles($roles);
     }
 }

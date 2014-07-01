@@ -41,11 +41,15 @@ class ACL
 
     /**
      * @param EntityManager        $entityManager
+     * @param array                $roles
      * @param CascadeStrategy|null $cascadeStrategy The strategy to use for cascading authorizations.
      */
-    public function __construct(EntityManager $entityManager, CascadeStrategy $cascadeStrategy = null)
+    public function __construct(EntityManager $entityManager, array $roles, CascadeStrategy $cascadeStrategy = null)
     {
         $this->entityManager = $entityManager;
+        foreach ($roles as $roleName => $roleArray) {
+            $this->roles[$roleName] = Role::fromArray($roleName, $roleArray);
+        }
 
         $this->cascadeStrategy = $cascadeStrategy ?: new SimpleCascadeStrategy($entityManager);
     }
@@ -245,20 +249,6 @@ class ACL
 
         $this->entityManager->flush();
         $this->entityManager->clear();
-    }
-
-    /**
-     * Configure the roles using an array.
-     *
-     * @todo Move in the constructor.
-     *
-     * @param array $roles
-     */
-    public function setRoles(array $roles)
-    {
-        foreach ($roles as $roleName => $roleArray) {
-            $this->roles[$roleName] = Role::fromArray($roleName, $roleArray);
-        }
     }
 
     /**

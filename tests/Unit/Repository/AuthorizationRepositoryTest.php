@@ -55,9 +55,7 @@ class AuthorizationRepositoryTest extends \PHPUnit_Framework_TestCase
         $config = Setup::createAnnotationMetadataConfiguration($paths, true, null, new ArrayCache(), false);
         $this->em = EntityManager::create($dbParams, $config);
 
-        $this->acl = new ACL($this->em);
-
-        $setup->registerRoles($roles, $this->acl);
+        $this->acl = new ACL($this->em, $roles);
 
         $setup->setUpEntityManager($this->em, function () {
             return $this->acl;
