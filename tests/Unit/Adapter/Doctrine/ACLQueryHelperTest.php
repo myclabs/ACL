@@ -1,16 +1,16 @@
 <?php
 
-namespace Tests\MyCLabs\ACL\Unit\Doctrine;
+namespace Tests\MyCLabs\ACL\Unit\Adapter\Doctrine;
 
 use Doctrine\ORM\EntityManager;
 use Doctrine\ORM\QueryBuilder;
-use MyCLabs\ACL\Doctrine\ACLQueryHelper;
+use MyCLabs\ACL\Adapter\Doctrine\ACLQueryHelper;
 use MyCLabs\ACL\Model\Actions;
 use MyCLabs\ACL\Model\Authorization;
 use MyCLabs\ACL\Model\Identity;
 
 /**
- * @covers \MyCLabs\ACL\Doctrine\ACLQueryHelper
+ * @covers \MyCLabs\ACL\Adapter\Doctrine\ACLQueryHelper
  */
 class ACLQueryHelperTest extends \PHPUnit_Framework_TestCase
 {

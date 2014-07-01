@@ -1,9 +1,10 @@
 <?php
 
-namespace MyCLabs\ACL\Repository;
+namespace MyCLabs\ACL\Adapter\Doctrine\Repository;
 
 use Doctrine\ORM\EntityRepository;
 use MyCLabs\ACL\Model\Identity;
+use MyCLabs\ACL\Model\Repository\RoleEntryRepository;
 use MyCLabs\ACL\Model\ResourceInterface;
 use MyCLabs\ACL\Model\RoleEntry;
 
@@ -12,7 +13,7 @@ use MyCLabs\ACL\Model\RoleEntry;
  *
  * @author Matthieu Napoli <matthieu@mnapoli.fr>
  */
-class RoleEntryRepository extends EntityRepository
+class DoctrineRoleEntryRepository extends EntityRepository implements RoleEntryRepository
 {
     /**
      * Find the role entries of the given role that apply to the resource.

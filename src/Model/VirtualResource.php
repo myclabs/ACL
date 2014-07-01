@@ -15,23 +15,16 @@ class VirtualResource implements ResourceInterface
     private $name;
 
     /**
-     * @var int|null
-     */
-    private $id;
-
-    /**
      * @param string   $name
-     * @param int|null $id
      */
-    public function __construct($name, $id = null)
+    public function __construct($name)
     {
         $this->name = (string) $name;
-        $this->id = $id;
     }
 
     public function getResourceId()
     {
-        return new ResourceId($this->name, $this->id);
+        return new ResourceId(self::class, $this->name);
     }
 
     /**
@@ -40,13 +33,5 @@ class VirtualResource implements ResourceInterface
     public function getName()
     {
         return $this->name;
-    }
-
-    /**
-     * @return int|null
-     */
-    public function getId()
-    {
-        return $this->id;
     }
 }

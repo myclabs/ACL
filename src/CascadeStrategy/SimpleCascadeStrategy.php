@@ -2,11 +2,10 @@
 
 namespace MyCLabs\ACL\CascadeStrategy;
 
-use Doctrine\ORM\EntityManager;
+use MyCLabs\ACL\Adapter\BackendAdapter;
 use MyCLabs\ACL\Model\Authorization;
 use MyCLabs\ACL\Model\CascadingResource;
 use MyCLabs\ACL\Model\ResourceInterface;
-use MyCLabs\ACL\Repository\AuthorizationRepository;
 use MyCLabs\ACL\ResourceGraph\CascadingResourceGraphTraverser;
 use MyCLabs\ACL\ResourceGraph\ResourceGraphTraverser;
 use MyCLabs\ACL\ResourceGraph\ResourceGraphTraverserDispatcher;
@@ -19,24 +18,24 @@ use MyCLabs\ACL\ResourceGraph\ResourceGraphTraverserDispatcher;
 class SimpleCascadeStrategy implements CascadeStrategy
 {
     /**
-     * @var EntityManager
+     * @var BackendAdapter
      */
-    private $entityManager;
+    private $adapter;
 
     /**
      * @var ResourceGraphTraverserDispatcher
      */
     private $resourceGraphTraverser;
 
-    public function __construct(EntityManager $entityManager)
+    public function __construct(BackendAdapter $adapter)
     {
-        $this->entityManager = $entityManager;
+        $this->adapter = $adapter;
 
         $this->resourceGraphTraverser = new ResourceGraphTraverserDispatcher();
         // Default traverser for CascadingResource
         $this->resourceGraphTraverser->setResourceGraphTraverser(
             CascadingResource::class,
-            new CascadingResourceGraphTraverser($entityManager, $this->resourceGraphTraverser)
+            new CascadingResourceGraphTraverser($this->resourceGraphTraverser)
         );
     }
 
@@ -61,8 +60,7 @@ class SimpleCascadeStrategy implements CascadeStrategy
      */
     public function processNewResource(ResourceInterface $resource)
     {
-        /** @var AuthorizationRepository $repository */
-        $repository = $this->entityManager->getRepository(Authorization::class);
+        $repository = $this->adapter->getAuthorizationRepository();
 
         $parentResources = $this->resourceGraphTraverser->getAllParentResources($resource);
 

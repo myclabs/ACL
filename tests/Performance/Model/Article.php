@@ -3,7 +3,6 @@
 namespace Tests\MyCLabs\ACL\Performance\Model;
 
 use Doctrine\Common\Collections\ArrayCollection;
-use Doctrine\ORM\EntityManager;
 use Doctrine\ORM\Mapping as ORM;
 use MyCLabs\ACL\Model\CascadingResource;
 use MyCLabs\ACL\Model\ClassResource;
@@ -40,7 +39,7 @@ class Article implements ResourceInterface, CascadingResource
         return $this->id;
     }
 
-    public function getParentResources(EntityManager $entityManager)
+    public function getParentResources()
     {
         return [
             new ClassResource(get_class()),
@@ -48,7 +47,7 @@ class Article implements ResourceInterface, CascadingResource
         ];
     }
 
-    public function getSubResources(EntityManager $entityManager)
+    public function getSubResources()
     {
         return [];
     }

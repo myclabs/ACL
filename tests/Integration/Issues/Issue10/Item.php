@@ -2,7 +2,6 @@
 
 namespace Tests\MyCLabs\ACL\Integration\Issues\Issue10;
 
-use Doctrine\ORM\EntityManager;
 use Doctrine\ORM\Mapping as ORM;
 use MyCLabs\ACL\Model\CascadingResource;
 use MyCLabs\ACL\Model\EntityResourceTrait;
@@ -37,12 +36,12 @@ class Item implements ResourceInterface, CascadingResource
         return $this->id;
     }
 
-    public function getParentResources(EntityManager $entityManager)
+    public function getParentResources()
     {
         return [ $this->project ];
     }
 
-    public function getSubResources(EntityManager $entityManager)
+    public function getSubResources()
     {
         return [];
     }

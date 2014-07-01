@@ -2,8 +2,6 @@
 
 namespace MyCLabs\ACL\Model;
 
-use Doctrine\ORM\EntityManager;
-
 /**
  * Class resource.
  *
@@ -34,12 +32,12 @@ class ClassResource implements ResourceInterface, CascadingResource
         return $this->class;
     }
 
-    public function getParentResources(EntityManager $entityManager)
+    public function getParentResources()
     {
         return [];
     }
 
-    public function getSubResources(EntityManager $entityManager)
+    public function getSubResources()
     {
         $repository = $entityManager->getRepository($this->class);
 
@@ -48,6 +46,6 @@ class ClassResource implements ResourceInterface, CascadingResource
 
     public function getResourceId()
     {
-        return new ResourceId($this->class);
+        return new ResourceId(self::class, $this->class);
     }
 }

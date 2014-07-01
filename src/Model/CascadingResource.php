@@ -2,8 +2,6 @@
 
 namespace MyCLabs\ACL\Model;
 
-use Doctrine\ORM\EntityManager;
-
 /**
  * Resource that cascade authorizations.
  *
@@ -12,14 +10,12 @@ use Doctrine\ORM\EntityManager;
 interface CascadingResource extends ResourceInterface
 {
     /**
-     * @param EntityManager $entityManager
      * @return CascadingResource[]
      */
-    public function getParentResources(EntityManager $entityManager);
+    public function getParentResources();
 
     /**
-     * @param EntityManager $entityManager
      * @return CascadingResource[]
      */
-    public function getSubResources(EntityManager $entityManager);
+    public function getSubResources();
 }

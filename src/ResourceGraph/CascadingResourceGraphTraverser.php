@@ -2,7 +2,6 @@
 
 namespace MyCLabs\ACL\ResourceGraph;
 
-use Doctrine\ORM\EntityManager;
 use MyCLabs\ACL\Model\CascadingResource;
 use MyCLabs\ACL\Model\ResourceInterface;
 
@@ -17,24 +16,17 @@ use MyCLabs\ACL\Model\ResourceInterface;
 class CascadingResourceGraphTraverser implements ResourceGraphTraverser
 {
     /**
-     * @var EntityManager
-     */
-    private $entityManager;
-
-    /**
      * @var ResourceGraphTraverser
      */
     private $parentTraverser;
 
     /**
-     * @param EntityManager          $entityManager
      * @param ResourceGraphTraverser $parentTraverser We need the parent traverser to use it
      *        to recursively traverse resources. This is because CascadingResource returns
      *        returns only its direct parent and sub-resources.
      */
-    public function __construct(EntityManager $entityManager, ResourceGraphTraverser $parentTraverser)
+    public function __construct(ResourceGraphTraverser $parentTraverser)
     {
-        $this->entityManager = $entityManager;
         $this->parentTraverser = $parentTraverser;
     }
 
@@ -49,7 +41,7 @@ class CascadingResourceGraphTraverser implements ResourceGraphTraverser
 
         $parentResources = [];
 
-        foreach ($resource->getParentResources($this->entityManager) as $parentResource) {
+        foreach ($resource->getParentResources() as $parentResource) {
             $parentResources[] = $parentResource;
 
             // Recursively get its sub-resources
@@ -73,7 +65,7 @@ class CascadingResourceGraphTraverser implements ResourceGraphTraverser
 
         $subResources = [];
 
-        foreach ($resource->getSubResources($this->entityManager) as $subResource) {
+        foreach ($resource->getSubResources() as $subResource) {
             $subResources[] = $subResource;
 
             // Recursively get its sub-resources

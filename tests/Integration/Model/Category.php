@@ -3,7 +3,6 @@
 namespace Tests\MyCLabs\ACL\Integration\Model;
 
 use Doctrine\Common\Collections\ArrayCollection;
-use Doctrine\ORM\EntityManager;
 use Doctrine\ORM\Mapping as ORM;
 use MyCLabs\ACL\Model\CascadingResource;
 use MyCLabs\ACL\Model\ClassResource;
@@ -50,7 +49,7 @@ class Category implements ResourceInterface, CascadingResource
         return $this->id;
     }
 
-    public function getParentResources(EntityManager $entityManager)
+    public function getParentResources()
     {
         $parents = [ new ClassResource(get_class()) ];
 
@@ -61,7 +60,7 @@ class Category implements ResourceInterface, CascadingResource
         return $parents;
     }
 
-    public function getSubResources(EntityManager $entityManager)
+    public function getSubResources()
     {
         return $this->children->toArray();
     }

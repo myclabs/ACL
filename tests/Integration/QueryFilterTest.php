@@ -2,7 +2,7 @@
 
 namespace Tests\MyCLabs\ACL\Integration;
 
-use MyCLabs\ACL\Doctrine\ACLQueryHelper;
+use MyCLabs\ACL\Adapter\Doctrine\ACLQueryHelper;
 use MyCLabs\ACL\Model\Actions;
 use MyCLabs\ACL\Model\Authorization;
 use Tests\MyCLabs\ACL\Integration\Model\Article;

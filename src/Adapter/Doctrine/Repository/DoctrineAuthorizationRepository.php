@@ -1,11 +1,12 @@
 <?php
 
-namespace MyCLabs\ACL\Repository;
+namespace MyCLabs\ACL\Adapter\Doctrine\Repository;
 
 use Doctrine\ORM\EntityRepository;
 use Doctrine\ORM\QueryBuilder;
 use MyCLabs\ACL\Model\Authorization;
 use MyCLabs\ACL\Model\Identity;
+use MyCLabs\ACL\Model\Repository\AuthorizationRepository;
 use MyCLabs\ACL\Model\ResourceInterface;
 
 /**
@@ -13,7 +14,7 @@ use MyCLabs\ACL\Model\ResourceInterface;
  *
  * @author Matthieu Napoli <matthieu@mnapoli.fr>
  */
-class AuthorizationRepository extends EntityRepository
+class DoctrineAuthorizationRepository extends EntityRepository implements AuthorizationRepository
 {
     /**
      * Insert authorizations directly in database without using the entity manager.

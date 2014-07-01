@@ -1,6 +1,6 @@
 <?php
 
-namespace MyCLabs\ACL\Doctrine;
+namespace MyCLabs\ACL\Adapter\Doctrine;
 
 use Doctrine\ORM\QueryBuilder;
 use MyCLabs\ACL\Model\Authorization;

@@ -48,3 +48,32 @@ be deleted in cascade by the ACL automatically.
 
 Furthermore, if you need to find the role entries that apply to a resource, you can now use
 `RoleEntryRepository::findByRoleAndResource($roleName, $resource)`.
+
+### Cascading resources
+
+The `CascadingResource` interface let's you define sub-resources and parent resources inside your model.
+The signature of the methods defined by that interface have changed: they no longer get the entity manager.
+
+Before:
+
+```php
+interface CascadingResource extends ResourceInterface
+{
+    public function getParentResources(EntityManager $entityManager);
+    public function getSubResources(EntityManager $entityManager);
+}
+```
+
+After:
+
+```php
+interface CascadingResource extends ResourceInterface
+{
+    public function getParentResources();
+    public function getSubResources();
+}
+```
+
+This is much cleaner because the model should never know about the entity manager. If you needed the entity
+manager to get the parent or sub-resources, then you now need to write a `ResourceGraphTraverser`
+(see the [Cascading](doc/cascading.md) documentation).

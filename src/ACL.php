@@ -3,8 +3,8 @@
 namespace MyCLabs\ACL;
 
 use BadMethodCallException;
-use Doctrine\ORM\EntityManager;
 use InvalidArgumentException;
+use MyCLabs\ACL\Adapter\BackendAdapter;
 use MyCLabs\ACL\CascadeStrategy\CascadeStrategy;
 use MyCLabs\ACL\CascadeStrategy\SimpleCascadeStrategy;
 use MyCLabs\ACL\Model\Actions;
@@ -14,8 +14,6 @@ use MyCLabs\ACL\Model\Identity;
 use MyCLabs\ACL\Model\ResourceInterface;
 use MyCLabs\ACL\Model\Role;
 use MyCLabs\ACL\Model\RoleEntry;
-use MyCLabs\ACL\Repository\AuthorizationRepository;
-use MyCLabs\ACL\Repository\RoleEntryRepository;
 
 /**
  * Manages ACL.
@@ -30,9 +28,9 @@ class ACL
     private $roles = [];
 
     /**
-     * @var EntityManager
+     * @var BackendAdapter
      */
-    private $entityManager;
+    private $adapter;
 
     /**
      * @var CascadeStrategy
@@ -40,14 +38,14 @@ class ACL
     private $cascadeStrategy;
 
     /**
-     * @param EntityManager        $entityManager
+     * @param BackendAdapter       $adapter
      * @param CascadeStrategy|null $cascadeStrategy The strategy to use for cascading authorizations.
      */
-    public function __construct(EntityManager $entityManager, CascadeStrategy $cascadeStrategy = null)
+    public function __construct(BackendAdapter $adapter, CascadeStrategy $cascadeStrategy = null)
     {
-        $this->entityManager = $entityManager;
+        $this->adapter = $adapter;
 
-        $this->cascadeStrategy = $cascadeStrategy ?: new SimpleCascadeStrategy($entityManager);
+        $this->cascadeStrategy = $cascadeStrategy ?: new SimpleCascadeStrategy($adapter);
     }
 
     /**
@@ -62,8 +60,7 @@ class ACL
      */
     public function isAllowed(Identity $identity, $action, ResourceInterface $resource)
     {
-        /** @var AuthorizationRepository $repository */
-        $repository = $this->entityManager->getRepository(Authorization::class);
+        $repository = $this->adapter->getAuthorizationRepository();
 
         return $repository->hasAuthorization($identity, $action, $resource);
     }
@@ -90,8 +87,7 @@ class ACL
             $authorizations = [ $authorization ];
         }
 
-        /** @var AuthorizationRepository $repository */
-        $repository = $this->entityManager->getRepository(Authorization::class);
+        $repository = $this->adapter->getAuthorizationRepository();
 
         $repository->insertBulk($authorizations);
     }
@@ -144,8 +140,7 @@ class ACL
 
         $resource = $role->validateAndReturnResourceForGrant($resource);
 
-        /** @var RoleEntryRepository $roleEntryRepository */
-        $roleEntryRepository = $this->entityManager->getRepository(RoleEntry::class);
+        $roleEntryRepository = $this->adapter->getRoleEntryRepository();
         $roleEntry = $roleEntryRepository->findOneByIdentityAndRoleAndResource($identity, $roleName, $resource);
 
         $identity->removeRoleEntry($roleEntry);
@@ -170,8 +165,7 @@ class ACL
 
         $resource = $role->validateAndReturnResourceForGrant($resource);
 
-        /** @var RoleEntryRepository $roleEntryRepository */
-        $roleEntryRepository = $this->entityManager->getRepository(RoleEntry::class);
+        $roleEntryRepository = $this->adapter->getRoleEntryRepository();
 
         $roleEntry = $roleEntryRepository->findOneByIdentityAndRoleAndResource($identity, $roleName, $resource);
 
@@ -189,8 +183,7 @@ class ACL
     {
         $cascadedAuthorizations = $this->cascadeStrategy->processNewResource($resource);
 
-        /** @var AuthorizationRepository $repository */
-        $repository = $this->entityManager->getRepository(Authorization::class);
+        $repository = $this->adapter->getAuthorizationRepository();
 
         $repository->insertBulk($cascadedAuthorizations);
     }
@@ -204,10 +197,8 @@ class ACL
      */
     public function processDeletedResource(ResourceInterface $resource)
     {
-        /** @var AuthorizationRepository $authorizationRepository */
-        $authorizationRepository = $this->entityManager->getRepository(Authorization::class);
-        /** @var RoleEntryRepository $roleEntryRepository */
-        $roleEntryRepository = $this->entityManager->getRepository(RoleEntry::class);
+        $authorizationRepository = $this->adapter->getAuthorizationRepository();
+        $roleEntryRepository = $this->adapter->getRoleEntryRepository();
 
         // Remove the role entries for this resource
         $roleEntryRepository->removeForResource($resource);
@@ -221,7 +212,7 @@ class ACL
      */
     public function rebuildAuthorizations()
     {
-        $roleEntryRepository = $this->entityManager->getRepository(RoleEntry::class);
+        $roleEntryRepository = $this->adapter->getRoleEntryRepository();
 
         // Clear
         $this->entityManager->createQuery('DELETE ' . Authorization::class)->execute();
@@ -280,8 +271,7 @@ class ACL
         $roleName,
         ResourceInterface $resource
     ) {
-        /** @var RoleEntryRepository $roleEntryRepository */
-        $roleEntryRepository = $this->entityManager->getRepository(RoleEntry::class);
+        $roleEntryRepository = $this->adapter->getRoleEntryRepository();
         $roleEntry = $roleEntryRepository->findOneByIdentityAndRoleAndResource($identity, $roleName, $resource);
 
         if ($roleEntry) {
