@@ -12,9 +12,9 @@ Filtering in a SQL query would then look like this:
 ```sql
 SELECT article.* FROM Blog_Article article
 INNER JOIN ACL_Authorization authorization
-    ON authorization.entity_id = article.id
-    AND authorization.entity_class = 'Blog\\Article'
-WHERE authorization.securityIdentity_id = :userId
+    ON authorization.resource_id = article.id
+    AND authorization.resource_name = 'Blog\\Article'
+WHERE authorization.identity_id = :userId
     AND actions_edit = true
 ```
 
@@ -40,9 +40,9 @@ This will generate the following DQL query:
 ```sql
 SELECT article FROM Blog\Article article
 INNER JOIN MyCLabs\ACL\Model\Authorization authorization
-    WITH authorization.entityId = article.id
-WHERE authorization.entityClass = 'Blog\\Article'
-    AND authorization.securityIdentity = :user
+    WITH authorization.resource.id = article.id
+WHERE authorization.resource.name = 'Blog\\Article'
+    AND authorization.identity = :user
     AND authorization.actions.edit = true
 ```
 

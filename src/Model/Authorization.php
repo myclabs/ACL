@@ -4,16 +4,15 @@ namespace MyCLabs\ACL\Model;
 
 use Doctrine\Common\Collections\ArrayCollection;
 use Doctrine\Common\Collections\Collection;
-use Doctrine\Common\Util\ClassUtils;
 use Doctrine\ORM\Mapping as ORM;
 
 /**
- * Authorization of a security identity to do something on a resource.
+ * Authorization of an identity to do something on a resource.
  *
  * @ORM\Entity(readOnly=true, repositoryClass="MyCLabs\ACL\Repository\AuthorizationRepository")
  * @ORM\Table(name="ACL_Authorization", indexes={
- *     @ORM\Index(name="is_allowed", columns={"entity_id", "entity_class", "securityIdentity_id"}),
- *     @ORM\Index(name="root_authorizations", columns={"parentAuthorization_id", "entity_id", "entity_class"})
+ *     @ORM\Index(name="is_allowed", columns={"resource_id", "resource_name", "identity_id"}),
+ *     @ORM\Index(name="root_authorizations", columns={"parentAuthorization_id", "resource_id", "resource_name"})
  * })
  *
  * @author Matthieu Napoli <matthieu@mnapoli.fr>
@@ -28,20 +27,20 @@ class Authorization
     protected $id;
 
     /**
-     * Role that created the authorization.
+     * RoleEntry that created the authorization.
      *
-     * @var Role
-     * @ORM\ManyToOne(targetEntity="Role", inversedBy="authorizations")
-     * @ORM\JoinColumn(name="role_id", nullable=false, onDelete="CASCADE")
+     * @var RoleEntry
+     * @ORM\ManyToOne(targetEntity="RoleEntry", inversedBy="authorizations")
+     * @ORM\JoinColumn(name="role_entry_id", nullable=false, onDelete="CASCADE")
      */
-    protected $role;
+    protected $roleEntry;
 
     /**
-     * @var SecurityIdentityInterface
-     * @ORM\ManyToOne(targetEntity="SecurityIdentityInterface")
-     * @ORM\JoinColumn(name="securityIdentity_id", nullable=false, onDelete="CASCADE")
+     * @var Identity
+     * @ORM\ManyToOne(targetEntity="Identity")
+     * @ORM\JoinColumn(name="identity_id", nullable=false, onDelete="CASCADE")
      */
-    protected $securityIdentity;
+    protected $identity;
 
     /**
      * @var Actions
@@ -50,21 +49,10 @@ class Authorization
     protected $actions;
 
     /**
-     * The entity targeted by the authorization.
-     * If null, then $entityClass is used and this authorization is at class-scope.
-     *
-     * @ORM\Column(name="entity_id", type="integer", nullable=true)
-     * @var int|null
+     * @var ResourceId
+     * @ORM\Embedded(class="ResourceId")
      */
-    protected $entityId;
-
-    /**
-     * The class of the entity.
-     *
-     * @ORM\Column(name="entity_class")
-     * @var string
-     */
-    protected $entityClass;
+    protected $resource;
 
     /**
      * @var Authorization
@@ -88,44 +76,35 @@ class Authorization
     /**
      * Creates an authorization on a resource.
      *
-     * @param Role              $role
+     * @param RoleEntry         $roleEntry
      * @param Actions           $actions
      * @param ResourceInterface $resource
-     * @param bool              $cascade  Should this authorization cascade?
+     * @param bool              $cascade Should this authorization cascade?
      * @throws \RuntimeException
      * @return static
      */
-    public static function create(Role $role, Actions $actions, ResourceInterface $resource, $cascade = true)
+    public static function create(RoleEntry $roleEntry, Actions $actions, ResourceInterface $resource, $cascade = true)
     {
-        if ($resource instanceof EntityResource) {
-            return new static($role, $actions, $cascade, ClassUtils::getClass($resource), $resource->getId());
-        } elseif ($resource instanceof ClassResource) {
-            return new static($role, $actions, $cascade, $resource->getClass());
-        }
-
-        throw new \RuntimeException('Unknown type of resource: ' . get_class($resource));
+        return new static($roleEntry, $actions, $resource->getResourceId(), $cascade);
     }
 
     /**
-     * @param Role    $role
-     * @param Actions $actions
-     * @param bool    $cascade Should this authorization cascade?
-     * @param string  $entityClass
-     * @param int     $entityId
+     * @param RoleEntry  $roleEntry
+     * @param Actions    $actions
+     * @param ResourceId $resourceId
+     * @param bool       $cascade Should this authorization cascade?
      */
     private function __construct(
-        Role $role,
+        RoleEntry $roleEntry,
         Actions $actions,
-        $cascade,
-        $entityClass,
-        $entityId = null
+        ResourceId $resourceId,
+        $cascade
     ) {
-        $this->role = $role;
-        $this->securityIdentity = $role->getSecurityIdentity();
+        $this->roleEntry = $roleEntry;
+        $this->identity = $roleEntry->getIdentity();
         $this->actions = $actions;
+        $this->resource = $resourceId;
         $this->cascadable = $cascade;
-        $this->entityClass = $entityClass;
-        $this->entityId = $entityId;
 
         $this->childAuthorizations = new ArrayCollection();
     }
@@ -138,7 +117,7 @@ class Authorization
      */
     public function createChildAuthorization(ResourceInterface $resource)
     {
-        $authorization = self::create($this->role, $this->actions, $resource);
+        $authorization = self::create($this->roleEntry, $this->actions, $resource);
 
         $authorization->parentAuthorization = $this;
 
@@ -146,11 +125,11 @@ class Authorization
     }
 
     /**
-     * @return SecurityIdentityInterface
+     * @return Identity
      */
-    public function getSecurityIdentity()
+    public function getIdentity()
     {
-        return $this->securityIdentity;
+        return $this->identity;
     }
 
     /**
@@ -162,19 +141,11 @@ class Authorization
     }
 
     /**
-     * @return int|null
+     * @return ResourceId
      */
-    public function getEntityId()
+    public function getResourceId()
     {
-        return $this->entityId;
-    }
-
-    /**
-     * @return string|null
-     */
-    public function getEntityClass()
-    {
-        return $this->entityClass;
+        return $this->resource;
     }
 
     /**
@@ -202,11 +173,11 @@ class Authorization
     }
 
     /**
-     * @return Role
+     * @return RoleEntry
      */
-    public function getRole()
+    public function getRoleEntry()
     {
-        return $this->role;
+        return $this->roleEntry;
     }
 
     /**

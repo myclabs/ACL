@@ -45,4 +45,9 @@ final class ClassResource implements ResourceInterface, CascadingResource
 
         return $repository->findAll();
     }
+
+    public function getResourceId()
+    {
+        return new ResourceId($this->class);
+    }
 }

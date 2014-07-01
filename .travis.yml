@@ -1,7 +1,6 @@
 language: php
 
 php:
-  - 5.4
   - 5.5
   - 5.6
   - hhvm
@@ -25,10 +24,11 @@ before_script:
   - sh -c "if [ '$DB' = 'pgsql' ]; then psql -c 'CREATE DATABASE acl_tests;' -U postgres; fi"
   - sh -c "if [ '$DB' = 'mysql' ]; then mysql -e 'CREATE DATABASE IF NOT EXISTS acl_tests;'; fi"
   - composer require satooshi/php-coveralls:dev-master --dev --no-interaction --prefer-source
+  - mkdir -p build/logs
 
 script:
-  - mkdir -p build/logs
-  - phpunit --configuration tests/travis/$DB.phpunit.xml --coverage-clover build/logs/clover.xml
+  - if [[ "$TRAVIS_PHP_VERSION" != "hhvm" ]]; then vendor/bin/phpunit --configuration tests/travis/$DB.phpunit.xml --colors --coverage-clover ./build/logs/clover.xml; fi
+  - if [[ "$TRAVIS_PHP_VERSION" == "hhvm" ]]; then vendor/bin/phpunit --configuration tests/travis/$DB.phpunit.xml --colors; fi
 
 after_script:
-  - php vendor/bin/coveralls -v
+  - if [[ "$TRAVIS_PHP_VERSION" != "hhvm" ]]; then vendor/bin/coveralls -v; fi

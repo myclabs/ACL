@@ -5,7 +5,7 @@ namespace MyCLabs\ACL\Doctrine;
 use Doctrine\ORM\EntityManager;
 use Doctrine\ORM\Events;
 use Doctrine\ORM\Tools\ResolveTargetEntityListener;
-use MyCLabs\ACL\Model\SecurityIdentityInterface;
+use MyCLabs\ACL\Model\Identity;
 
 /**
  * Configures the entity manager.
@@ -22,7 +22,7 @@ class ACLSetup
     /**
      * @var string
      */
-    private $securityIdentityClass;
+    private $identityClass;
 
     public function __construct()
     {
@@ -31,17 +31,17 @@ class ACLSetup
 
     public function setUpEntityManager(EntityManager $entityManager, callable $aclLocator)
     {
-        if ($this->securityIdentityClass === null) {
+        if ($this->identityClass === null) {
             throw new \RuntimeException(
-                'The security identity class must be configured: call ->setSecurityIdentityClass("...")'
+                'The identity class must be configured: call $aclSetup->setIdentityClass("...")'
             );
         }
 
         $evm = $entityManager->getEventManager();
 
-        // Configure which entity implements the SecurityIdentityInterface
+        // Configure which entity implements the Identity interface
         $rtel = new ResolveTargetEntityListener();
-        $rtel->addResolveTargetEntity('MyCLabs\ACL\Model\SecurityIdentityInterface', $this->securityIdentityClass, []);
+        $rtel->addResolveTargetEntity(Identity::class, $this->identityClass, []);
         $evm->addEventListener(Events::loadClassMetadata, $rtel);
 
         // Register the metadata loader
@@ -52,32 +52,19 @@ class ACLSetup
     }
 
     /**
-     * Register which class is the security identity. Must be called exactly once.
+     * Register which class is the identity. Must be called exactly once.
      *
      * @param string $class
      *
-     * @throws \InvalidArgumentException The given class doesn't implement SecurityIdentityInterface
+     * @throws \InvalidArgumentException The given class doesn't implement the Identity interface
      */
-    public function setSecurityIdentityClass($class)
+    public function setIdentityClass($class)
     {
-        if (! is_subclass_of($class, 'MyCLabs\ACL\Model\SecurityIdentityInterface')) {
-            throw new \InvalidArgumentException('The given class doesn\'t implement SecurityIdentityInterface');
+        if (! is_subclass_of($class, Identity::class)) {
+            throw new \InvalidArgumentException("The given class doesn't implement the Identity interface");
         }
 
-        $this->securityIdentityClass = $class;
-    }
-
-    /**
-     * Dynamically register a role subclass in the discriminator map for the Doctrine mapping.
-     *
-     * @param string $class
-     * @param string $shortName
-     *
-     * @throws \InvalidArgumentException The given class doesn't extend MyCLabs\ACL\Model\Role
-     */
-    public function registerRoleClass($class, $shortName)
-    {
-        $this->metadataLoader->registerRoleClass($class, $shortName);
+        $this->identityClass = $class;
     }
 
     /**

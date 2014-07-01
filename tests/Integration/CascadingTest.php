@@ -4,7 +4,6 @@ namespace Tests\MyCLabs\ACL\Integration;
 
 use MyCLabs\ACL\Model\Actions;
 use Tests\MyCLabs\ACL\Integration\Model\Category;
-use Tests\MyCLabs\ACL\Integration\Model\CategoryManagerRole;
 use Tests\MyCLabs\ACL\Integration\Model\User;
 
 /**
@@ -31,7 +30,7 @@ class CascadingTest extends AbstractIntegrationTest
 
         $this->em->flush();
 
-        $this->acl->grant($user, new CategoryManagerRole($user, $category1));
+        $this->acl->grant($user, 'CategoryManager', $category1);
 
         // Direct authorization
         $this->assertTrue($this->acl->isAllowed($user, Actions::VIEW, $category1));
@@ -59,7 +58,7 @@ class CascadingTest extends AbstractIntegrationTest
 
         $this->em->flush();
 
-        $this->acl->grant($user, new CategoryManagerRole($user, $category1));
+        $this->acl->grant($user, 'CategoryManager', $category1);
 
         // Direct authorization
         $this->assertTrue($this->acl->isAllowed($user, Actions::VIEW, $category1));

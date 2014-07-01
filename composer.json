@@ -16,8 +16,11 @@
         }
     },
     "require": {
-        "php": ">=5.4.0",
+        "php": ">=5.5.0",
         "doctrine/orm": "2.5.*@dev"
+    },
+    "require-dev": {
+        "phpunit/phpunit": "4.1.*"
     },
     "minimum-stability": "dev",
     "prefer-stable": true

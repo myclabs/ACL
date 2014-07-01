@@ -7,7 +7,6 @@ use MyCLabs\ACL\CascadeStrategy\SimpleCascadeStrategy;
 use MyCLabs\ACL\Model\Actions;
 use Tests\MyCLabs\ACL\Integration\AbstractIntegrationTest;
 use Tests\MyCLabs\ACL\Integration\Issues\Issue10\Account;
-use Tests\MyCLabs\ACL\Integration\Issues\Issue10\AccountAdminRole;
 use Tests\MyCLabs\ACL\Integration\Issues\Issue10\Item;
 use Tests\MyCLabs\ACL\Integration\Issues\Issue10\Project;
 use Tests\MyCLabs\ACL\Integration\Issues\Issue10\ProjectGraphTraverser;
@@ -24,11 +23,11 @@ class Issue10Test extends AbstractIntegrationTest
     {
         $cascadeStrategy = new SimpleCascadeStrategy($this->em);
         $cascadeStrategy->setResourceGraphTraverser(
-            'Tests\MyCLabs\ACL\Integration\Issues\Issue10\Project',
+            Issue10\Project::class,
             new ProjectGraphTraverser()
         );
 
-        return new ACL($this->em, $cascadeStrategy);
+        return new ACL($this->em, $this->getRoles(), $cascadeStrategy);
     }
 
     /**
@@ -48,7 +47,7 @@ class Issue10Test extends AbstractIntegrationTest
         $this->em->persist($user);
         $this->em->flush();
 
-        $this->acl->grant($user, new AccountAdminRole($user, $account));
+        $this->acl->grant($user, 'AccountAdmin', $account);
 
         $this->assertTrue($this->acl->isAllowed($user, Actions::VIEW, $account));
         $this->assertTrue($this->acl->isAllowed($user, Actions::VIEW, $project));
@@ -70,7 +69,7 @@ class Issue10Test extends AbstractIntegrationTest
         $this->em->persist($user);
         $this->em->flush();
 
-        $this->acl->grant($user, new AccountAdminRole($user, $account));
+        $this->acl->grant($user, 'AccountAdmin', $account);
 
         $this->assertTrue($this->acl->isAllowed($user, Actions::VIEW, $account));
 

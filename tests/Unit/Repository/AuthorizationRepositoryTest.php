@@ -11,9 +11,9 @@ use MyCLabs\ACL\Doctrine\ACLSetup;
 use MyCLabs\ACL\Model\Actions;
 use MyCLabs\ACL\Model\Authorization;
 use MyCLabs\ACL\Model\ClassResource;
+use MyCLabs\ACL\Model\RoleEntry;
 use MyCLabs\ACL\Repository\AuthorizationRepository;
 use Tests\MyCLabs\ACL\Unit\Repository\Model\File;
-use Tests\MyCLabs\ACL\Unit\Repository\Model\FileOwnerRole;
 use Tests\MyCLabs\ACL\Unit\Repository\Model\User;
 
 /**
@@ -43,14 +43,19 @@ class AuthorizationRepositoryTest extends \PHPUnit_Framework_TestCase
         ];
 
         $setup = new ACLSetup();
-        $setup->setSecurityIdentityClass('Tests\MyCLabs\ACL\Unit\Repository\Model\User');
-        $setup->registerRoleClass('Tests\MyCLabs\ACL\Unit\Repository\Model\FileOwnerRole', 'fileOwner');
+        $setup->setIdentityClass(Model\User::class);
+        $roles = [
+            'fileOwner' => [
+                'resourceType' => Model\File::class,
+                'actions'      => new Actions([Actions::VIEW, Actions::EDIT])
+            ]
+        ];
 
         // Create the entity manager
         $config = Setup::createAnnotationMetadataConfiguration($paths, true, null, new ArrayCache(), false);
         $this->em = EntityManager::create($dbParams, $config);
 
-        $this->acl = new ACL($this->em);
+        $this->acl = new ACL($this->em, $roles);
 
         $setup->setUpEntityManager($this->em, function () {
             return $this->acl;
@@ -67,7 +72,7 @@ class AuthorizationRepositoryTest extends \PHPUnit_Framework_TestCase
         $this->em->persist($user);
         $resource = new File();
         $this->em->persist($resource);
-        $role = new FileOwnerRole($user, $resource);
+        $role = new RoleEntry($user, 'fileOwner', $resource);
         $this->em->persist($role);
         $this->em->flush();
 
@@ -76,7 +81,7 @@ class AuthorizationRepositoryTest extends \PHPUnit_Framework_TestCase
         ];
 
         /** @var AuthorizationRepository $repository */
-        $repository = $this->em->getRepository('MyCLabs\ACL\Model\Authorization');
+        $repository = $this->em->getRepository(Authorization::class);
 
         $repository->insertBulk($authorizations);
 
@@ -87,10 +92,10 @@ class AuthorizationRepositoryTest extends \PHPUnit_Framework_TestCase
 
         /** @var Authorization $authorization */
         $authorization = $inserted[0];
-        $this->assertSame($role, $authorization->getRole());
-        $this->assertSame($user, $authorization->getSecurityIdentity());
-        $this->assertEquals($resource->getId(), $authorization->getEntityId());
-        $this->assertEquals('Tests\MyCLabs\ACL\Unit\Repository\Model\File', $authorization->getEntityClass());
+        $this->assertSame($role, $authorization->getRoleEntry());
+        $this->assertSame($user, $authorization->getIdentity());
+        $this->assertEquals($resource->getId(), $authorization->getResourceId()->getId());
+        $this->assertEquals(Model\File::class, $authorization->getResourceId()->getName());
         $this->assertEquals(Actions::all(), $authorization->getActions());
         $this->assertNull($authorization->getParentAuthorization());
         $this->assertEquals(0, count($authorization->getChildAuthorizations()));
@@ -106,11 +111,11 @@ class AuthorizationRepositoryTest extends \PHPUnit_Framework_TestCase
         $this->em->persist($user);
         $resource = new File();
         $this->em->persist($resource);
-        $role = new FileOwnerRole($user, $resource);
+        $role = new RoleEntry($user, 'owner', $resource);
         $this->em->persist($role);
         $this->em->flush();
 
-        $classResource = new ClassResource('\Tests\MyCLabs\ACL\Unit\Repository\Model\File');
+        $classResource = new ClassResource(Model\File::class);
 
         $authorizations = [
             // VIEW cascades (entity resource)
@@ -125,7 +130,7 @@ class AuthorizationRepositoryTest extends \PHPUnit_Framework_TestCase
         ];
 
         /** @var AuthorizationRepository $repository */
-        $repository = $this->em->getRepository('MyCLabs\ACL\Model\Authorization');
+        $repository = $this->em->getRepository(Authorization::class);
 
         $repository->insertBulk($authorizations);
 
@@ -145,13 +150,13 @@ class AuthorizationRepositoryTest extends \PHPUnit_Framework_TestCase
     /**
      * @depends testInsertBulk
      */
-    public function testIsAllowedOnEntity()
+    public function testHasAuthorizationOnEntity()
     {
         $user = new User();
         $this->em->persist($user);
         $resource = new File();
         $this->em->persist($resource);
-        $role = new FileOwnerRole($user, $resource);
+        $role = new RoleEntry($user, 'owner', $resource);
         $this->em->persist($role);
         $this->em->flush();
 
@@ -160,39 +165,38 @@ class AuthorizationRepositoryTest extends \PHPUnit_Framework_TestCase
         ];
 
         /** @var AuthorizationRepository $repository */
-        $repository = $this->em->getRepository('MyCLabs\ACL\Model\Authorization');
+        $repository = $this->em->getRepository(Authorization::class);
         $repository->insertBulk($authorizations);
 
-        $this->assertTrue($repository->isAllowedOnEntity($user, Actions::VIEW, $resource));
-        $this->assertFalse($repository->isAllowedOnEntity($user, Actions::EDIT, $resource));
+        $this->assertTrue($repository->hasAuthorization($user, Actions::VIEW, $resource));
+        $this->assertFalse($repository->hasAuthorization($user, Actions::EDIT, $resource));
     }
 
     /**
      * @depends testInsertBulk
      */
-    public function testIsAllowedOnEntityClass()
+    public function testHasAuthorizationOnEntityClass()
     {
         $user = new User();
         $this->em->persist($user);
         $resource = new File();
         $this->em->persist($resource);
-        $role = new FileOwnerRole($user, $resource);
+        $role = new RoleEntry($user, 'owner', $resource);
         $this->em->persist($role);
         $this->em->flush();
 
-        $class = 'Tests\MyCLabs\ACL\Unit\Repository\Model\File';
-        $classResource = new ClassResource($class);
+        $classResource = new ClassResource(Model\File::class);
 
         $authorizations = [
             Authorization::create($role, new Actions([ Actions::VIEW ]), $classResource),
         ];
 
         /** @var AuthorizationRepository $repository */
-        $repository = $this->em->getRepository('MyCLabs\ACL\Model\Authorization');
+        $repository = $this->em->getRepository(Authorization::class);
         $repository->insertBulk($authorizations);
 
-        $this->assertTrue($repository->isAllowedOnEntityClass($user, Actions::VIEW, $class));
-        $this->assertFalse($repository->isAllowedOnEntityClass($user, Actions::EDIT, $class));
+        $this->assertTrue($repository->hasAuthorization($user, Actions::VIEW, $classResource));
+        $this->assertFalse($repository->hasAuthorization($user, Actions::EDIT, $classResource));
     }
 
     /**
@@ -205,13 +209,13 @@ class AuthorizationRepositoryTest extends \PHPUnit_Framework_TestCase
 
         $resource1 = new File();
         $this->em->persist($resource1);
-        $role1 = new FileOwnerRole($user, $resource1);
+        $role1 = new RoleEntry($user, 'owner', $resource1);
         $this->em->persist($role1);
         $this->em->flush();
 
         $resource2 = new File();
         $this->em->persist($resource2);
-        $role2 = new FileOwnerRole($user, $resource2);
+        $role2 = new RoleEntry($user, 'owner', $resource2);
         $this->em->persist($role2);
         $this->em->flush();
 
@@ -221,14 +225,14 @@ class AuthorizationRepositoryTest extends \PHPUnit_Framework_TestCase
         ];
 
         /** @var AuthorizationRepository $repository */
-        $repository = $this->em->getRepository('MyCLabs\ACL\Model\Authorization');
+        $repository = $this->em->getRepository(Authorization::class);
         $repository->insertBulk($authorizations);
 
         // We remove the authorizations for the resource 1
-        $repository->removeAuthorizationsForResource($resource1);
+        $repository->removeForResource($resource1);
         // We check that they were removed
-        $this->assertFalse($repository->isAllowedOnEntity($user, Actions::VIEW, $resource1));
+        $this->assertFalse($repository->hasAuthorization($user, Actions::VIEW, $resource1));
         // and that authorizations for the resource 2 weren't removed
-        $this->assertTrue($repository->isAllowedOnEntity($user, Actions::VIEW, $resource2));
+        $this->assertTrue($repository->hasAuthorization($user, Actions::VIEW, $resource2));
     }
 }

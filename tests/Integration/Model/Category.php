@@ -3,29 +3,25 @@
 namespace Tests\MyCLabs\ACL\Integration\Model;
 
 use Doctrine\Common\Collections\ArrayCollection;
-use Doctrine\Common\Collections\Collection;
 use Doctrine\ORM\EntityManager;
 use Doctrine\ORM\Mapping as ORM;
 use MyCLabs\ACL\Model\CascadingResource;
 use MyCLabs\ACL\Model\ClassResource;
-use MyCLabs\ACL\Model\EntityResource;
+use MyCLabs\ACL\Model\EntityResourceTrait;
+use MyCLabs\ACL\Model\ResourceInterface;
 
 /**
  * @ORM\Entity
  */
-class Category implements EntityResource, CascadingResource
+class Category implements ResourceInterface, CascadingResource
 {
+    use EntityResourceTrait;
+
     /**
      * @ORM\Id @ORM\GeneratedValue
      * @ORM\Column(type="integer")
      */
     protected $id;
-
-    /**
-     * @var CategoryManagerRole[]|Collection
-     * @ORM\OneToMany(targetEntity="CategoryManagerRole", mappedBy="category")
-     */
-    protected $roles;
 
     /**
      * @var Category[]
@@ -41,7 +37,6 @@ class Category implements EntityResource, CascadingResource
 
     public function __construct(Category $parent = null)
     {
-        $this->roles = new ArrayCollection();
         $this->children = new ArrayCollection();
 
         if ($parent !== null) {

@@ -4,7 +4,6 @@ namespace Tests\MyCLabs\ACL\Integration;
 
 use MyCLabs\ACL\Model\Actions;
 use Tests\MyCLabs\ACL\Integration\Model\Article;
-use Tests\MyCLabs\ACL\Integration\Model\ArticleEditorRole;
 use Tests\MyCLabs\ACL\Integration\Model\User;
 
 /**
@@ -24,7 +23,7 @@ class IsAllowedTest extends AbstractIntegrationTest
 
         $this->em->flush();
 
-        $this->acl->grant($user, new ArticleEditorRole($user, $article2));
+        $this->acl->grant($user, 'ArticleEditor', $article2);
 
         $this->assertFalse($this->acl->isAllowed($user, Actions::VIEW, $article1));
         $this->assertFalse($this->acl->isAllowed($user, Actions::EDIT, $article1));

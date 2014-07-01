@@ -4,7 +4,6 @@ namespace Tests\MyCLabs\ACL\Integration;
 
 use Tests\MyCLabs\ACL\Integration\Model\Actions;
 use Tests\MyCLabs\ACL\Integration\Model\Article;
-use Tests\MyCLabs\ACL\Integration\Model\ArticlePublisherRole;
 use Tests\MyCLabs\ACL\Integration\Model\User;
 
 /**
@@ -24,7 +23,7 @@ class CustomActionsTest extends AbstractIntegrationTest
 
         $this->em->flush();
 
-        $this->acl->grant($user, new ArticlePublisherRole($user, $article2));
+        $this->acl->grant($user, 'ArticlePublisher', $article2);
 
         $this->assertFalse($this->acl->isAllowed($user, Actions::VIEW, $article1));
         $this->assertFalse($this->acl->isAllowed($user, Actions::PUBLISH, $article1));

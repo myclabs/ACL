@@ -5,15 +5,16 @@ namespace Tests\MyCLabs\ACL\Unit\Repository\Model;
 use Doctrine\Common\Collections\ArrayCollection;
 use Doctrine\Common\Collections\Collection;
 use Doctrine\ORM\Mapping as ORM;
-use MyCLabs\ACL\Model\SecurityIdentityInterface;
-use MyCLabs\ACL\Model\SecurityIdentityTrait;
+use MyCLabs\ACL\Model\Identity;
+use MyCLabs\ACL\Model\IdentityTrait;
+use MyCLabs\ACL\Model\RoleEntry;
 
 /**
  * @ORM\Entity
  */
-class User implements SecurityIdentityInterface
+class User implements Identity
 {
-    use SecurityIdentityTrait;
+    use IdentityTrait;
 
     /**
      * @ORM\Id @ORM\GeneratedValue
@@ -22,8 +23,8 @@ class User implements SecurityIdentityInterface
     protected $id;
 
     /**
-     * @var FileOwnerRole[]|Collection
-     * @ORM\OneToMany(targetEntity="FileOwnerRole", mappedBy="securityIdentity",
+     * @var RoleEntry[]|Collection
+     * @ORM\OneToMany(targetEntity="MyCLabs\ACL\Model\RoleEntry", mappedBy="identity",
      * cascade={"persist", "remove"}, orphanRemoval=true)
      */
     protected $roles;

@@ -22,15 +22,15 @@ allow very efficient filtering at the SQL level through Doctrine queries
 
 Requirements:
 
-- PHP 5.4
+- PHP 5.5
 - Use Doctrine as the ORM for your model
 - Doctrine 2.5 (currently in beta)
 
 Vocabulary:
 
-- **Security identity**: the entity which will be granted some access (this is generally the user)
+- **Identity**: the entity which will be granted some access (this is generally the user)
 - **Resource**: a *thing* to which we want to control the access
-- **Authorization**: allows a security identity (user) to do something on a resource
+- **Authorization**: allows an identity (user) to do something on a resource
 - **Role**: a role gives authorizations to a user (e.g. an administrator, an article editor, a project owner, …)
 
 There are 2 kinds of resources:
@@ -44,35 +44,35 @@ We hate being lost and confused, so everything you have to do with ACL is done o
 You can start by creating it:
 
 ```php
+$roles = [
+    // An article editor will be allowed to VIEW and EDIT an article
+    'ArticleEditor' => [
+        'resourceType' => 'Acme\Model\Article',
+        'actions'      => new Actions([ Actions::VIEW, Actions::EDIT ]),
+    ],
+];
+
 // full configuration shown in the documentation
-$acl = new ACL($entityManager);
+$acl = new ACL($entityManager, $roles);
 ```
 
-You give permissions to a user by adding it a role:
+Now you can grant a user the role and the resource to which it applies:
 
 ```php
-$acl->grant($user, new ArticleEditorRole($user, $article));
-```
-
-Roles are classes that you write and which define the permissions a user has on a resource.
-
-You remove permissions to a user by removing the role:
-
-```php
-$acl->revoke($user, $role);
+$acl->grant($user, 'ArticleEditor', $article);
 ```
 
 Test permissions:
 
 ```php
-$acl->isAllowed($user, Actions::EDIT, $article);
+echo $acl->isAllowed($user, Actions::EDIT, $article); // true
 ```
 
 You can also filter your queries to get only the entities the user has access to:
 
 ```php
 $qb = $entityManager->createQueryBuilder();
-$qb->select('article')->from('Model\Article', 'article');
+$qb->select('article')->from('Acme\Model\Article', 'article');
 
 ACLQueryHelper::joinACL($qb, $user, Actions::EDIT);
 
@@ -85,7 +85,7 @@ $articles = $qb->getQuery()->getResult();
 - stored in database (you don't need to handle persistence yourself)
 - extremely optimized:
   - filters queries at database level (you don't load entities the user can't access)
-  - joins with only 1 extra table
+  - joins with only 1 extra table only
   - bypasses Doctrine's ORM to insert authorizations in database (fast and efficient)
   - cascade delete at database level
 - authorization cascading/inheritance
@@ -95,4 +95,4 @@ $articles = $qb->getQuery()->getResult();
 ### Limitations
 
 - because of Doctrine limitations you need to flush your resources before giving or testing authorizations
-- backed up by the database: testing `isAllowed` means one call to the database
+- backed up by the database: testing `isAllowed` means one call to the database unless cached

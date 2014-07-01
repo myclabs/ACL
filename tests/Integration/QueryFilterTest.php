@@ -2,10 +2,10 @@
 
 namespace Tests\MyCLabs\ACL\Integration;
 
-use MyCLabs\ACL\Model\Actions;
 use MyCLabs\ACL\Doctrine\ACLQueryHelper;
+use MyCLabs\ACL\Model\Actions;
+use MyCLabs\ACL\Model\Authorization;
 use Tests\MyCLabs\ACL\Integration\Model\Article;
-use Tests\MyCLabs\ACL\Integration\Model\ArticleEditorRole;
 use Tests\MyCLabs\ACL\Integration\Model\User;
 
 /**
@@ -25,16 +25,16 @@ class QueryFilterTest extends AbstractIntegrationTest
 
         $this->em->flush();
 
-        $this->acl->grant($user, new ArticleEditorRole($user, $article2));
+        $this->acl->grant($user, 'ArticleEditor', $article2);
 
         $query = $this->em->createQuery(
-            'SELECT a FROM Tests\MyCLabs\ACL\Integration\Model\Article a
-            JOIN MyCLabs\ACL\Model\Authorization authorization WITH a.id = authorization.entityId
-            WHERE authorization.securityIdentity = :identity
-            AND authorization.entityClass = :entityClass
+            'SELECT a FROM ' . Model\Article::class . ' a
+            JOIN ' . Authorization::class . ' authorization WITH a.id = authorization.resource.id
+            WHERE authorization.identity = :identity
+            AND authorization.resource.name = :resourceName
             AND authorization.actions.view = true'
         );
-        $query->setParameter('entityClass', 'Tests\MyCLabs\ACL\Integration\Model\Article');
+        $query->setParameter('resourceName', Model\Article::class);
         $query->setParameter('identity', $user);
         $articles = $query->getResult();
 
@@ -54,10 +54,10 @@ class QueryFilterTest extends AbstractIntegrationTest
 
         $this->em->flush();
 
-        $this->acl->grant($user, new ArticleEditorRole($user, $article2));
+        $this->acl->grant($user, 'ArticleEditor', $article2);
 
         $qb = $this->em->createQueryBuilder();
-        $qb->select('a')->from('Tests\MyCLabs\ACL\Integration\Model\Article', 'a');
+        $qb->select('a')->from(Model\Article::class, 'a');
         ACLQueryHelper::joinACL($qb, $user, Actions::VIEW);
         $articles = $qb->getQuery()->getResult();
 
@@ -82,15 +82,15 @@ class QueryFilterTest extends AbstractIntegrationTest
         $this->em->flush();
 
         // Add the role twice => 2 authorizations for the same resource
-        $this->acl->grant($user, new ArticleEditorRole($user, $article2));
-        $this->acl->grant($user, new ArticleEditorRole($user, $article2));
+        $this->acl->grant($user, 'ArticleEditor', $article2);
+        $this->acl->grant($user, 'ArticleEditorCopy', $article2);
 
         // Check that there is really 2 authorizations created
-        $authorizations = $this->em->getRepository('MyCLabs\ACL\Model\Authorization')->findAll();
+        $authorizations = $this->em->getRepository(Authorization::class)->findAll();
         $this->assertCount(2, $authorizations);
 
         $qb = $this->em->createQueryBuilder();
-        $qb->select('a')->from('Tests\MyCLabs\ACL\Integration\Model\Article', 'a');
+        $qb->select('a')->from(Model\Article::class, 'a');
         ACLQueryHelper::joinACL($qb, $user, Actions::VIEW);
         $articles = $qb->getQuery()->getResult();
 

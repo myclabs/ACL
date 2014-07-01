@@ -9,4 +9,8 @@ namespace MyCLabs\ACL\Model;
  */
 interface ResourceInterface
 {
+    /**
+     * @return ResourceId
+     */
+    public function getResourceId();
 }

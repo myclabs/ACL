@@ -11,6 +11,8 @@ use Doctrine\ORM\Tools\SchemaTool;
 use Doctrine\ORM\Tools\Setup;
 use MyCLabs\ACL\ACL;
 use MyCLabs\ACL\Doctrine\ACLSetup;
+use MyCLabs\ACL\Model\ClassResource;
+use Tests\MyCLabs\ACL\Integration\Model\Actions;
 
 abstract class AbstractIntegrationTest extends \PHPUnit_Framework_TestCase
 {
@@ -59,22 +61,14 @@ abstract class AbstractIntegrationTest extends \PHPUnit_Framework_TestCase
 
     protected function createACL()
     {
-        return new ACL($this->em);
+        return new ACL($this->em, $this->getRoles());
     }
 
     private function configureACL()
     {
         $setup = new ACLSetup();
-        $setup->setSecurityIdentityClass('Tests\MyCLabs\ACL\Integration\Model\User');
-
-        $setup->registerRoleClass('Tests\MyCLabs\ACL\Integration\Model\ArticleEditorRole', 'articleEditor');
-        $setup->registerRoleClass('Tests\MyCLabs\ACL\Integration\Model\AllArticlesEditorRole', 'allArticlesEditor');
-        $setup->registerRoleClass('Tests\MyCLabs\ACL\Integration\Model\ArticlePublisherRole', 'articlePublisher');
-        $setup->registerRoleClass('Tests\MyCLabs\ACL\Integration\Model\CategoryManagerRole', 'categoryManager');
-
-        $setup->registerRoleClass('Tests\MyCLabs\ACL\Integration\Issues\Issue10\AccountAdminRole', 'accountAdmin');
-
-        $setup->setActionsClass('Tests\MyCLabs\ACL\Integration\Model\Actions');
+        $setup->setIdentityClass(Model\User::class);
+        $setup->setActionsClass(Model\Actions::class);
 
         return $setup;
     }
@@ -127,5 +121,39 @@ abstract class AbstractIntegrationTest extends \PHPUnit_Framework_TestCase
                 $connection->exec($stmt);
             }
         }
+    }
+
+    /**
+     * @return array
+     */
+    protected function getRoles()
+    {
+        $roles = [
+            'ArticleEditor'     => [
+                'resourceType' => Model\Article::class,
+                'actions'      => new Actions([Actions::VIEW, Actions::EDIT])
+            ],
+            'AllArticlesEditor' => [
+                'resource' => new ClassResource(Model\Article::class),
+                'actions'  => new Actions([Actions::VIEW, Actions::EDIT])
+            ],
+            'ArticlePublisher'  => [
+                'resourceType' => Model\Article::class,
+                'actions'      => new Actions([Actions::VIEW, Actions::PUBLISH])
+            ],
+            'CategoryManager'   => [
+                'resourceType' => Model\Category::class,
+                'actions'      => new Actions([Actions::VIEW])
+            ],
+            'ArticleEditorCopy' => [
+                'resourceType' => Model\Article::class,
+                'actions'      => new Actions([Actions::VIEW, Actions::EDIT])
+            ],
+            'AccountAdmin'      => [
+                'resourceType' => Issues\Issue10\Account::class,
+                'actions'      => Actions::all()
+            ]
+        ];
+        return $roles;
     }
 }

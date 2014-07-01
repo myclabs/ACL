@@ -6,7 +6,7 @@ use Doctrine\ORM\Event\LoadClassMetadataEventArgs;
 use Doctrine\ORM\Mapping\ClassMetadata;
 use Doctrine\ORM\Mapping\ClassMetadataFactory;
 use MyCLabs\ACL\Model\Actions;
-use MyCLabs\ACL\Model\Role;
+use MyCLabs\ACL\Model\Authorization;
 
 /**
  * Loads metadata relative to ACL in Doctrine.
@@ -16,32 +16,9 @@ use MyCLabs\ACL\Model\Role;
 class ACLMetadataLoader
 {
     /**
-     * Discriminator map for roles.
-     * @var string[]
-     */
-    private $roles = [];
-
-    /**
      * @var string
      */
     private $actionsClass;
-
-    /**
-     * Dynamically register a role subclass in the discriminator map for the Doctrine mapping.
-     *
-     * @param string $class
-     * @param string $shortName
-     *
-     * @throws \InvalidArgumentException The given class doesn't extend MyCLabs\ACL\Model\Role
-     */
-    public function registerRoleClass($class, $shortName)
-    {
-        if (! is_subclass_of($class, 'MyCLabs\ACL\Model\Role')) {
-            throw new \InvalidArgumentException(sprintf('%s doesn\'t extend MyCLabs\ACL\Model\Role', $class));
-        }
-
-        $this->roles[$shortName] = $class;
-    }
 
     /**
      * Registers an alternative "Actions" class to use in the authorization entity.
@@ -54,8 +31,8 @@ class ACLMetadataLoader
      */
     public function setActionsClass($class)
     {
-        if (! is_subclass_of($class, 'MyCLabs\ACL\Model\Actions')) {
-            throw new \InvalidArgumentException('The given class doesn\'t extend MyCLabs\ACL\Model\Actions');
+        if (! is_subclass_of($class, Actions::class)) {
+            throw new \InvalidArgumentException("The given class doesn't extend " . Actions::class);
         }
 
         $this->actionsClass = $class;
@@ -69,11 +46,7 @@ class ACLMetadataLoader
         /** @var ClassMetadata $metadata */
         $metadata = $eventArgs->getClassMetadata();
 
-        if ($metadata->getName() === 'MyCLabs\ACL\Model\Role') {
-            $metadata->setDiscriminatorMap($this->roles);
-        }
-
-        if (($this->actionsClass !== null) && ($metadata->getName() === 'MyCLabs\ACL\Model\Authorization')) {
+        if (($this->actionsClass !== null) && ($metadata->getName() === Authorization::class)) {
             $this->remapActions($metadata, $eventArgs->getEntityManager()->getMetadataFactory());
         }
     }
