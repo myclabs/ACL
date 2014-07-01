@@ -9,7 +9,7 @@ use Doctrine\ORM\EntityManager;
  *
  * @author Matthieu Napoli <matthieu@mnapoli.fr>
  */
-class ClassResource implements ResourceInterface, CascadingResource
+final class ClassResource implements ResourceInterface, CascadingResource
 {
     /**
      * @var string

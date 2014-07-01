@@ -12,7 +12,6 @@ use Doctrine\ORM\Tools\Setup;
 use MyCLabs\ACL\ACL;
 use MyCLabs\ACL\Doctrine\ACLSetup;
 use MyCLabs\ACL\Model\ClassResource;
-use MyCLabs\ACL\Model\VirtualResource;
 use Tests\MyCLabs\ACL\Integration\Model\Actions;
 
 abstract class AbstractIntegrationTest extends \PHPUnit_Framework_TestCase
@@ -94,11 +93,7 @@ abstract class AbstractIntegrationTest extends \PHPUnit_Framework_TestCase
             'AccountAdmin' => [
                 'resourceType' => Issues\Issue10\Account::class,
                 'actions' => Actions::all()
-            ],
-            'BackendAdmin' => [
-                'resource' => new VirtualResource('backend'),
-                'actions' => new Actions([Actions::VIEW]),
-            ],
+            ]
         ];
 
         $setup->registerRoles($roles, $this->acl);
