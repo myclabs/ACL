@@ -10,7 +10,7 @@ use MyCLabs\ACL\ACL;
 /**
  * Role.
  *
- * @ORM\Entity
+ * @ORM\Entity(repositoryClass="MyCLabs\ACL\Repository\RoleRepository")
  * @ORM\InheritanceType("JOINED")
  * @ORM\DiscriminatorColumn(name="type", type="string")
  * @ORM\Table(name="ACL_Role")
