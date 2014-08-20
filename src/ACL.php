@@ -13,6 +13,7 @@ use MyCLabs\ACL\Model\ResourceInterface;
 use MyCLabs\ACL\Model\Role;
 use MyCLabs\ACL\Model\SecurityIdentityInterface;
 use MyCLabs\ACL\Repository\AuthorizationRepository;
+use MyCLabs\ACL\Repository\RoleRepository;
 
 /**
  * Manages ACL.
@@ -169,6 +170,30 @@ class ACL
         $repository = $this->entityManager->getRepository('MyCLabs\ACL\Model\Authorization');
 
         $repository->removeAuthorizationsForResource($resource);
+    }
+
+    /**
+     * Clears and rebuilds all the authorization for a given resource.
+     *
+     * @param EntityResource $resource
+     */
+    public function rebuildAuthorizationsForResource(EntityResource $resource)
+    {
+        /** @var RoleRepository $roleRepository */
+        $roleRepository = $this->entityManager->getRepository('MyCLabs\ACL\Model\Role');
+        // Get all Role applied directly on the Resource.
+        $rolesDirectlyLinkedToResource = $roleRepository->findRolesDirectlyLinkedToResource($resource);
+
+        // Deletion of all the old authorizations.
+        $this->processDeletedResource($resource);
+
+        // Creation of all the parent authorizations.
+        $this->processNewResource($resource);
+
+        // Create Authorizations from Roles attached directly to the resource.
+        foreach ($rolesDirectlyLinkedToResource as $role) {
+            $role->createAuthorizations($this);
+        }
     }
 
     /**
