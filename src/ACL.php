@@ -177,7 +177,7 @@ class ACL
      *
      * @param EntityResource $resource
      */
-    public function rebuildResourceAuthorizations(EntityResource $resource)
+    public function rebuildAuthorizationsForResource(EntityResource $resource)
     {
         /** @var RoleRepository $roleRepository */
         $roleRepository = $this->entityManager->getRepository('MyCLabs\ACL\Model\Role');

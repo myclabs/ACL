@@ -34,7 +34,7 @@ class RebuildAuthorizationTest extends AbstractIntegrationTest
 
         $initialCount = $query->getSingleScalarResult();
 
-        $this->acl->rebuildResourceAuthorizations($article1);
+        $this->acl->rebuildAuthorizationsForResource($article1);
 
         $this->assertFalse($this->acl->isAllowed($user, Actions::VIEW, $article1));
         $this->assertFalse($this->acl->isAllowed($user, Actions::EDIT, $article1));
@@ -43,7 +43,7 @@ class RebuildAuthorizationTest extends AbstractIntegrationTest
 
         $this->assertEquals($initialCount, $query->getSingleScalarResult());
 
-        $this->acl->rebuildResourceAuthorizations($article2);
+        $this->acl->rebuildAuthorizationsForResource($article2);
 
         $this->assertFalse($this->acl->isAllowed($user, Actions::VIEW, $article1));
         $this->assertFalse($this->acl->isAllowed($user, Actions::EDIT, $article1));
