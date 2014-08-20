@@ -46,7 +46,6 @@ abstract class Role
 
     /**
      * @param ACL $acl
-     * @return Authorization[]
      */
     abstract public function createAuthorizations(ACL $acl);
 
