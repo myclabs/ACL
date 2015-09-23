@@ -84,7 +84,7 @@ That allows to bypass using Doctrine's "cascade remove" which loads all the enti
 be thousands of authorizations).
 
 However this means **your database must support CASCADE operations**. MySQL and PostgreSQL support it,
-but SQLite usually [needs a configuration step](http://www.sqlite.org/foreignkeys.html#fk_enable):
+but SQLite usually [needs a configuration step](https://www.sqlite.org/foreignkeys.html#fk_enable):
 
 ```php
 $entityManager->getConnection()->executeQuery('PRAGMA foreign_keys = ON');
