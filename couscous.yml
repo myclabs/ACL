@@ -2,7 +2,7 @@ templateUrl: https://github.com/myclabs/couscous-template
 
 template:
     # Base URL of the published website
-    baseUrl: http://myclabs.github.io/ACL
+    baseUrl: https://myclabs.github.io/ACL
 
     github:
         user: myclabs
@@ -46,7 +46,7 @@ template:
                 items:
                     work:
                         text: '<i class="fa fa-github"></i> MyCLabs\Work'
-                        absoluteUrl: http://myclabs.github.io/Work/
+                        absoluteUrl: https://myclabs.github.io/Work/
                     deepcopy:
                         text: '<i class="fa fa-github"></i> MyCLabs\DeepCopy'
                         absoluteUrl: https://github.com/myclabs/DeepCopy
@@ -55,4 +55,4 @@ template:
                         absoluteUrl: https://github.com/myclabs/php-enum
                     jqueryconfirm:
                         text: '<i class="fa fa-github"></i> jquery.confirm'
-                        absoluteUrl: http://myclabs.github.io/jquery.confirm/
+                        absoluteUrl: https://myclabs.github.io/jquery.confirm/
